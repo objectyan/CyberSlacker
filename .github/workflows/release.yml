@@ -56,7 +56,7 @@ jobs:
       shell: pwsh
       run: |
         $ver = "${{ github.ref_name }}".TrimStart('v')
-        if ($ver -notmatch '^\d+\.\d+\.\d+') { $ver += ".0" }\
+        if ($ver -notmatch '^\d+\.\d+\.\d+') { $ver += ".0" }
 
         wix build Package.wxs `
           -d AppVersion="$ver" `
