@@ -64,12 +64,36 @@ jobs:
             -arch ${{ matrix.arch }} `
             -o "Output/CyberSlacker_$($ver)_${{ matrix.arch }}.msi"
 
-      # 5. 将包存入暂存区
+      
+      # 5. 生成架构专属的 XML
+      - name: Generate Update XML
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $ver = $tag.TrimStart('v')
+          if ($ver -notmatch '^\d+\.\d+\.\d+') { $ver += ".0" }
+          $arch = "${{ matrix.arch }}"
+          
+          $xmlContent = @"
+          <?xml version="1.0" encoding="UTF-8"?>
+          <item>
+              <version>$ver</version>
+              <url>https://github.com/$(github.repository)/releases/download/$tag/CyberSlacker_$(arch).msi</url>
+              <changelog>https://github.com/$(github.repository)/releases/tag/$tag</changelog>
+              <mandatory>false</mandatory>
+          </item>
+          "@
+          $xmlContent | Set-Content -Path "Update_$(arch).xml" -Encoding utf8
+
+      
+      # 5. 上传当前架构的 MSI 和 XML 到暂存区
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: msi-${{ matrix.arch }}
-          path: Output/*.msi
+          name: assets-${{ matrix.arch }}
+          path: |
+            Output/*.msi
+            Update_${{ matrix.arch }}.xml
 
   # 发布任务
   release:
@@ -82,53 +106,44 @@ jobs:
           ref: master
           fetch-depth: 0
 
-      - name: Download all MSIs
+      - name: Download all artifacts (MSIs and XMLs)
         uses: actions/download-artifact@v4
         with:
-          pattern: msi-*
-          path: ./all_msis
+          pattern: assets-*
+          path: ./temp_all
           merge-multiple: true
 
       - name: List Downloaded Files
-        run: ls -R ./all_msis
+        run: ls -R ./temp_all
 
-      - name: Generate Arch-Specific XMLs
-        run: |
-          TAG="${{ github.ref_name }}"
-          VER="${TAG#v}"
-          # 确保版本号是 x.y.z.w 格式
-          if [[ ! $VER =~ ^[0-9]+\.[0-9]+\.[0-9]+ ]]; then VER="$VER.0"; fi
-          
-          ARCHS=("x64" "x86" "arm64")
-          for ARCH in "${ARCHS[@]}"; do
-            # 直接生成最简单的 XML 结构
-            cat <<EOF > Update_$ARCH.xml
-            <?xml version="1.0" encoding="UTF-8"?>
-            <item>
-                <version>$VER</version>
-                <url>https://github.com/${{ github.repository }}/releases/download/$TAG/CyberSlacker_$ARCH.msi</url>
-                <changelog>https://github.com/${{ github.repository }}/releases/tag/$TAG</changelog>
-                <mandatory>false</mandatory>
-            </item>
-            EOF
-          done
-
-      # 4. 推送 XML 回仓库
+      # 推送 XML 回仓库
       - name: Sync XML to Repo
+        shell: pwsh
         run: |
+          move "./temp_all/Update_*.xml" "./"
           git config --global user.name "github-actions"
           git config --global user.email "action@github.com"
           git add Update_*.xml
-          git commit -m "chore: auto-update multi-arch manifests for ${{ github.ref_name }}"
-          git push origin main
+          if ((git status --porcelain)) {
+              git commit -m "chore: auto-update multi-arch manifests for ${{ github.ref_name }}"
+              git push origin master
+          }
 
-      # 5. 【核心】使用 softprops 发布，关联生成的日志
-      - name: Final Release
+      # 使用 softprops 发布，关联生成的日志
+      - name: Create/Update GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           name: CyberSlacker ${{ github.ref_name }}
+          body: |
+            ## 📢 摸鱼员注意：赛博组件已进化！
+            > "钱是老板的，命是自己的。" 
+            本次版本更新已就绪，请各工位成员及时领取。
+            
+            ---
           generate_release_notes: true
-          files: ./all_msis/*.msi
+          files: ./temp_all/*.msi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # 推送至 WinGet
   publish-winget:
