@@ -2,7 +2,7 @@ name: Build and Release CyberSlacker
 
 on:
   push:
-    tags: ['v*']
+    tags: ["v*"]
 
 permissions:
   contents: write
@@ -13,68 +13,68 @@ jobs:
       fail-fast: false
       matrix:
         arch: [x64, x86, arm64]
-    
+
     runs-on: windows-latest
-    
+
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '8.0.x'
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
 
-    - name: Install WiX Toolset
-      run: dotnet tool install --global wix --version 6.0.2
+      - name: Install WiX Toolset
+        run: dotnet tool install --global wix --version 6.0.2
 
-    # 1. 编译发布程序 (2MB 模式)
-    - name: Publish Application
-      run: |
-        dotnet publish CyberSlacker/CyberSlacker.csproj `
-          -c Release `
-          -r win-${{ matrix.arch }} `
-          --self-contained false `
-          -o ./publish-${{ matrix.arch }}
+      # 1. 编译发布程序 (2MB 模式)
+      - name: Publish Application
+        run: |
+          dotnet publish CyberSlacker/CyberSlacker.csproj `
+            -c Release `
+            -r win-${{ matrix.arch }} `
+            --self-contained false `
+            -o ./publish-${{ matrix.arch }}
 
-    # 2. 物理隔离主 EXE，防止 WIX0369 重复定义
-    - name: Isolate Main Executable
-      shell: pwsh
-      run: |
-        mkdir ./exe-only-${{ matrix.arch }}
-        move "./publish-${{ matrix.arch }}/CyberSlacker.exe" "./exe-only-${{ matrix.arch }}/"
+      # 2. 物理隔离主 EXE，防止 WIX0369 重复定义
+      - name: Isolate Main Executable
+        shell: pwsh
+        run: |
+          mkdir ./exe-only-${{ matrix.arch }}
+          move "./publish-${{ matrix.arch }}/CyberSlacker.exe" "./exe-only-${{ matrix.arch }}/"
 
-    # 3. 【核心修复】启动 Windows Installer 服务，解决 WIX0001 (1631) 错误
-    - name: Enable Windows Installer Service
-      shell: pwsh
-      run: net start msiserver || echo "Service already running or inaccessible"
+      # 3. 【核心修复】启动 Windows Installer 服务，解决 WIX0001 (1631) 错误
+      - name: Enable Windows Installer Service
+        shell: pwsh
+        run: net start msiserver || echo "Service already running or inaccessible"
 
-    # 4. 构建 MSI
-    - name: Build MSI
-      shell: pwsh
-      run: |
-        $ver = "${{ github.ref_name }}".TrimStart('v')
-        if ($ver -notmatch '^\d+\.\d+\.\d+') { $ver += ".0" }
+      # 4. 构建 MSI
+      - name: Build MSI
+        shell: pwsh
+        run: |
+          $ver = "${{ github.ref_name }}".TrimStart('v')
+          if ($ver -notmatch '^\d+\.\d+\.\d+') { $ver += ".0" }
 
-        wix build Package.wxs `
-          -d AppVersion="$ver" `
-          -d AppArch="${{ matrix.arch }}" `
-          -arch ${{ matrix.arch }} `
-          -o "Output/CyberSlacker_$($ver)_${{ matrix.arch }}.msi"
-    
-    # 5. 将包存入暂存区
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: msi-${{ matrix.arch }}
-        path: Output/*.msi
+          wix build Package.wxs `
+            -d AppVersion="$ver" `
+            -d AppArch="${{ matrix.arch }}" `
+            -arch ${{ matrix.arch }} `
+            -o "Output/CyberSlacker_$($ver)_${{ matrix.arch }}.msi"
+
+      # 5. 将包存入暂存区
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: msi-${{ matrix.arch }}
+          path: Output/*.msi
 
   # 发布任务
   release:
     needs: build
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -88,49 +88,30 @@ jobs:
           pattern: msi-*
           path: ./all_msis
           merge-multiple: true
-      
+
       - name: List Downloaded Files
         run: ls -R ./all_msis
 
-      # 利用 GitHub CLI 提前生成系统日志，存入变量
-      - name: Generate System Release Notes
-        id: get_notes
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Generate Arch-Specific XMLs
         run: |
-          $tag = "${{ github.ref_name }}"
-          # 调用 GitHub 原生接口获取“自动生成的日志”
-          $notes = gh api repos/${{ github.repository }}/releases/generate-notes -f tag_name=$tag | ConvertFrom-Json
-          $body = $notes.body
-          # 将日志存入环境变量，解决多行字符串问题
-          $body | Out-File -FilePath "release_notes.md" -Encoding utf8
-          echo "CLEAN_VER=$($tag.TrimStart('v'))" >> $env:GITHUB_ENV
-
-      # 3. 更新所有架构的 Update.xml
-      - name: Update XMLs with System Notes
-        shell: pwsh
-        run: |
-          $ver = $env:CLEAN_VER
-          $tag = "${{ github.ref_name }}"
-          $changelog = Get-Content "release_notes.md" -Raw
-          $archs = @("x64", "x86", "arm64")
+          TAG="${{ github.ref_name }}"
+          VER="${TAG#v}"
+          # 确保版本号是 x.y.z.w 格式
+          if [[ ! $VER =~ ^[0-9]+\.[0-9]+\.[0-9]+ ]]; then VER="$VER.0"; fi
           
-          foreach ($a in $archs) {
-              [xml]$xml = Get-Content Update.xml
-              $xml.item.version = $ver
-              $xml.item.url = "https://github.com/${{ github.repository }}/releases/download/$tag/CyberSlacker_$($ver)_$a.msi"
-              
-              # 注入 description (使用系统生成的日志)
-              $item = $xml.SelectSingleNode("//item")
-              $descNode = $item.SelectSingleNode("description")
-              if ($null -eq $descNode) { 
-                  $descNode = $xml.CreateElement("description")
-                  $item.AppendChild($descNode)
-              }
-              $descNode.InnerXml = "<![CDATA[$changelog]]>"
-              $xml.Save("Update_$a.xml")
-          }
+          ARCHS=("x64" "x86" "arm64")
+          for ARCH in "${ARCHS[@]}"; do
+            # 直接生成最简单的 XML 结构
+            cat <<EOF > Update_$ARCH.xml
+            <?xml version="1.0" encoding="UTF-8"?>
+            <item>
+                <version>$VER</version>
+                <url>https://github.com/${{ github.repository }}/releases/download/$TAG/CyberSlacker_$ARCH.msi</url>
+                <changelog>https://github.com/${{ github.repository }}/releases/tag/$TAG</changelog>
+                <mandatory>false</mandatory>
+            </item>
+            EOF
+          done
 
       # 4. 推送 XML 回仓库
       - name: Sync XML to Repo
@@ -146,45 +127,17 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           name: CyberSlacker ${{ github.ref_name }}
-          # 既然我们已经手动抓了日志，这里可以用我们抓好的文件
-          body_path: release_notes.md
-          # 也可以保留这个让 GitHub 再次确认生成
-          generate_release_notes: true 
+          generate_release_notes: true
           files: ./all_msis/*.msi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  sync-manifests:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          ref: master 
-      - name: Download XMLs
-        uses: actions/download-artifact@v4
-        with:
-          path: ./temp_xmls
-          merge-multiple: true
-      - name: Sync and Push
-        run: |
-          mv ./temp_xmls/Update_*.xml ./
-          git config --global user.name "github-actions"
-          git config --global user.email "action@github.com"
-          git add Update_*.xml
-          if [ -n "$(git status --porcelain)" ]; then
-            git commit -m "chore: update manifests for ${{ github.ref_name }}"
-            git push origin master
-          fi
-          
+  # 推送至 WinGet
   publish-winget:
-    needs: sync-manifests
+    needs: release
     runs-on: ubuntu-latest
     steps:
-    - name: Submit to WinGet
-      uses: vedantmgoyal9/winget-releaser@v2
-      with:
-        identifier: LaborLogic.CyberSlacker
-        installers-regex: '.*\.msi$'
-        token: ${{ secrets.WINGET_TOKEN }}
+      - name: Submit to WinGet
+        uses: vedantmgoyal9/winget-releaser@v2
+        with:
+          identifier: LaborLogic.CyberSlacker
+          installers-regex: '.*\.msi$'
+          token: ${{ secrets.WINGET_TOKEN }}
