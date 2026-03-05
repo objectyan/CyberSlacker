@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <item>
     <version>1.0.1</version>
-    <url>https://github.com/objectyan/CyberSlacker/releases/download/v1.0.1/CyberSlacker_arm64.msi</url>
+    <url>https://github.com/objectyan/CyberSlacker/releases/download/v1.0.1/CyberSlacker_1.0.1_arm64.msi</url>
     <changelog>https://github.com/objectyan/CyberSlacker/releases/tag/v1.0.1</changelog>
     <mandatory>false</mandatory>
 </item>
