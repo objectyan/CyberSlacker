@@ -78,8 +78,8 @@ jobs:
           <?xml version="1.0" encoding="UTF-8"?>
           <item>
               <version>$ver</version>
-              <url>https://github.com/$(github.repository)/releases/download/$tag/CyberSlacker_$(arch).msi</url>
-              <changelog>https://github.com/$(github.repository)/releases/tag/$tag</changelog>
+              <url>https://github.com/${{ github.repository }}/releases/download/$tag/CyberSlacker_$(ver)_$(arch).msi</url>
+              <changelog>https://github.com/${{ github.repository }}/releases/tag/$tag</changelog>
               <mandatory>false</mandatory>
           </item>
           "@
