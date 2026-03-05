@@ -55,37 +55,104 @@ jobs:
     - name: Build MSI
       shell: pwsh
       run: |
-        $tag = "${{ github.ref_name }}"
-        $ver = $tag.TrimStart('v')
-        if ($ver -notmatch '^\d+\.\d+\.\d+') { $ver += ".0" }
+        $ver = "${{ github.ref_name }}".TrimStart('v')
+        if ($ver -notmatch '^\d+\.\d+\.\d+') { $ver += ".0" }\
 
         wix build Package.wxs `
           -d AppVersion="$ver" `
           -d AppArch="${{ matrix.arch }}" `
           -arch ${{ matrix.arch }} `
           -o "Output/CyberSlacker_$($ver)_${{ matrix.arch }}.msi"
-
-        # 生成架构专属 XML (AutoUpdater.NET 用)
-        if (-not (Test-Path "Update.xml")) {
-            "<item><version>0.0.0</version><url></url></item>" | Out-File -FilePath "Update.xml" -Encoding utf8
-        }
-        [xml]$xml = Get-Content Update.xml
-        $xml.item.version = $ver
-        $xml.item.url = "https://github.com/${{ github.repository }}/releases/download/$tag/CyberSlacker_$($ver)_${{ matrix.arch }}.msi"
-        $xml.Save("Update_${{ matrix.arch }}.xml")
-
-    - name: Upload XML Artifact
+    
+    # 5. 将包存入暂存区
+    - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: xml-${{ matrix.arch }}
-        path: Update_${{ matrix.arch }}.xml
+        name: msi-${{ matrix.arch }}
+        path: Output/*.msi
 
-    - name: Create GitHub Release
-      uses: softprops/action-gh-release@v2
-      with:
-        files: ./Output/*.msi
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # 发布任务
+  release:
+    needs: build
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Download all MSIs
+        uses: actions/download-artifact@v4
+        with:
+          pattern: msi-*
+          path: ./all_msis
+          merge-multiple: true
+      
+      - name: List Downloaded Files
+        run: ls -R ./all_msis
+
+      # 利用 GitHub CLI 提前生成系统日志，存入变量
+      - name: Generate System Release Notes
+        id: get_notes
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag = "${{ github.ref_name }}"
+          # 调用 GitHub 原生接口获取“自动生成的日志”
+          $notes = gh api repos/${{ github.repository }}/releases/generate-notes -f tag_name=$tag | ConvertFrom-Json
+          $body = $notes.body
+          # 将日志存入环境变量，解决多行字符串问题
+          $body | Out-File -FilePath "release_notes.md" -Encoding utf8
+          echo "CLEAN_VER=$($tag.TrimStart('v'))" >> $env:GITHUB_ENV
+
+      # 3. 更新所有架构的 Update.xml
+      - name: Update XMLs with System Notes
+        shell: pwsh
+        run: |
+          $ver = $env:CLEAN_VER
+          $tag = "${{ github.ref_name }}"
+          $changelog = Get-Content "release_notes.md" -Raw
+          $archs = @("x64", "x86", "arm64")
+          
+          foreach ($a in $archs) {
+              [xml]$xml = Get-Content Update.xml
+              $xml.item.version = $ver
+              $xml.item.url = "https://github.com/${{ github.repository }}/releases/download/$tag/CyberSlacker_$($ver)_$a.msi"
+              
+              # 注入 description (使用系统生成的日志)
+              $item = $xml.SelectSingleNode("//item")
+              $descNode = $item.SelectSingleNode("description")
+              if ($null -eq $descNode) { 
+                  $descNode = $xml.CreateElement("description")
+                  $item.AppendChild($descNode)
+              }
+              $descNode.InnerXml = "<![CDATA[$changelog]]>"
+              $xml.Save("Update_$a.xml")
+          }
+
+      # 4. 推送 XML 回仓库
+      - name: Sync XML to Repo
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "action@github.com"
+          git add Update_*.xml
+          git commit -m "chore: auto-update multi-arch manifests for ${{ github.ref_name }}"
+          git push origin main
+
+      # 5. 【核心】使用 softprops 发布，关联生成的日志
+      - name: Final Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: CyberSlacker ${{ github.ref_name }}
+          # 既然我们已经手动抓了日志，这里可以用我们抓好的文件
+          body_path: release_notes.md
+          # 也可以保留这个让 GitHub 再次确认生成
+          generate_release_notes: true 
+          files: ./all_msis/*.msi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   sync-manifests:
     needs: build
