@@ -1,0 +1,72 @@
+﻿<Window x:Class="CyberSlacker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:tb="clr-namespace:H.NotifyIcon;assembly=H.NotifyIcon.Wpf"
+        Title="打工人小组件"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ShowInTaskbar="False" Topmost="False" 
+         WindowStartupLocation="Manual" 
+        Left="100" 
+        Top="100" 
+        Height="300" 
+        Width="300">
+
+    <Grid Background="#01000000" MouseLeftButtonDown="Window_MouseLeftButtonDown" Margin="0,0,0,0">
+        <!-- 系统托盘图标 -->
+        <tb:TaskbarIcon x:Name="MyNotifyIcon"  ToolTipText="{Binding TaskbarTooltip}" Margin="0,0,0,36">
+            <tb:TaskbarIcon.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="设置信息" Click="OpenSettings_Click"/>
+                    <Separator/>
+                    <MenuItem Header="退出程序" Click="ExitApp_Click"/>
+                </ContextMenu>
+            </tb:TaskbarIcon.ContextMenu>
+        </tb:TaskbarIcon>
+
+        <!-- 主体视觉部分 -->
+        <Border Background="#CC111111" CornerRadius="20" BorderBrush="#33FFFFFF" BorderThickness="1">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="15" ShadowDepth="0" Color="Black" Opacity="0.5"/>
+            </Border.Effect>
+
+            <StackPanel Margin="20">
+                <!-- 顶部节日/状态提示 -->
+                <Border Background="#22FFFFFF" Padding="12,8" CornerRadius="8" Margin="0,0,0,15" MinHeight="50">
+                    <TextBlock Text="{Binding HolidayTip}" 
+                               Foreground="White" 
+                               FontSize="13" 
+                               HorizontalAlignment="Center" 
+                               VerticalAlignment="Center"
+                               TextWrapping="Wrap" 
+                               TextAlignment="Center" 
+                               LineHeight="20"/>
+                </Border>
+
+                <!-- 下班倒计时 -->
+                <StackPanel Margin="0,0,0,10">
+                    <TextBlock Text="距离下班还有" Foreground="#888" FontSize="11"/>
+                    <TextBlock Text="{Binding OffWorkCountdown}" Foreground="#FF5252" FontSize="36" FontWeight="Bold"/>
+                </StackPanel>
+
+                <!-- 周末/节假日混合显示 -->
+                <StackPanel Margin="0,0,0,8">
+                    <TextBlock Text="距离周末还有" Foreground="#888" FontSize="11"/>
+                    <TextBlock Text="{Binding WeekendCountdown}" Foreground="White" FontSize="15"/>
+                </StackPanel>
+
+                <!-- 发薪日 -->
+                <StackPanel Margin="0,0,0,8">
+                    <TextBlock Text="距离发薪日还有" Foreground="#888" FontSize="11"/>
+                    <TextBlock Text="{Binding PayDayCountdown}" Foreground="Gold" FontSize="15" FontWeight="Bold"/>
+                </StackPanel>
+
+                <!-- 下一个节日 -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="下一个节日 " Foreground="#888" FontSize="11"/>
+                    <TextBlock Text="{Binding NextHolidayName}" Foreground="LimeGreen" FontSize="14" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding NextHolidayCountdown}" Foreground="White" FontSize="14"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

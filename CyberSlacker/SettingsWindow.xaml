@@ -1,0 +1,146 @@
+﻿<Window x:Class="CyberSlacker.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:CyberSlacker.Converters"
+        Title="设置中心" Height="Auto" Width="420" 
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#F3F3F3">
+
+    <Window.Resources>
+        <!-- 引入转换器，用于 RadioButton 绑定 int 值 -->
+        <local:EnumToBooleanConverter x:Key="IntToBool"/>
+
+        <!-- 定义统一的样式，让界面整洁 -->
+        <Style TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="#333"/>
+        </Style>
+    </Window.Resources>
+
+    <Border Padding="25">
+        <StackPanel>
+            <TextBlock Text="打工人助手设置" FontSize="20" FontWeight="Bold" Margin="0,0,0,25"/>
+
+            <TextBlock Text="精准工时" FontWeight="Bold" Margin="0,10,0,10"/>
+            <!-- 考勤时间 -->
+            <TextBlock Text="* 考勤时间" FontWeight="SemiBold" Margin="0,0,0,8"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                <ComboBox x:Name="StartHour" Width="60"/>
+                <TextBlock Text=" : " Margin="5,0"/>
+                <ComboBox x:Name="StartMin" Width="60"/>
+                <TextBlock Text=" 至 " Margin="15,0"/>
+                <ComboBox x:Name="EndHour" Width="60"/>
+                <TextBlock Text=" : " Margin="5,0"/>
+                <ComboBox x:Name="EndMin" Width="60"/>
+            </StackPanel>
+
+            <!-- 点饭提醒 -->
+            <TextBlock Text="* 点饭提醒："  FontWeight="SemiBold" Margin="0,0,0,8"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                <ComboBox x:Name="MealHour" Width="60"/>
+                <TextBlock Text=" : " VerticalAlignment="Center"/>
+                <ComboBox x:Name="MealMin" Width="60"/>
+                <TextBlock Text=" (通常设为11:50)" FontSize="10" Foreground="Gray" Margin="10,0,0,0"/>
+            </StackPanel>
+
+            <!-- 午休设置 -->
+            <TextBlock Text="* 午休时间：" FontWeight="SemiBold" Margin="0,0,0,8"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                <ComboBox x:Name="LunchStartHour" Width="60"/>
+                <TextBlock Text=" : " Margin="5,0"/>
+                <ComboBox x:Name="LunchStartMin" Width="60"/>
+                <TextBlock Text=" 至 " Margin="15,0"/>
+                <ComboBox x:Name="LunchEndHour" Width="60"/>
+                <TextBlock Text=" : "  Margin="5,0"/>
+                <ComboBox x:Name="LunchEndMin" Width="60"/>
+            </StackPanel>
+
+            <!-- 发薪设置 -->
+            <TextBlock Text="* 发薪日设置" FontWeight="SemiBold" Margin="0,0,0,8"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <TextBlock Text="每月 "/>
+                <TextBox x:Name="PayDayInput"  Text="{Binding PayDay, UpdateSourceTrigger=PropertyChanged}" Width="50" Padding="3" HorizontalContentAlignment="Center"  PreviewTextInput="NumberValidationTextBox"/>
+                <TextBlock Text=" 号发放"/>
+            </StackPanel>
+
+            <TextBlock Text="发薪日遇周末策略：" FontSize="12" Foreground="#666" Margin="0,0,0,5"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                <RadioButton Content="提前发放" Margin="0,0,15,0"
+                             IsChecked="{Binding PaydayStrategy, Converter={StaticResource IntToBool}, ConverterParameter=0}"/>
+                <RadioButton Content="延后发放" 
+                             IsChecked="{Binding PaydayStrategy, Converter={StaticResource IntToBool}, ConverterParameter=1}"/>
+            </StackPanel>
+
+            <!-- 工作制 -->
+            <TextBlock Text="* 工作制" FontWeight="SemiBold" Margin="0,0,0,8"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <RadioButton Content="双休" Margin="0,0,15,0"
+                             IsChecked="{Binding WorkMode, Converter={StaticResource IntToBool}, ConverterParameter=0}"/>
+                <RadioButton Content="大小周" Margin="0,0,15,0"
+                             IsChecked="{Binding WorkMode, Converter={StaticResource IntToBool}, ConverterParameter=1}"/>
+                <RadioButton Content="单休" 
+                             IsChecked="{Binding WorkMode, Converter={StaticResource IntToBool}, ConverterParameter=2}"/>
+            </StackPanel>
+            <TextBlock Text="大小周按单周单休、双周双休计算" FontSize="11" Foreground="Gray" Margin="0,0,0,20"/>
+
+            <Border BorderBrush="#DDD" BorderThickness="0,1,0,0" Padding="0,15,0,0">
+            </Border>
+
+            <!-- 周期性小憩设置 -->
+            <StackPanel Margin="0,0,0,20">
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <CheckBox x:Name="RestEnabledCheck" Content="开启久坐提醒" 
+       IsChecked="{Binding IsRestEnabled}" VerticalAlignment="Center"/>
+                    <TextBlock Text="(每隔一段时间提醒活动)" FontSize="11" Foreground="Gray" Margin="10,0,0,0"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" IsEnabled="{Binding IsRestEnabled}">
+                    <TextBlock Text="提醒间隔：" Width="80"/>
+                    <!-- 使用 Slider 滑动选择 30-120 分钟 -->
+                    <Slider x:Name="RestIntervalSlider" Minimum="30" Maximum="120" Width="180" 
+     Value="{Binding RestInterval}" TickFrequency="5" IsSnapToTickEnabled="True"/>
+                    <TextBlock Text="{Binding RestInterval}" Margin="10,0,0,0" FontWeight="Bold"/>
+                    <TextBlock Text=" 分钟"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- 下班提醒 -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                <TextBlock Text="下班提醒："  Width="80"/>
+                <TextBlock Text="提前 " Margin="10,0,0,0"/>
+                <Slider Minimum="5" Maximum="120" Width="150" Value="{Binding PreOffWorkMins}" TickFrequency="5" IsSnapToTickEnabled="True"/>
+                <TextBlock Text="{Binding PreOffWorkMins}" FontWeight="Bold"/>
+                <TextBlock Text=" 分钟"/>
+            </StackPanel>
+
+            <!-- 外观设置 -->
+            <Border BorderBrush="#DDD" BorderThickness="0,1,0,0" Padding="0,5,0,0">
+            </Border>
+            <TextBlock Text="外观设置" FontWeight="Bold" Margin="0,10,0,10"/>
+            <StackPanel Margin="0,0,0,20">
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <TextBlock Text="透明度：" Width="80"/>
+                    <Slider Value="{Binding Opacity, Mode=TwoWay}" Minimum="0.2" Maximum="1.0" Width="200" TickFrequency="0.1" IsSnapToTickEnabled="True"/>
+                    <TextBlock Text="{Binding Opacity, StringFormat={}{0:P0}}" Margin="10,0,0,0"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- 系统设置 -->
+            <Border BorderBrush="#DDD" BorderThickness="0,1,0,0" Padding="0,15,0,0">
+                <CheckBox Content="开机自动启动" FontSize="13"
+                          IsChecked="{Binding IsAutoStart, Mode=TwoWay}"/>
+            </Border>
+
+            <!-- 底部按钮 -->
+            <Button Content="保存并应用" Click="OnSave_Click" Margin="0,30,0,0"
+                    Height="35" Width="120" HorizontalAlignment="Right"
+                    Background="#2196F3" Foreground="White" BorderThickness="0">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="4"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+        </StackPanel>
+    </Border>
+</Window>

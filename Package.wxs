@@ -1,0 +1,57 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+
+  <Package Name="CyberSlacker (赛博摸鱼员)" 
+           Manufacturer="LaborLogic" 
+           Version="$(var.AppVersion)" 
+           UpgradeCode="9B7E1234-A1B2-C3D4-E5F6-7890ABCDEF12"
+           Scope="perUser" 
+           Language="2052">
+
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- 目录定义 -->
+    <StandardDirectory Id="LocalAppDataFolder">
+      <Directory Id="INSTALLFOLDER" Name="CyberSlacker" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="StartMenuDir" Name="赛博摸鱼员" />
+    </StandardDirectory>
+
+    <ComponentGroup Id="MainComponents" Directory="INSTALLFOLDER">
+      
+      <!-- 1. 主程序：从隔离出的 exe-only 文件夹读取 -->
+      <Component Guid="*">
+        <File Id="MainExeFile" 
+              Source="exe-only-$(var.AppArch)\CyberSlacker.exe" 
+              KeyPath="yes">
+          <Shortcut Name="赛博摸鱼员"
+                    Directory="StartMenuDir"
+                    Advertise="yes"
+                    Icon="app.ico" />
+        </File>
+      </Component>
+
+       <!-- 2. 全量采集：从 publish 文件夹提取 (此时里面已经没有主 EXE 了) -->
+      <Files Include="publish-$(var.AppArch)\**" />
+
+      <!-- 3. 清理组件 -->
+      <Component Directory="StartMenuDir" Guid="*">
+        <RemoveFolder On="uninstall" />
+        <RegistryValue Root="HKCU" 
+                       Key="Software\LaborLogic\CyberSlacker" 
+                       Name="installed" 
+                       Type="integer" 
+                       Value="1" 
+                       KeyPath="yes" />
+      </Component>
+             
+    </ComponentGroup>
+
+    <Icon Id="app.ico" SourceFile="CyberSlacker\Resources\app.ico" />
+
+    <Feature Id="Main">
+      <ComponentGroupRef Id="MainComponents" />
+    </Feature>
+  </Package>
+</Wix>
