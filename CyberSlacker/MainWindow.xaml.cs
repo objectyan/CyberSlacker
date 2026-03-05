@@ -40,13 +40,7 @@ namespace CyberSlacker
             _vm = new MainViewModel();
             this.DataContext = _vm;
 
-            AutoUpdater.DownloadPath = Path.Combine(Path.GetTempPath(), "CyberSlackerUpdates");
-            string arch = RuntimeInformation.ProcessArchitecture.ToString().ToLower();
-            AutoUpdater.Start($"https://raw.githubusercontent.com/objectyan/CyberSlacker/main/Update_{arch}.xml");
-            AutoUpdater.ShowSkipButton = true;      // 允许跳过此版本
-            AutoUpdater.ShowRemindLaterButton = true; // 允许稍后提醒
-            AutoUpdater.RunUpdateAsAdmin = true;
-
+            AutoUpdater.Start(App.GetUpdateUrl());
 
             WeakReferenceMessenger.Default.Register<string[], string>(this, "NotifyOffWork", (r, m) =>
             {
@@ -139,7 +133,25 @@ namespace CyberSlacker
             sw.ShowDialog();
         }
 
-        private void ExitApp_Click(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
+        private void OnOpenAbout(object sender, RoutedEventArgs e)
+        {
+            AboutWindow aw = new AboutWindow();
+            aw.Owner = this;
+            aw.ShowDialog();
+        }
+
+        private void ExitApp_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Application.Current.Shutdown();
+                System.Environment.Exit(0);
+            }
+            catch
+            {
+                System.Diagnostics.Process.GetCurrentProcess().Kill();
+            }
+        }
 
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
