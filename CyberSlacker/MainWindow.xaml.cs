@@ -22,7 +22,6 @@ namespace CyberSlacker
     public partial class MainWindow : Window
     {
         private bool _isTopmost = false;
-        private bool _hasNotifiedMeal = false;
         IntPtr shellView = IntPtr.Zero;
         private double _windowsScalingFactor;
         private readonly MainViewModel _vm;

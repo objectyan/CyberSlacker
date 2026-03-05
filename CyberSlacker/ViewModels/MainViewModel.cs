@@ -22,12 +22,12 @@ namespace CyberSlacker.ViewModels
 
         [ObservableProperty] private string _offWorkCountdown = "计算中...";
         [ObservableProperty] private string _weekendCountdown = "同步中...";
-        [ObservableProperty] private string _payDayCountdown;
+        [ObservableProperty] private string _payDayCountdown = "计算中...";
         [ObservableProperty] private string _holidayTip = "正在加载...";
-        [ObservableProperty] private string _nextHolidayName = "加载中";
-        [ObservableProperty] private string _nextHolidayCountdown;
-        [ObservableProperty] private string _currentTime;
-        [ObservableProperty] private string _taskbarTooltip;
+        [ObservableProperty] private string _nextHolidayName = "加载中...";
+        [ObservableProperty] private string _nextHolidayCountdown = "加载中...";
+        [ObservableProperty] private string _currentTime = "计算中...";
+        [ObservableProperty] private string _taskbarTooltip = "打工小组件";
 
         public MainViewModel()
         {

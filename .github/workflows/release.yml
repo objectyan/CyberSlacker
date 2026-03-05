@@ -78,7 +78,7 @@ jobs:
           <?xml version="1.0" encoding="UTF-8"?>
           <item>
               <version>$ver</version>
-              <url>https://github.com/${{ github.repository }}/releases/download/$tag/CyberSlacker_$ver_$arch.msi</url>
+              <url>https://github.com/${{ github.repository }}/releases/download/$tag/CyberSlacker_${ver}_${arch}.msi</url>
               <changelog>https://github.com/${{ github.repository }}/releases/tag/$tag</changelog>
               <mandatory>false</mandatory>
           </item>
@@ -141,7 +141,7 @@ jobs:
             
             ---
           generate_release_notes: true
-          files: ./temp_all/*.msi
+          files: ./temp_all/Output/*.msi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
