@@ -37,14 +37,33 @@ jobs:
             -p:PublishSingleFile=false `
             -p:Version=$ver `
             -o ./publish-${{ matrix.arch }}
+     
+      - name: Install WiX Toolset
+        run: |
+          dotnet tool install --global wix --version 6.0.2
 
-      - name: Build Installer (ISCC)
+      - name: Install WiX Extensions
+        run: |
+          wix extension add WixToolset.Netfx.wixext/6.0.2
+          
+      - name: Enable Windows Installer Service
+        shell: pwsh
+        run: |
+          Start-Service -Name "msiserver" -ErrorAction SilentlyContinue
+      
+      - name: Build Installer (WiX)
         shell: pwsh
         run: |
           $ver = "${{ github.ref_name }}".TrimStart('v')
-          # 运行系统自带的 Inno Setup 编译器
-          iscc /DAppArch=${{ matrix.arch }} /DAppVersion=$ver "installer.iss"
-      
+          if ($ver -notmatch '^\d+\.\d+\.\d+') { $ver += ".0" }
+          
+          wix build Package.wxs `
+            -ext WixToolset.Netfx.wixext/6.0.2 `
+            -d AppVersion="$ver" `
+            -d AppArch="${{ matrix.arch }}" `
+            -arch ${{ matrix.arch }} `
+            -o "Output/CyberSlacker_$($ver)_${{ matrix.arch }}.msi"
+
       - name: Generate XML
         shell: pwsh
         run: |
@@ -57,7 +76,7 @@ jobs:
           <?xml version="1.0" encoding="UTF-8"?>
           <item>
               <version>$ver</version>
-              <url>https://github.com/${{ github.repository }}/releases/download/$tag/CyberSlacker_v${ver}_${arch}_Setup.exe</url>
+              <url>https://github.com/${{ github.repository }}/releases/download/$tag/CyberSlacker_${ver}_${arch}.msi</url>
               <changelog>https://github.com/${{ github.repository }}/releases/tag/$tag</changelog>
               <mandatory>true</mandatory>
           </item>
@@ -69,7 +88,7 @@ jobs:
         with:
           name: assets-${{ matrix.arch }}
           path: |
-            Output/*.exe
+            Output/*.msi
             Update_${{ matrix.arch }}.xml
 
   # 发布任务
@@ -116,7 +135,7 @@ jobs:
             
             ---
           generate_release_notes: true
-          files: ./temp_all/Output/*.exe
+          files: ./temp_all/Output/*.msi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

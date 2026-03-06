@@ -1,16 +1,26 @@
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:netfx="http://wixtoolset.org/schemas/v4/wxs/netfx">
 
-  <Package Name="CyberSlacker (赛博摸鱼员)" 
-           Manufacturer="LaborLogic" 
-           Version="$(var.AppVersion)" 
+  <Package Name="CyberSlacker (赛博摸鱼员)"
+           Manufacturer="LaborLogic"
+           Version="$(var.AppVersion)"
            UpgradeCode="9B7E1234-A1B2-C3D4-E5F6-7890ABCDEF12"
-           Scope="perUser" 
+           Scope="perUser"
            Language="2052">
 
     <!-- 强制关闭重启管理器，防止因为占用文件导致安装挂起 -->
     <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" />
-  
-    <!-- 确保静默安装时不需要用户点击 -->
+    
+    <netfx:DotNetCompatibilityCheck  Property="NETDESKTOPSTATUS"
+                                     RollForward="major"
+                                     RuntimeType="desktop"
+                                     Platform="$(var.AppArch)"
+                                     Version="8.0.0">
+    </netfx:DotNetCompatibilityCheck>
+
+    <Launch Condition="Installed OR NETDESKTOPSTATUS = 0"
+            Message="本软件需要安装 .NET 8.0 ($(var.AppArch)) 桌面运行时，请安装后再试。" />
+
     <Property Id="ARPNOMODIFY" Value="1" />
 
     <MediaTemplate EmbedCab="yes" />
@@ -24,12 +34,22 @@
       <Directory Id="StartMenuDir" Name="赛博摸鱼员" />
     </StandardDirectory>
 
+    <!-- 安装完成后 运行主程序 -->
+    <CustomAction Id="RunAfterInstall" 
+                FileRef="MainExeFile" 
+                ExeCommand="" 
+                Execute="immediate" 
+                Return="asyncNoWait" />
+    <InstallExecuteSequence>
+      <Custom Action="RunAfterInstall" After="InstallFinalize" Condition="NOT Installed" />
+    </InstallExecuteSequence>
+
     <ComponentGroup Id="MainComponents" Directory="INSTALLFOLDER">
-      
+
       <!-- 1. 主程序：从隔离出的 exe-only 文件夹读取 -->
       <Component Guid="*">
-        <File Id="MainExeFile" 
-              Source="exe-only-$(var.AppArch)\CyberSlacker.exe" 
+        <File Id="MainExeFile"
+              Source="publish-$(var.AppArch)\CyberSlacker.exe"
               KeyPath="yes">
           <Shortcut Name="赛博摸鱼员"
                     Directory="StartMenuDir"
@@ -38,20 +58,22 @@
         </File>
       </Component>
 
-       <!-- 2. 全量采集：从 publish 文件夹提取 (此时里面已经没有主 EXE 了) -->
-      <Files Include="publish-$(var.AppArch)\**" />
+      <!-- 2. 全量采集：从 publish 文件夹提取 (此时里面已经没有主 EXE 了) -->
+      <Files Include="publish-$(var.AppArch)\**" >
+        <Exclude Files="publish-$(var.AppArch)\CyberSlacker.exe" />
+      </Files>
 
       <!-- 3. 清理组件 -->
       <Component Directory="StartMenuDir" Guid="*">
         <RemoveFolder On="uninstall" />
-        <RegistryValue Root="HKCU" 
-                       Key="Software\LaborLogic\CyberSlacker" 
-                       Name="installed" 
-                       Type="integer" 
-                       Value="1" 
+        <RegistryValue Root="HKCU"
+                       Key="Software\LaborLogic\CyberSlacker"
+                       Name="installed"
+                       Type="integer"
+                       Value="1"
                        KeyPath="yes" />
       </Component>
-             
+
     </ComponentGroup>
 
     <Icon Id="app.ico" SourceFile="CyberSlacker\Resources\app.ico" />
@@ -59,5 +81,6 @@
     <Feature Id="Main">
       <ComponentGroupRef Id="MainComponents" />
     </Feature>
+
   </Package>
 </Wix>
