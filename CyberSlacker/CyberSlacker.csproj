@@ -20,6 +20,8 @@
     <Title></Title>
     <PackageProjectUrl>https://github.com/objectyan/CyberSlacker</PackageProjectUrl>
     <RepositoryUrl>https://github.com/objectyan/CyberSlacker.git</RepositoryUrl>
+    <Nullable>disable</Nullable>
+    <NoWarn>$(NoWarn);CS8600;CS8601;CS8602;CS8604;CS8618;CS8625;CS8632</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
