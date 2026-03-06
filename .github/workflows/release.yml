@@ -27,46 +27,25 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
-      - name: Install WiX Toolset
-        run: dotnet tool install --global wix --version 6.0.2
-
-      # 1. 编译发布程序 (2MB 模式)
       - name: Publish Application
         run: |
+          $ver = "${{ github.ref_name }}".TrimStart('v')
           dotnet publish CyberSlacker/CyberSlacker.csproj `
             -c Release `
             -r win-${{ matrix.arch }} `
             --self-contained false `
+            -p:PublishSingleFile=false `
+            -p:Version=$ver `
             -o ./publish-${{ matrix.arch }}
 
-      # 2. 物理隔离主 EXE，防止 WIX0369 重复定义
-      - name: Isolate Main Executable
-        shell: pwsh
-        run: |
-          mkdir ./exe-only-${{ matrix.arch }}
-          move "./publish-${{ matrix.arch }}/CyberSlacker.exe" "./exe-only-${{ matrix.arch }}/"
-
-      # 3. 【核心修复】启动 Windows Installer 服务，解决 WIX0001 (1631) 错误
-      - name: Enable Windows Installer Service
-        shell: pwsh
-        run: net start msiserver || echo "Service already running or inaccessible"
-
-      # 4. 构建 MSI
-      - name: Build MSI
+      - name: Build Installer (ISCC)
         shell: pwsh
         run: |
           $ver = "${{ github.ref_name }}".TrimStart('v')
-          if ($ver -notmatch '^\d+\.\d+\.\d+') { $ver += ".0" }
-
-          wix build Package.wxs `
-            -d AppVersion="$ver" `
-            -d AppArch="${{ matrix.arch }}" `
-            -arch ${{ matrix.arch }} `
-            -o "Output/CyberSlacker_$($ver)_${{ matrix.arch }}.msi"
-
+          # 运行系统自带的 Inno Setup 编译器
+          iscc /DAppArch=${{ matrix.arch }} /DAppVersion=$ver "installer.iss"
       
-      # 5. 生成架构专属的 XML
-      - name: Generate Update XML
+      - name: Generate XML
         shell: pwsh
         run: |
           $tag = "${{ github.ref_name }}"
@@ -78,21 +57,19 @@ jobs:
           <?xml version="1.0" encoding="UTF-8"?>
           <item>
               <version>$ver</version>
-              <url>https://github.com/${{ github.repository }}/releases/download/$tag/CyberSlacker_${ver}_${arch}.msi</url>
+              <url>https://github.com/${{ github.repository }}/releases/download/$tag/CyberSlacker_v${ver}_${arch}_Setup.exe</url>
               <changelog>https://github.com/${{ github.repository }}/releases/tag/$tag</changelog>
-              <mandatory>false</mandatory>
+              <mandatory>true</mandatory>
           </item>
           "@
           $xmlContent | Set-Content -Path "Update_$arch.xml" -Encoding utf8
 
-      
-      # 5. 上传当前架构的 MSI 和 XML 到暂存区
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: assets-${{ matrix.arch }}
           path: |
-            Output/*.msi
+            Output/*.exe
             Update_${{ matrix.arch }}.xml
 
   # 发布任务
@@ -115,8 +92,7 @@ jobs:
 
       - name: List Downloaded Files
         run: ls -R ./temp_all
-
-      # 推送 XML 回仓库
+      
       - name: Sync XML to Repo
         shell: pwsh
         run: |
@@ -129,7 +105,6 @@ jobs:
               git push origin master
           }
 
-      # 使用 softprops 发布，关联生成的日志
       - name: Create/Update GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -141,7 +116,7 @@ jobs:
             
             ---
           generate_release_notes: true
-          files: ./temp_all/Output/*.msi
+          files: ./temp_all/Output/*.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -154,5 +129,5 @@ jobs:
         uses: vedantmgoyal9/winget-releaser@v2
         with:
           identifier: LaborLogic.CyberSlacker
-          installers-regex: '.*\.msi$'
+          installers-regex: '.*_Setup\.exe$'
           token: ${{ secrets.WINGET_TOKEN }}

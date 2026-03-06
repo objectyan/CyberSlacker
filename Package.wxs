@@ -7,6 +7,12 @@
            Scope="perUser" 
            Language="2052">
 
+    <!-- 强制关闭重启管理器，防止因为占用文件导致安装挂起 -->
+    <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" />
+  
+    <!-- 确保静默安装时不需要用户点击 -->
+    <Property Id="ARPNOMODIFY" Value="1" />
+
     <MediaTemplate EmbedCab="yes" />
 
     <!-- 目录定义 -->
