@@ -8,6 +8,8 @@
            Scope="perUser"
            Language="2052">
 
+    <MajorUpgrade DowngradeErrorMessage="您的计算机上已安装了更高版本的 [ProductName]。" />
+
     <!-- 强制关闭重启管理器，防止因为占用文件导致安装挂起 -->
     <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" />
     
@@ -38,6 +40,7 @@
     <CustomAction Id="RunAfterInstall" 
                 FileRef="MainExeFile" 
                 ExeCommand="" 
+                Impersonate="yes"
                 Execute="immediate" 
                 Return="asyncNoWait" />
     <InstallExecuteSequence>
