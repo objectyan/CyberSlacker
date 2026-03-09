@@ -206,11 +206,21 @@ namespace CyberSlacker
 
             try
             {
-                MyNotifyIcon.Icon = Properties.Resources.app;
+                if (System.Windows.Forms.SystemInformation.TerminalServerSession == false)
+                {
+                    try
+                    {
+                        MyNotifyIcon.Icon = Properties.Resources.app;
+                    }
+                    catch
+                    {
+                        MyNotifyIcon.Icon = System.Drawing.SystemIcons.Application;
+                    }
+                }
             }
             catch
             {
-                MyNotifyIcon.Icon = System.Drawing.SystemIcons.Application;
+                System.Diagnostics.Debug.WriteLine("无桌面环境，跳过托盘初始化");
             }
 
 
