@@ -1,5 +1,6 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
-     xmlns:netfx="http://wixtoolset.org/schemas/v4/wxs/netfx">
+     xmlns:netfx="http://wixtoolset.org/schemas/v4/wxs/netfx"     
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
 
   <Package Name="CyberSlacker (赛博摸鱼员)"
            Manufacturer="LaborLogic"
@@ -36,15 +37,24 @@
       <Directory Id="StartMenuDir" Name="赛博摸鱼员" />
     </StandardDirectory>
 
-    <!-- 安装完成后 运行主程序 -->
-    <CustomAction Id="RunAfterInstall" 
-                FileRef="MainExeFile" 
-                ExeCommand="" 
-                Impersonate="yes"
-                Execute="immediate" 
-                Return="asyncNoWait" />
+    <!-- 自动关闭旧进程：在安装/更新前，如果 CyberSlacker 在跑，自动关掉它 -->
+    <util:CloseApplication Id="CloseApp"
+                           Target="CyberSlacker.exe"
+                           CloseMessage="yes"
+                           RebootPrompt="no"
+                           TerminateProcess="1" />
+
+    <!-- 定义启动动作 -->
+    <CustomAction Id="LaunchApp"
+                  FileRef="MainExeFile"
+                  ExeCommand=""
+                  Return="asyncNoWait"
+                  Impersonate="yes" />
+
     <InstallExecuteSequence>
-      <Custom Action="RunAfterInstall" After="InstallFinalize" Condition="NOT Installed" />
+      <!-- 核心逻辑： OnExit="success" 配合 Condition -->
+      <!-- NOT REMOVE="ALL" 表示：只要不是在彻底卸载，就执行启动（包含初装和升级） -->
+      <Custom Action="LaunchApp" OnExit="success" Condition="NOT REMOVE=&quot;ALL&quot;" />
     </InstallExecuteSequence>
 
     <ComponentGroup Id="MainComponents" Directory="INSTALLFOLDER">

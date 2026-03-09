@@ -45,6 +45,7 @@ jobs:
       - name: Install WiX Extensions
         run: |
           wix extension add WixToolset.Netfx.wixext/6.0.2
+          wix extension add WixToolset.Util.wixext/6.0.2
           
       - name: Enable Windows Installer Service
         shell: pwsh
@@ -59,6 +60,7 @@ jobs:
           
           wix build Package.wxs `
             -ext WixToolset.Netfx.wixext/6.0.2 `
+            -ext WixToolset.Util.wixext/6.0.2 ` 
             -d AppVersion="$ver" `
             -d AppArch="${{ matrix.arch }}" `
             -arch ${{ matrix.arch }} `
