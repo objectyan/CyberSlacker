@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
      xmlns:netfx="http://wixtoolset.org/schemas/v4/wxs/netfx"     
      xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
@@ -7,7 +8,8 @@
            Version="$(var.AppVersion)"
            UpgradeCode="9B7E1234-A1B2-C3D4-E5F6-7890ABCDEF12"
            Scope="perUser"
-           Language="2052">
+           Language="2052"
+           Codepage="65001">
 
     <MajorUpgrade DowngradeErrorMessage="您的计算机上已安装了更高版本的 [ProductName]。" />
 

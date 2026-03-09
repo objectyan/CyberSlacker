@@ -61,6 +61,7 @@ jobs:
           wix build Package.wxs `
             -ext WixToolset.Netfx.wixext/6.0.2 `
             -ext WixToolset.Util.wixext/6.0.2 `
+            -culture zh-CN `
             -d AppVersion="$ver" `
             -d AppArch="${{ matrix.arch }}" `
             -arch ${{ matrix.arch }} `
