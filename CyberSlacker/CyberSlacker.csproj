@@ -11,17 +11,21 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <Authors>Object Yan</Authors>
+    <Company>$(Authors)</Company>
     <Copyright>Copyright © 2026-$([System.DateTime]::UtcNow.Year) $(Authors)</Copyright>
     <RepositoryType>git</RepositoryType>
     <Version>1.0.0</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
-    <Description>赛博摸鱼员 - 懂打工人的桌面挂件</Description>
+    <AssemblyTitle>赛博摸鱼员</AssemblyTitle>
+    <Product>CyberSlacker (赛博摸鱼员)</Product>
+    <Description>赛博摸鱼员 - 一款极致优雅的打工人桌面小挂件</Description>
     <Title></Title>
     <PackageProjectUrl>https://github.com/objectyan/CyberSlacker</PackageProjectUrl>
     <RepositoryUrl>https://github.com/objectyan/CyberSlacker.git</RepositoryUrl>
     <Nullable>disable</Nullable>
     <NoWarn>$(NoWarn);CS8600;CS8601;CS8602;CS8604;CS8618;CS8625;CS8632</NoWarn>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
 
   <ItemGroup>
