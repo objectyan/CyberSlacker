@@ -33,7 +33,7 @@ jobs:
           dotnet publish CyberSlacker/CyberSlacker.csproj `
             -c Release `
             -r win-${{ matrix.arch }} `
-            --self-contained false `
+            --self-contained true `
             -p:PublishSingleFile=false `
             -p:Version=$ver `
             -o ./publish-${{ matrix.arch }}
