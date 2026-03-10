@@ -7,8 +7,11 @@
 ![Framework](https://img.shields.io/badge/.NET-8.0-blueviolet?logo=dotnet)
 [![Downloads](https://img.shields.io/github/downloads/objectyan/CyberSlacker/total?color=brightgreen)](https://github.com/objectyan/CyberSlacker/releases)
 [![Stars](https://img.shields.io/github/stars/objectyan/CyberSlacker?style=flat&color=yellow)](https://github.com/objectyan/CyberSlacker/stargazers)
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/objectyan/CyberSlacker)](https://github.com/objectyan/CyberSlacker/commits/master)
 ![Last Commit](https://img.shields.io/github/last-commit/objectyan/CyberSlacker?color=blue)
 ![Top Language](https://img.shields.io/github/languages/top/objectyan/CyberSlacker?color=blueviolet)
+[![CodeFactor](https://www.codefactor.io/repository/github/objectyan/CyberSlacker/badge)](https://www.codefactor.io/repository/github/objectyan/CyberSlacker)
+
 
 > 掌控搬砖时间的终极逻辑。
 
