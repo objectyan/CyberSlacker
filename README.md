@@ -1,14 +1,17 @@
 # ⚡ CyberSlacker (赛博摸鱼员)
 
 [![Build Status](https://github.com/objectyan/CyberSlacker/actions/workflows/release.yml/badge.svg)](https://github.com/objectyan/CyberSlacker/actions)
-[![WinGet Version](https://img.shields.io/winget/v/CyberSlacker.App?label=winget)](https://winget.run/pkg/LaborLogic.CyberSlacker)
+[![WinGet Version](https://img.shields.io/winget/v/LaborLogic.CyberSlacker?label=winget&style=flat-square)](https://github.com/microsoft/winget-pkgs)
 [![Latest Release](https://img.shields.io/github/v/release/objectyan/CyberSlacker?color=orange&logo=github)](https://github.com/objectyan/CyberSlacker/releases)
 [![License](https://img.shields.io/github/license/objectyan/CyberSlacker?color=blue)](https://github.com/objectyan/CyberSlacker/blob/master/LICENSE)
 ![Framework](https://img.shields.io/badge/.NET-8.0-blueviolet?logo=dotnet)
 [![Downloads](https://img.shields.io/github/downloads/objectyan/CyberSlacker/total?color=brightgreen)](https://github.com/objectyan/CyberSlacker/releases)
 [![Stars](https://img.shields.io/github/stars/objectyan/CyberSlacker?style=flat&color=yellow)](https://github.com/objectyan/CyberSlacker/stargazers)
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/objectyan/CyberSlacker)](https://github.com/objectyan/CyberSlacker/commits/master)
 ![Last Commit](https://img.shields.io/github/last-commit/objectyan/CyberSlacker?color=blue)
 ![Top Language](https://img.shields.io/github/languages/top/objectyan/CyberSlacker?color=blueviolet)
+[![CodeFactor](https://www.codefactor.io/repository/github/objectyan/CyberSlacker/badge)](https://www.codefactor.io/repository/github/objectyan/CyberSlacker)
+
 
 > 掌控搬砖时间的终极逻辑。
 
