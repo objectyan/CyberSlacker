@@ -28,10 +28,13 @@
 
     <Property Id="ARPNOMODIFY" Value="1" />
 
-    <Property Id="Manufacturer" Value="Object Yan" />
     <Property Id="ARPCONTACT" Value="Object Yan" />
-    <Property Id="ARPHELPLINK" Value="https://github.com/objectyan/CyberSlacker" />
-
+    <Property Id="ARPHELPLINK" Value="https://github.com/objectyan/CyberSlacker/issues" />
+    <Property Id="ARPURLUPDATEINFO" Value="https://github.com/objectyan/CyberSlacker/releases" />
+    <Property Id="ARPCOMMENTS"
+      Value="CyberSlacker (赛博摸鱼员) - “钱是老板的，命是自己的。” —— 这是一个真正懂打工人的桌面贴心挂件。" />
+    <Property Id="ARPPRODUCTICON" Value="app.ico" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/objectyan/CyberSlacker" />
 
     <MediaTemplate EmbedCab="yes" />
 
