@@ -7,7 +7,6 @@
     <authors>Object Yan</authors>
     <owners>Object Yan</owners>
     <copyright>Copyright © 2026 Object Yan</copyright>
-    <license type="expression">MIT</license>
     <projectUrl>https://github.com/objectyan/CyberSlacker</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/objectyan/CyberSlacker/main/CyberSlacker/app.ico</iconUrl>
     <licenseUrl>https://github.com/objectyan/CyberSlacker/blob/main/LICENSE</licenseUrl>
@@ -22,10 +21,7 @@
     - 建议配合 .NET 8 使用。
     </description>
     <releaseNotes>https://github.com/objectyan/CyberSlacker/releases</releaseNotes>
-    <dependencies>
-      <!-- dotnet-desktopruntime 是 Chocolatey 官方维护的标准包名 -->
-      <dependency id="dotnet-8.0-desktopruntime" />
-    </dependencies>
+    
   </metadata>
   <files>
     <file src="tools\**" target="tools" />

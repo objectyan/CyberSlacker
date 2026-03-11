@@ -1,4 +1,4 @@
-# 1. 变量准备 (删掉没用的 $tools)
+# 1. 变量准备 
 $version = '0.0.1'
 $baseUrl = "https://github.com/objectyan/CyberSlacker/releases/download/v$version/CyberSlacker_$version"
 
