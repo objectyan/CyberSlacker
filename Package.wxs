@@ -81,8 +81,7 @@
           Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductCode]"
           Name="Publisher"
           Type="string"
-          Value="Object Yan"
-          ForceCreateOnInstall="yes" />
+          Value="Object Yan" />
 
         <RemoveFolder Id="CleanupFolder" Directory="StartMenuDir" On="uninstall" />
       </Component>
