@@ -174,8 +174,8 @@ jobs:
           $nuspecPath = "choco/CyberSlacker.nuspec"
           $scriptPath = "choco/tools/chocolateyInstall.ps1"
           
-          (Get-Content $nuspecPath).Replace('0.0.1', $ver) | Set-Content $nuspecPath
-          (Get-Content $scriptPath).Replace('0.0.1', $ver) | Set-Content $scriptPath
+          (Get-Content $nuspecPath).Replace('1.0.0', $ver) | Set-Content $nuspecPath
+          (Get-Content $scriptPath).Replace('1.0.0', $ver) | Set-Content $scriptPath
 
       - name: Pack and Push to Chocolatey
         shell: pwsh
