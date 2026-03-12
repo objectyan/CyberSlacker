@@ -195,7 +195,7 @@ jobs:
             .Replace('[[HASH32]]', $h86) `
             .Replace('[[HASHARM]]', $hArm) | Set-Content $ps1Path
 
-          (Get-Content $nuspecPath).Replace('1.0.0', $ver) | Set-Content $nuspecPath
+          (Get-Content $nuspecPath).Replace('0.0.1', $ver) | Set-Content $nuspecPath
       - name: Pack and Push to Chocolatey
         shell: pwsh
         run: |
