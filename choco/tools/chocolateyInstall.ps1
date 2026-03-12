@@ -1,5 +1,5 @@
 # 1. 变量准备 
-$version = '1.0.0'
+$version = '[[VERSION]]'
 $baseUrl = "https://github.com/objectyan/CyberSlacker/releases/download/v$version/CyberSlacker_$version"
 
 # 2. 定义三架构下载地址
@@ -7,9 +7,9 @@ $url32 = "$baseUrl`_x86.msi"
 $url64 = "$baseUrl`_x64.msi"
 $urlArm = "$baseUrl`_arm64.msi"
 
-$hash32 = "9be39c01bfa7aedcae1fa3a8659c00473e5642e47ae5af6f25a8fb4378fd3512"
-$hash64 = "98a54f24989a99159dbeaa8db4afb767b21b83e60d0e54ad282a8b82a5e35d25"
-$hashArm = "6f4b404c186f73c09ac3c25874b94d74b3f79ecd4b5949e6adb785ca8e678184"
+$hash32 = "[[HASH32]]"
+$hash64 = "[[HASH64]]"
+$hashArm = "[[HASHARM]]"
 
 # 3. 【核心优化】动态判定 64 位槽位该给谁
 # 默认给 x64

@@ -37,7 +37,7 @@ jobs:
             -p:PublishSingleFile=false `
             -p:Version=$ver `
             -o ./publish-${{ matrix.arch }}
-     
+
       - name: Install WiX Toolset
         run: |
           dotnet tool install --global wix --version 6.0.2
@@ -46,18 +46,18 @@ jobs:
         run: |
           wix extension add WixToolset.Netfx.wixext/6.0.2
           wix extension add WixToolset.Util.wixext/6.0.2
-          
+
       - name: Enable Windows Installer Service
         shell: pwsh
         run: |
           Start-Service -Name "msiserver" -ErrorAction SilentlyContinue
-      
+
       - name: Build Installer (WiX)
         shell: pwsh
         run: |
           $ver = "${{ github.ref_name }}".TrimStart('v')
           if ($ver -notmatch '^\d+\.\d+\.\d+') { $ver += ".0" }
-          
+
           wix build Package.wxs `
             -ext WixToolset.Netfx.wixext/6.0.2 `
             -ext WixToolset.Util.wixext/6.0.2 `
@@ -74,7 +74,7 @@ jobs:
           $ver = $tag.TrimStart('v')
           if ($ver -notmatch '^\d+\.\d+\.\d+') { $ver += ".0" }
           $arch = "${{ matrix.arch }}"
-          
+
           $xmlContent = @"
           <?xml version="1.0" encoding="UTF-8"?>
           <item>
@@ -114,7 +114,7 @@ jobs:
 
       - name: List Downloaded Files
         run: ls -R ./temp_all
-      
+
       - name: Sync XML to Repo
         shell: pwsh
         run: |
@@ -135,7 +135,7 @@ jobs:
             ## 📢 摸鱼员注意：赛博组件已进化！
             > "钱是老板的，命是自己的。" 
             本次版本更新已就绪，请各工位成员及时领取。
-            
+
             ---
           generate_release_notes: true
           files: ./temp_all/Output/*.msi
@@ -162,34 +162,53 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Prepare Choco Package
+      - name: Download all artifacts (MSIs and XMLs)
+        uses: actions/download-artifact@v4
+        with:
+          pattern: assets-*
+          path: ./all_assets
+          merge-multiple: true
+
+      - name: Prepare Choco Package and Calculate Hashes
         shell: pwsh
         run: |
           # 1. 提取版本号 
           $tag = "${{ github.ref_name }}"
           $ver = $tag.TrimStart('v')
-          
+
+          $h64 = (Get-FileHash "./all_assets/CyberSlacker_x64.msi" -Algorithm SHA256).Hash
+          $h86 = (Get-FileHash "./all_assets/CyberSlacker_x86.msi" -Algorithm SHA256).Hash
+          $hArm = (Get-FileHash "./all_assets/CyberSlacker_arm64.msi" -Algorithm SHA256).Hash
+
+          Write-Host "x64 Hash: $h64"
+          Write-Host "x86 Hash: $h86"
+          Write-Host "ARM Hash: $hArm"
+
           # 2. 强力替换 nuspec 和 ps1 里的版本占位符
           # 确保文件名和目录名正确
           $nuspecPath = "choco/CyberSlacker.nuspec"
           $scriptPath = "choco/tools/chocolateyInstall.ps1"
-          
-          (Get-Content $nuspecPath).Replace('1.0.0', $ver) | Set-Content $nuspecPath
-          (Get-Content $scriptPath).Replace('1.0.0', $ver) | Set-Content $scriptPath
 
+           (Get-Content $scriptPath) `
+            .Replace('[[VERSION]]', $ver) `
+            .Replace('[[HASH64]]', $h64) `
+            .Replace('[[HASH32]]', $h86) `
+            .Replace('[[HASHARM]]', $hArm) | Set-Content $ps1Path
+
+          (Get-Content $nuspecPath).Replace('1.0.0', $ver) | Set-Content $nuspecPath
       - name: Pack and Push to Chocolatey
         shell: pwsh
         run: |
           # 1. 设置 API Key
           choco apikey --key ${{ secrets.CHOCO_API_KEY }} --source https://push.chocolatey.org/
-          
+
           # 2. 打包 (明确输出目录为当前 choco 文件夹)
           choco pack choco/CyberSlacker.nuspec --outputdirectory choco
-          
+
           # 3. 【核心修复】动态寻找生成的 .nupkg 文件名
           # 这样可以避开通配符解析失败的问题
           $package = Get-ChildItem -Path choco/*.nupkg | Select-Object -First 1
-          
+
           if ($package) {
               Write-Host "找到安装包: $($package.FullName)，准备推送到 Chocolatey..."
               # 4. 执行推送
