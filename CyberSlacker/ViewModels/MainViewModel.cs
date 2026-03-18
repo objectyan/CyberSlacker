@@ -1,9 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
-using System.Timers;
 using CyberSlacker.Models;
 using CyberSlacker.Services;
 using CyberSlacker.Util;
+using H.NotifyIcon.Core;
+using System.Timers;
 using Timer = System.Timers.Timer;
 
 namespace CyberSlacker.ViewModels
@@ -11,6 +12,7 @@ namespace CyberSlacker.ViewModels
     public partial class MainViewModel : ObservableObject, IDisposable
     {
         private readonly HolidayService _holidayService;
+        private readonly HardwareService _hardwareService;
         private readonly Timer _timer;
         private readonly Random _rng = new Random();
 
@@ -18,6 +20,7 @@ namespace CyberSlacker.ViewModels
 
         private bool _hasNotifiedMeal = false;
         private bool _hasNotifiedToday = false;
+        
         private DateTime _lastRestNotifyTime = DateTime.Now;
 
         [ObservableProperty] private string _offWorkCountdown = "计算中...";
@@ -29,10 +32,17 @@ namespace CyberSlacker.ViewModels
         [ObservableProperty] private string _currentTime = "计算中...";
         [ObservableProperty] private string _taskbarTooltip = "打工小组件";
 
+        [ObservableProperty] private string _hwCpu = "---";
+        [ObservableProperty] private string _hwRam = "---";
+        [ObservableProperty] private string _hwGpu = "---";
+        [ObservableProperty] private string _hwNet = "---";
+
         public MainViewModel()
         {
             // 1. 初始化服务
             _holidayService = new HolidayService(new TimorProvider());
+
+            _hardwareService = new HardwareService();
 
             // 2. 初始化定时器 (1秒)
             _timer = new Timer(1000);
@@ -84,11 +94,28 @@ namespace CyberSlacker.ViewModels
 
             CheckCyclicRestNotification(now);
 
+            var stats = _hardwareService.GetStats();
+            HwCpu = $"{stats.cpu:F0}%";
+            HwRam = $"{stats.ram:F0}%";
+            HwGpu = $"{stats.gpu:F0}%";
+            HwNet = $"↓{stats.netIn} ↑{stats.netOut}";
+
             TaskbarTooltip = $"{HolidayTip}\n" +
                              $"下班倒计时: {OffWorkCountdown}\n" +
                              $"周末倒计时: {WeekendCountdown}\n" +
                              $"发薪日倒计时: {PayDayCountdown}\n" +
                              $"下一个节日: {NextHolidayName} ({NextHolidayCountdown})";
+
+        }
+
+        /// <summary>
+        /// 更新提示语
+        /// </summary>
+        public void RefreshHolidayTip()
+        {
+            DateTime now = DateTime.Now;
+            var todayInfo = _holidayService.GetDateInfo(now);
+            HolidayTip = CountdownEngine.GetDynamicTip(now, todayInfo, _holidayService, _lastRestNotifyTime);
         }
 
         private void CheckOffWorkNotification(DateTime now)

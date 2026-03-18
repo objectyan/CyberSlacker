@@ -13,6 +13,8 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Shell;
 using System.Windows.Threading;
 using static CyberSlacker.Util.Interop;
@@ -168,6 +170,15 @@ namespace CyberSlacker
                     Properties.Settings.Default.WindowTop = rect.Top;
                     Properties.Settings.Default.Save();
                 }
+            }
+        }
+
+        private void Window_OnRefreshQuote(object sender, MouseButtonEventArgs e)
+        {
+            if (this.DataContext is MainViewModel vm)
+            {
+                // 调用 ViewModel 的方法
+                _vm.RefreshHolidayTip();
             }
         }
 
