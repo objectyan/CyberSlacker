@@ -162,7 +162,7 @@ jobs:
           - **预览版本号**: ${{ env.PREVIEW_VER }}
           ---
           *警告：预览版可能包含未完成的功能，仅供测试。*
-        artifacts: "./Output/*.msi"
+        artifacts: "./temp_preview/*.msi"
         allowUpdates: true
         removeArtifacts: true # 删掉上一次预览版的文件，换成最新的
         replacesArtifacts: true
