@@ -144,7 +144,7 @@ jobs:
         if ($status) {
             # 使用 [skip ci] 防止触发无限循环编译
             git commit -m "chore: update Preview manifests [skip ci]"
-            git push origin main
+            git push origin master
         }
 
     - name: Update Preview Release
