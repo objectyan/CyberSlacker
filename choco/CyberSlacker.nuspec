@@ -12,16 +12,39 @@
     <packageSourceUrl>https://github.com/objectyan/CyberSlacker/tree/master/choco</packageSourceUrl>
     <projectSourceUrl>https://github.com/objectyan/CyberSlacker</projectSourceUrl>
 
-    <iconUrl>https://raw.githubusercontent.com/objectyan/CyberSlacker/refs/heads/master/docs/logo.png</iconUrl>
+    <iconUrl>
+      https://raw.githubusercontent.com/objectyan/CyberSlacker/refs/heads/master/docs/logo.png</iconUrl>
     <licenseUrl>https://github.com/objectyan/CyberSlacker/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <docsUrl>https://github.com/objectyan/CyberSlacker/blob/master/README.md</docsUrl>
-    <tags>productivity countdown widget holiday</tags>
-    <summary>真正的打工人桌面挂件，智能节假日提醒。</summary>
-    <description>赛博摸鱼员是一款基于 WPF 的桌面组件。它能自动同步调休，精准计算下班时间，并提供毒鸡汤。
-    安装说明：
-    - 此包将自动安装 MSI。
-    - 建议配合 .NET 8 使用。
+    <tags>slacker moyu work countdown timer widget desktop-widget productivity holiday payday dotnet</tags>
+    <summary>A professional desktop widget for work-life balance and countdowns.</summary>
+    <description>
+      [English]
+      CyberSlacker is a modern desktop widget built with WPF (.NET 8). It is designed to help
+      office workers keep track of their "freedom" with high precision.
+
+      Key Features:
+      - Smart Holiday Integration: Automatically syncs with holiday APIs to handle legal holidays
+      and makeup workdays.
+      - Precision Countdown: Intelligent countdown logic that accounts for lunch breaks and
+      periodic rest times.
+      - Immortal Desktop Widget: Uses low-level Win32 hooks to stay pinned to the desktop, even
+      when pressing Win+D.
+      - Salary Day Strategy: Customizable payday tracking with weekend adjustment strategies (pay
+      ahead or delay).
+      - Modern Interaction: Support for Windows 10/11 native color Toast notifications and
+      randomized "slacker" quotes.
+
+      [中文]
+      赛博摸鱼员 (CyberSlacker) 是一款基于 WPF (.NET 8) 开发的现代化桌面小组件。它不仅是一个高精度的倒计时器，更是一个贴心的工位助手。
+
+      核心特性：
+      - 智联节假日：集成 API 自动同步法定假、调休及补班，计算绝无误差。
+      - 净工时倒计时：自动感知午休、小憩时段，显示真正的剩余“搬砖”秒数。
+      - 桌面不死挂件：采用底层 Win32 注入，按下 Win+D 显示桌面时依然稳如泰山。
+      - 智能发薪日：支持自定义发薪策略（遇周末提前或延后），钱到手前一秒都知道。
+      - 现代感交互：支持 Win10/11 原生彩色 Toast 通知及动态随机毒鸡汤。
     </description>
     <releaseNotes>https://github.com/objectyan/CyberSlacker/releases</releaseNotes>
     <dependencies>
