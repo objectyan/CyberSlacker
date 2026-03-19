@@ -1,11 +1,14 @@
 # ⚡ CyberSlacker (赛博摸鱼员)
 
+
 [![Build Status](https://github.com/objectyan/CyberSlacker/actions/workflows/release.yml/badge.svg)](https://github.com/objectyan/CyberSlacker/actions)
+[![Preview Build Status](https://github.com/objectyan/CyberSlacker/actions/workflows/preview.yml/badge.svg)](https://github.com/objectyan/CyberSlacker/releases/tag/preview)
 [![WinGet Version](https://img.shields.io/winget/v/LaborLogic.CyberSlacker?label=winget&style=flat-square)](https://github.com/microsoft/winget-pkgs)
 [![Latest Release](https://img.shields.io/github/v/release/objectyan/CyberSlacker?color=orange&logo=github)](https://github.com/objectyan/CyberSlacker/releases)
 [![License](https://img.shields.io/github/license/objectyan/CyberSlacker?color=blue)](https://github.com/objectyan/CyberSlacker/blob/master/LICENSE)
 ![Framework](https://img.shields.io/badge/.NET-8.0-blueviolet?logo=dotnet)
 [![Downloads](https://img.shields.io/github/downloads/objectyan/CyberSlacker/total?color=brightgreen)](https://github.com/objectyan/CyberSlacker/releases)
+[![Preview Download](https://img.shields.io/badge/download-nightly-red?logo=windows)](https://github.com/objectyan/CyberSlacker/releases/tag/preview)
 [![Stars](https://img.shields.io/github/stars/objectyan/CyberSlacker?style=flat&color=yellow)](https://github.com/objectyan/CyberSlacker/stargazers)
 [![GitHub commit activity](https://img.shields.io/github/commit-activity/m/objectyan/CyberSlacker)](https://github.com/objectyan/CyberSlacker/commits/master)
 ![Last Commit](https://img.shields.io/github/last-commit/objectyan/CyberSlacker?color=blue)

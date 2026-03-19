@@ -261,5 +261,17 @@ namespace CyberSlacker.Properties {
                 this["PreOffWorkMins"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IsPreviewEnabled {
+            get {
+                return ((bool)(this["IsPreviewEnabled"]));
+            }
+            set {
+                this["IsPreviewEnabled"] = value;
+            }
+        }
     }
 }

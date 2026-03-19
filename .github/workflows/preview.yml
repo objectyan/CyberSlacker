@@ -1,0 +1,169 @@
+name: Preview Build (Preview)
+
+on:
+  push:
+    branches:
+      - master  # 当 main 分支有变动时触发
+    paths-ignore:
+      - '**.md'
+      - 'manifests/Update_*.xml' # 忽略只修改文档或正式版清单的提交
+
+permissions:
+  contents: write
+
+jobs:
+  build-preview:
+    strategy:
+      matrix:
+        arch: [x64, arm64] # 预览版只提供主流架构，加快编译速度
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Install WiX
+      run: dotnet tool install --global wix --version 6.0.2
+
+    - name: Install WiX Extensions
+      run: |
+        wix extension add WixToolset.Netfx.wixext/6.0.2
+        wix extension add WixToolset.Util.wixext/6.0.2
+    
+    - name: Enable Windows Installer Service
+      shell: pwsh
+      run: |
+        Start-Service -Name "msiserver" -ErrorAction SilentlyContinue
+
+    - name: Fetch Latest Version from GitHub
+      id: get_latest
+      shell: pwsh
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        try {
+            # 1. 直接获取最新正式发布的 Tag 名称 (例如 v1.0.1)
+            $latestTag = gh api repos/${{ github.repository }}/releases/latest --jq '.tag_name'
+        } catch {
+            # 2. 如果从未发布过，给个初始版本
+            $latestTag = "v1.0.0"
+        }
+        
+        # 清洗：去掉前面的 'v'
+        $baseVer = $latestTag.TrimStart('v')
+        
+        # 3. 构造预览版版本号：最新正式版.构建流水号
+        $fullVer = "$baseVer.${{ github.run_number }}"
+        
+        echo "PREVIEW_VER=$fullVer" >> $env:GITHUB_ENV
+        Write-Host "检测到云端最新版本: $latestTag, 最终预览版: $fullVer"
+    
+    - name: Publish Application
+      run: |
+        dotnet publish CyberSlacker/CyberSlacker.csproj `
+            -c Release `
+            -r win-${{ matrix.arch }} `
+            --self-contained false `
+            -p:PublishSingleFile=false `
+            -p:Version=${{ env.PREVIEW_VER }} `
+            -o ./publish-${{ matrix.arch }} 
+            
+    - name: Build MSI
+      run: |
+        net start msiserver
+        dotnet wix build Package.wxs `
+          -ext WixToolset.DotNet.wixext `
+          -d AppVersion="${{ env.PREVIEW_VER }}" `
+          -d AppArch="${{ matrix.arch }}" `
+          -arch ${{ matrix.arch }} `
+          -o "Output/CyberSlacker_Preview_${{ matrix.arch }}.msi"
+
+    - name: Generate Preview XML
+      shell: pwsh
+      run: |
+        $ver = "${{ env.PREVIEW_VER }}"
+        $arch = "${{ matrix.arch }}"
+        $repo = $env:GITHUB_REPOSITORY
+        
+        if (-not (Test-Path "manifests")) { mkdir manifests }
+        
+        $xmlContent = @"
+            <?xml version="1.0" encoding="UTF-8"?>
+            <item>
+                <version>$ver</version>
+                <url>https://github.com/$repo/releases/download/preview/CyberSlacker_Preview_$arch.msi</url>
+                <changelog>https://github.com/$repo/releases/tag/preview</changelog>
+                <mandatory>true</mandatory>
+            </item>
+            "@
+        $xmlContent | Set-Content -Path "manifests/Update_preview_$arch.xml" -Encoding utf8
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: preview-assets-${{ matrix.arch }}
+        path: |
+          Output/*.msi
+          manifests/Update_preview_${{ matrix.arch }}.xml
+
+  # --- 新增：汇总并推送任务 ---
+  sync-preview:
+    needs: build-preview
+    runs-on: windows-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+        ref: master
+
+    - name: Download Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: preview-assets-*
+        path: ./temp_preview
+        merge-multiple: true
+
+    - name: Push Preview Manifests to Repo
+      shell: pwsh
+      run: |
+        if (-not (Test-Path "manifests")) { mkdir manifests }
+        Move-Item -Force "./temp_preview/Update_preview_*.xml" "./manifests/"
+        
+        git config --global user.name "github-actions"
+        git config --global user.email "action@github.com"
+        git add manifests/Update_preview_*.xml
+        
+        $status = git status --porcelain
+        if ($status) {
+            # 使用 [skip ci] 防止触发无限循环编译
+            git commit -m "chore: update Preview manifests [skip ci]"
+            git push origin main
+        }
+
+    - name: Update Preview Release
+      uses: ncipollo/release-action@v1
+      with:
+        tag: preview
+        name: "🛠️ 预览版 (Preview Build)"
+        body: |
+         🚀 **CyberSlacker 预览版更新**
+          ### ⚠️ 实验性版本
+          此版本由 GitHub Actions 自动编译。包含最新的开发特性，可能存在不稳定因素。
+          - **编译时间**: ${{ github.event.head_commit.timestamp }}
+          - **提交记录**: ${{ github.event.head_commit.message }}
+          - **构建编号**: ${{ github.run_number }}
+          - **预览版本号**: ${{ env.PREVIEW_VER }}
+          ---
+          *警告：预览版可能包含未完成的功能，仅供测试。*
+        artifacts: "./Output/*.msi"
+        allowUpdates: true
+        removeArtifacts: true # 删掉上一次预览版的文件，换成最新的
+        replacesArtifacts: true
+        prerelease: true # 🌟 核心：标记为预发布版
+        token: ${{ secrets.GITHUB_TOKEN }}

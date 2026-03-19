@@ -75,6 +75,8 @@ jobs:
           if ($ver -notmatch '^\d+\.\d+\.\d+') { $ver += ".0" }
           $arch = "${{ matrix.arch }}"
 
+          if (-not (Test-Path "manifests")) { New-Item -ItemType Directory -Path "manifests" }
+
           $xmlContent = @"
           <?xml version="1.0" encoding="UTF-8"?>
           <item>
@@ -84,7 +86,7 @@ jobs:
               <mandatory>true</mandatory>
           </item>
           "@
-          $xmlContent | Set-Content -Path "Update_$arch.xml" -Encoding utf8
+          $xmlContent | Set-Content -Path "manifests/Update_$arch.xml" -Encoding utf8
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -92,7 +94,7 @@ jobs:
           name: assets-${{ matrix.arch }}
           path: |
             Output/*.msi
-            Update_${{ matrix.arch }}.xml
+            manifests/Update_${{ matrix.arch }}.xml
 
   # 发布任务
   release:
@@ -118,10 +120,10 @@ jobs:
       - name: Sync XML to Repo
         shell: pwsh
         run: |
-          move -Force "./temp_all/Update_*.xml" "./"
+          move -Force "./temp_all/Update_*.xml" "./manifests/"
           git config --global user.name "github-actions"
           git config --global user.email "action@github.com"
-          git add Update_*.xml
+          git add manifests/Update_*.xml
           if ((git status --porcelain)) {
               git commit -m "chore: auto-update multi-arch manifests for ${{ github.ref_name }}"
               git push origin master

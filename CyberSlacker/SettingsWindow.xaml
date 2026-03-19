@@ -130,6 +130,15 @@
                 <CheckBox Content="开机自动启动" FontSize="13"
                           IsChecked="{Binding IsAutoStart, Mode=TwoWay}"/>
             </Border>
+            <Border BorderBrush="#DDD" BorderThickness="0,1,0,0" Padding="0,15,0,0" Margin="0,10">
+                <StackPanel>
+                    <CheckBox Content="参与预览体验计划 (接收开发版更新)" 
+                  IsChecked="{Binding IsPreviewEnabled, Mode=TwoWay}"
+                  FontSize="13"/>
+                    <TextBlock Text="* 开启后将优先收到包含新功能但可能不稳定的版本推送。" 
+                   FontSize="11" Foreground="#FF8C00" Margin="25,5,0,0"/>
+                </StackPanel>
+            </Border>
 
             <!-- 底部按钮 -->
             <Button Content="保存并应用" Click="OnSave_Click" Margin="0,30,0,0"
