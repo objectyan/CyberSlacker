@@ -78,7 +78,9 @@ jobs:
       run: |
         net start msiserver
         dotnet wix build Package.wxs `
-          -ext WixToolset.DotNet.wixext `
+          -ext WixToolset.Netfx.wixext/6.0.2 `
+          -ext WixToolset.Util.wixext/6.0.2 `
+          -culture zh-CN `
           -d AppVersion="${{ env.PREVIEW_VER }}" `
           -d AppArch="${{ matrix.arch }}" `
           -arch ${{ matrix.arch }} `
