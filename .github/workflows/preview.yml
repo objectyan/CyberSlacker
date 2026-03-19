@@ -19,7 +19,7 @@ jobs:
   build-preview:
     strategy:
       matrix:
-        arch: [x64, arm64] # 预览版只提供主流架构，加快编译速度
+        arch: [x64, x86, arm64] # 预览版只提供主流架构，加快编译速度
     runs-on: windows-latest
     
     steps:
@@ -142,8 +142,6 @@ jobs:
         
         git config --global user.name "github-actions"
         git config --global user.email "action@github.com"
-
-        git pull origin master --rebase
 
         git add manifests/Update_preview_*.xml
         
