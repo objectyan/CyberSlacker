@@ -1,8 +1,6 @@
 ﻿using AutoUpdaterDotNET;
 using CyberSlacker.Services;
 using Serilog;
-using System.Configuration;
-using System.Data;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -49,7 +47,7 @@ namespace CyberSlacker
         protected override void OnExit(ExitEventArgs e)
         {
             Log.Information(">>> 赛博摸鱼员 正常关闭 <<<");
-            Log.CloseAndFlush(); 
+            Log.CloseAndFlush();
             base.OnExit(e);
         }
     }

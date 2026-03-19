@@ -1,22 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 using System.Windows.Data;
 
 namespace CyberSlacker.Converters
 {
     public class EnumToBooleanConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
-            return value?.ToString() == parameter?.ToString();
+            // 增加空检查
+            if (value == null || parameter == null) return false;
+            return value.ToString() == parameter.ToString();
         }
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+
+        public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
-            return value is bool b && b ? int.Parse(parameter.ToString()) : Binding.DoNothing;
+            // 使用 null-forgiving 运算符 ! 或者 check
+            if (value is bool b && b && parameter != null)
+            {
+                return int.Parse(parameter.ToString()!);
+            }
+            return Binding.DoNothing;
         }
     }
 }

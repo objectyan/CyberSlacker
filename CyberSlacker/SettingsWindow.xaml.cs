@@ -1,18 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using CyberSlacker.Util;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using CyberSlacker.Util;
 
 namespace CyberSlacker
 {
@@ -21,7 +11,7 @@ namespace CyberSlacker
     /// </summary>
     public partial class SettingsWindow : Window
     {
-        private bool _initialAutoStart;
+        private readonly bool _initialAutoStart;
 
 
         public SettingsWindow()
@@ -59,7 +49,7 @@ namespace CyberSlacker
         /// </summary>
         /// <param name="data"></param>
         /// <param name="cmbs"></param>
-        private void SetItemsSource(System.Collections.Generic.List<string> data, params ComboBox[] cmbs)
+        private static void SetItemsSource(System.Collections.Generic.List<string> data, params ComboBox[] cmbs)
         {
             foreach (var cb in cmbs)
             {
@@ -67,14 +57,15 @@ namespace CyberSlacker
             }
         }
 
-        // 仅允许输入数字的事件
-        private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
-        {
-            Regex regex = new Regex("[^0-9]+");
-            e.Handled = regex.IsMatch(e.Text);
-        }
 
-        private void ParseAndSetTime(string timeStr, System.Windows.Controls.ComboBox hBox, System.Windows.Controls.ComboBox mBox)
+        [GeneratedRegex("[^0-9]+")]
+        private static partial Regex NumericRegex();
+
+        // 仅允许输入数字的事件
+        private void NumberValidationTextBox(object sender, TextCompositionEventArgs e) => e.Handled = NumericRegex().IsMatch(e.Text);
+
+
+        private static void ParseAndSetTime(string timeStr, System.Windows.Controls.ComboBox hBox, System.Windows.Controls.ComboBox mBox)
         {
             try
             {

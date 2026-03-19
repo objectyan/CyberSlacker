@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 
@@ -9,8 +6,8 @@ namespace CyberSlacker.Services
 {
     public class HardwareService
     {
-        private PerformanceCounter _cpuCounter;
-        private List<PerformanceCounter> _gpuCounters = new List<PerformanceCounter>();
+        private readonly PerformanceCounter? _cpuCounter;
+        private readonly List<PerformanceCounter> _gpuCounters = [];
 
         private long _lastInBytes = 0;
         private long _lastOutBytes = 0;
@@ -30,8 +27,7 @@ namespace CyberSlacker.Services
                 var instanceNames = category.GetInstanceNames();
                 foreach (var name in instanceNames.Where(n => n.Contains("engtype_3D")))
                 {
-                    var pc = new PerformanceCounter("GPU Engine", "Utilization Percentage", name);
-                    _gpuCounters.Add(pc);
+                    _gpuCounters.Add(new PerformanceCounter("GPU Engine", "Utilization Percentage", name));
                 }
             }
             catch (Exception ex)
@@ -76,28 +72,13 @@ namespace CyberSlacker.Services
 
         #region 内存逻辑 (免权限/极速)
 
-        [StructLayout(LayoutKind.Sequential)]
-        private struct MEMORYSTATUSEX
+        private static float GetRamUsage()
         {
-            public uint dwLength;
-            public uint dwMemoryLoad;
-            public ulong ullTotalPhys;
-            public ulong ullAvailPhys;
-            public ulong ullTotalPageFile;
-            public ulong ullAvailPageFile;
-            public ulong ullTotalVirtual;
-            public ulong ullAvailVirtual;
-            public ulong ullAvailExtendedVirtual;
-        }
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern bool GlobalMemoryStatusEx(ref MEMORYSTATUSEX lpBuffer);
-
-        private float GetRamUsage()
-        {
-            var memStatus = new MEMORYSTATUSEX();
-            memStatus.dwLength = (uint)Marshal.SizeOf(typeof(MEMORYSTATUSEX));
-            if (GlobalMemoryStatusEx(ref memStatus))
+            Util.Interop.MEMORYSTATUSEX memStatus = new()
+            {
+                dwLength = (uint)Marshal.SizeOf(typeof(Util.Interop.MEMORYSTATUSEX))
+            };
+            if (Util.Interop.GlobalMemoryStatusEx(ref memStatus))
             {
                 return memStatus.dwMemoryLoad; // 直接返回百分比
             }
@@ -151,7 +132,7 @@ namespace CyberSlacker.Services
             }
         }
 
-        private string FormatSpeed(double bytesPerSec)
+        private static string FormatSpeed(double bytesPerSec)
         {
             if (bytesPerSec < 1024) return $"{bytesPerSec:F0}B/s";
             if (bytesPerSec < 1024 * 1024) return $"{(bytesPerSec / 1024.0):F1}K/s";

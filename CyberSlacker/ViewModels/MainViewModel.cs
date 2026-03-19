@@ -1,10 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
-using CyberSlacker.Models;
 using CyberSlacker.Services;
 using CyberSlacker.Util;
-using H.NotifyIcon.Core;
-using System.Timers;
 using Timer = System.Timers.Timer;
 
 namespace CyberSlacker.ViewModels
@@ -14,13 +11,13 @@ namespace CyberSlacker.ViewModels
         private readonly HolidayService _holidayService;
         private readonly HardwareService _hardwareService;
         private readonly Timer _timer;
-        private readonly Random _rng = new Random();
+        private readonly Random _rng = new();
 
         private bool _isDisposed = false;
 
         private bool _hasNotifiedMeal = false;
         private bool _hasNotifiedToday = false;
-        
+
         private DateTime _lastRestNotifyTime = DateTime.Now;
 
         [ObservableProperty] private string _offWorkCountdown = "计算中...";
@@ -73,11 +70,11 @@ namespace CyberSlacker.ViewModels
             PayDayCountdown = CountdownEngine.GetPaydayString(now, _holidayService);
 
             // 5. 下一个节日
-            var holidayInfo = CountdownEngine.GetNextHolidayInfo(now, _holidayService);
-            NextHolidayName = holidayInfo.Name;
-            NextHolidayCountdown = holidayInfo.Countdown;
+            var (holidayName, holidayCountdown) = CountdownEngine.GetNextHolidayInfo(now, _holidayService);
+            NextHolidayName = holidayName;
+            NextHolidayCountdown = holidayCountdown;
 
-            DateTime startOfDay = new DateTime(now.Year, now.Month, now.Day);
+            DateTime startOfDay = new(now.Year, now.Month, now.Day);
             TimeSpan timeSpan = now - startOfDay;
             int seconds = (int)timeSpan.TotalSeconds;
             int step = _rng.Next(30, 300);
@@ -94,11 +91,11 @@ namespace CyberSlacker.ViewModels
 
             CheckCyclicRestNotification(now);
 
-            var stats = _hardwareService.GetStats();
-            HwCpu = $"{stats.cpu:F0}%";
-            HwRam = $"{stats.ram:F0}%";
-            HwGpu = $"{stats.gpu:F0}%";
-            HwNet = $"↓{stats.netIn} ↑{stats.netOut}";
+            var (cpu, ram, netIn, netOut, gpu) = _hardwareService.GetStats();
+            HwCpu = $"{cpu:F0}%";
+            HwRam = $"{ram:F0}%";
+            HwGpu = $"{gpu:F0}%";
+            HwNet = $"↓{netIn} ↑{netOut}";
 
             TaskbarTooltip = $"{HolidayTip}\n" +
                              $"下班倒计时: {OffWorkCountdown}\n" +
@@ -143,10 +140,10 @@ namespace CyberSlacker.ViewModels
                 {
                     _hasNotifiedToday = true; // 标记今日已完成通知
 
-                    var cheer = CountdownEngine.GetRandomOffWorkCheer();
+                    var (title, content) = CountdownEngine.GetRandomOffWorkCheer();
                     // 发送一条“下班啦”的消息给 MainWindow
                     // 这种方式不需要 ViewModel 引用 MainWindow，非常解耦
-                    WeakReferenceMessenger.Default.Send(new string[] { cheer.Title, cheer.Content }, "NotifyOffWork");
+                    WeakReferenceMessenger.Default.Send(new string[] { title, content }, "NotifyOffWork");
                 }
             }
         }
@@ -166,8 +163,8 @@ namespace CyberSlacker.ViewModels
                 if (now.Hour == mealTime.Hours && now.Minute == mealTime.Minutes)
                 {
                     _hasNotifiedMeal = true;
-                    var cheer = CountdownEngine.GetRandomMealCheer();
-                    WeakReferenceMessenger.Default.Send(new string[] { cheer.Title, cheer.Content }, "NotifyMeal");
+                    var (title, content) = CountdownEngine.GetRandomMealCheer();
+                    WeakReferenceMessenger.Default.Send(new string[] { title, content }, "NotifyMeal");
                 }
             }
         }
@@ -186,12 +183,12 @@ namespace CyberSlacker.ViewModels
             {
                 _lastRestNotifyTime = now; // 重置时间
 
-                var cheer = CountdownEngine.GetRandomRestCheer(Properties.Settings.Default.RestInterval);
+                var (title, content) = CountdownEngine.GetRandomRestCheer(Properties.Settings.Default.RestInterval);
 
                 // 2. 发送彩色通知消息
                 WeakReferenceMessenger.Default.Send(new string[] {
-                    cheer.Title,
-                    cheer.Content
+                    title,
+                   content
                 }, "NotifyRest");
             }
         }

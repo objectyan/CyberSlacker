@@ -1,29 +1,19 @@
 ﻿using AutoUpdaterDotNET;
 using CommunityToolkit.Mvvm.Messaging;
-using CyberSlacker.Models;
 using CyberSlacker.Properties;
-using CyberSlacker.Services;
 using CyberSlacker.Util;
 using CyberSlacker.ViewModels;
-using System;
-using System.IO;
-using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shell;
-using System.Windows.Threading;
 using static CyberSlacker.Util.Interop;
 
 namespace CyberSlacker
 {
     public partial class MainWindow : Window
     {
-        private bool _isTopmost = false;
         IntPtr shellView = IntPtr.Zero;
         private double _windowsScalingFactor;
         private readonly MainViewModel _vm;
@@ -130,15 +120,13 @@ namespace CyberSlacker
 
         private void OpenSettings_Click(object sender, RoutedEventArgs e)
         {
-            SettingsWindow sw = new SettingsWindow();
-            sw.Owner = this;
+            SettingsWindow sw = new() { Owner = this };
             sw.ShowDialog();
         }
 
         private void OnOpenAbout(object sender, RoutedEventArgs e)
         {
-            AboutWindow aw = new AboutWindow();
-            aw.Owner = this;
+            AboutWindow aw = new() { Owner = this };
             aw.ShowDialog();
         }
 
@@ -178,7 +166,7 @@ namespace CyberSlacker
             if (this.DataContext is MainViewModel vm)
             {
                 // 调用 ViewModel 的方法
-                _vm.RefreshHolidayTip();
+                vm.RefreshHolidayTip();
             }
         }
 
@@ -246,11 +234,7 @@ namespace CyberSlacker
 
         private void KeepWindowBehind()
         {
-            if (_isTopmost)
-            {
-                return;
-            }
-            IntPtr HWND_BOTTOM = new IntPtr(1);
+            IntPtr HWND_BOTTOM = new(1);
             var hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
             Interop.SetWindowPos(hwnd, HWND_BOTTOM, 0, 0, 0, 0, Interop.SWP_NOREDRAW | Interop.SWP_NOACTIVATE | Interop.SWP_NOMOVE | Interop.SWP_NOSIZE);
         }
@@ -263,7 +247,7 @@ namespace CyberSlacker
                 {
                     EnumWindows((tophandle, _) =>
                     {
-                        IntPtr shellViewIntPtr = FindWindowEx(tophandle, IntPtr.Zero, "SHELLDLL_DefView", null);
+                        IntPtr shellViewIntPtr = FindWindowEx(tophandle, IntPtr.Zero, "SHELLDLL_DefView", null!);
                         if (shellViewIntPtr != IntPtr.Zero)
                         {
                             shellView = shellViewIntPtr;
@@ -290,7 +274,7 @@ namespace CyberSlacker
             // convert coords to parent-relative coords
             uint dpi = GetDpiForWindow(hwnd);
             _windowsScalingFactor = dpi / 96.0;
-            POINT pt = new POINT
+            POINT pt = new()
             {
                 X = (int)(100 * _windowsScalingFactor),
                 Y = (int)(100 * _windowsScalingFactor)
@@ -300,20 +284,16 @@ namespace CyberSlacker
 
         public void SetNoActivate()
         {
-            if (_isTopmost)
-            {
-                return;
-            }
             IntPtr hwnd = new WindowInteropHelper(this).Handle;
             IntPtr style = Interop.GetWindowLong(hwnd, Interop.GWL_EXSTYLE);
-            IntPtr newStyle = new IntPtr(style.ToInt64() | Interop.WS_EX_NOACTIVATE);
+            IntPtr newStyle = new(style.ToInt64() | Interop.WS_EX_NOACTIVATE);
             Interop.SetWindowLong(hwnd, Interop.GWL_EXSTYLE, newStyle);
         }
 
         public void SetAsToolWindow()
         {
-            WindowInteropHelper wih = new WindowInteropHelper(this);
-            IntPtr dwNew = new IntPtr(((long)Interop.GetWindowLong(wih.Handle, Interop.GWL_EXSTYLE).ToInt32() | 128L | 0x00200000L) & 4294705151L);
+            WindowInteropHelper wih = new(this);
+            IntPtr dwNew = new(((long)Interop.GetWindowLong(wih.Handle, Interop.GWL_EXSTYLE).ToInt32() | 128L | 0x00200000L) & 4294705151L);
             Interop.SetWindowLong((nint)new HandleRef(this, wih.Handle), Interop.GWL_EXSTYLE, dwNew);
         }
     }

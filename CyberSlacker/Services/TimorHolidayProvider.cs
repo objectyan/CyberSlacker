@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using CyberSlacker.Models;
 using System.Net.Http;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using CyberSlacker.Models;
 
 namespace CyberSlacker.Services
 {
     public class TimorProvider : IHolidayProvider
     {
-        private static readonly HttpClient _client = new HttpClient();
+        private static readonly HttpClient _client = new();
 
         public async Task<List<HolidayItem>> FetchYearDataAsync(int year)
         {
@@ -20,7 +15,7 @@ namespace CyberSlacker.Services
                 var resp = await _client.GetStringAsync($"https://timor.tech/api/holiday/year/{year}");
                 using var doc = JsonDocument.Parse(resp);
 
-                if (doc.RootElement.GetProperty("code").GetInt32() != 0) return new List<HolidayItem>();
+                if (doc.RootElement.GetProperty("code").GetInt32() != 0) return [];
 
                 var holidayObj = doc.RootElement.GetProperty("holiday");
                 var list = new List<HolidayItem>();
@@ -29,25 +24,23 @@ namespace CyberSlacker.Services
                 {
                     var item = prop.Value;
 
-                    // 根据你截图的字段解析
                     bool isHoliday = item.GetProperty("holiday").GetBoolean();
-                    string dateStr = item.GetProperty("date").GetString();
-                    string name = item.GetProperty("name").GetString();
+                    string dateStr = item.GetProperty("date").GetString() ?? "";
+                    string name = item.GetProperty("name").GetString() ?? "节假日";
 
                     list.Add(new HolidayItem
                     {
                         Date = DateTime.Parse(dateStr),
                         Name = name,
-                        // 核心逻辑：在这个列表里，holiday为true是节日，false是调休上班
                         Type = isHoliday ? DayType.Holiday : DayType.Tiaoxiu
                     });
                 }
-                return list.OrderBy(x => x.Date).ToList();
+                return [.. list.OrderBy(x => x.Date)];
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("解析失败: " + ex.Message);
-                return new List<HolidayItem>();
+                return [];
             }
         }
     }
