@@ -91,19 +91,18 @@ jobs:
       run: |
         $ver = "${{ env.PREVIEW_VER }}"
         $arch = "${{ matrix.arch }}"
-        $repo = $env:GITHUB_REPOSITORY
         
-        if (-not (Test-Path "manifests")) { mkdir manifests }
+        if (-not (Test-Path "manifests")) { New-Item -ItemType Directory -Path "manifests" }
         
         $xmlContent = @"
-            <?xml version="1.0" encoding="UTF-8"?>
-            <item>
-                <version>$ver</version>
-                <url>https://github.com/$repo/releases/download/preview/CyberSlacker_Preview_$arch.msi</url>
-                <changelog>https://github.com/$repo/releases/tag/preview</changelog>
-                <mandatory>true</mandatory>
-            </item>
-            "@
+        <?xml version="1.0" encoding="UTF-8"?>
+        <item>
+            <version>$ver</version>
+            <url>https://github.com/${{ github.repository }}/releases/download/preview/CyberSlacker_Preview_$arch.msi</url>
+            <changelog>https://github.com/${{ github.repository }}/releases/tag/preview</changelog>
+            <mandatory>true</mandatory>
+        </item>
+        "@
         $xmlContent | Set-Content -Path "manifests/Update_preview_$arch.xml" -Encoding utf8
 
     - name: Upload Artifacts
