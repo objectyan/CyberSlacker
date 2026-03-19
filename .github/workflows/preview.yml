@@ -75,9 +75,9 @@ jobs:
             -o ./publish-${{ matrix.arch }} 
             
     - name: Build MSI
+      shell: pwsh
       run: |
-        net start msiserver
-        dotnet wix build Package.wxs `
+        wix build Package.wxs `
           -ext WixToolset.Netfx.wixext/6.0.2 `
           -ext WixToolset.Util.wixext/6.0.2 `
           -culture zh-CN `
