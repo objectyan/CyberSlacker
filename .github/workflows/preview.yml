@@ -11,6 +11,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true 
+
 jobs:
   build-preview:
     strategy:
@@ -138,6 +142,9 @@ jobs:
         
         git config --global user.name "github-actions"
         git config --global user.email "action@github.com"
+
+        git pull origin master --rebase
+
         git add manifests/Update_preview_*.xml
         
         $status = git status --porcelain
@@ -161,7 +168,7 @@ jobs:
           - **构建编号**: ${{ github.run_number }}
           ---
           *警告：预览版可能包含未完成的功能，仅供测试。*
-        artifacts: "./temp_preview/*.msi"
+        artifacts: "./temp_preview/Output/*.msi"
         allowUpdates: true
         removeArtifacts: true # 删掉上一次预览版的文件，换成最新的
         replacesArtifacts: true
