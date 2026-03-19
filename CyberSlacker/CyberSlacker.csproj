@@ -44,6 +44,7 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Emoji.Wpf" Version="0.3.4" />
     <PackageReference Include="H.NotifyIcon.Wpf" Version="2.3.2" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="10.0.5" />
     <PackageReference Include="System.Management" Version="10.0.5" />
   </ItemGroup>
