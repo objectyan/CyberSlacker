@@ -159,7 +159,6 @@ jobs:
           - **编译时间**: ${{ github.event.head_commit.timestamp }}
           - **提交记录**: ${{ github.event.head_commit.message }}
           - **构建编号**: ${{ github.run_number }}
-          - **预览版本号**: ${{ env.PREVIEW_VER }}
           ---
           *警告：预览版可能包含未完成的功能，仅供测试。*
         artifacts: "./temp_preview/*.msi"
