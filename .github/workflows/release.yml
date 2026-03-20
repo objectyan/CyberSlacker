@@ -179,9 +179,9 @@ jobs:
           $tag = "${{ github.ref_name }}"
           $ver = $tag.TrimStart('v')
 
-          $h64 = (Get-FileHash "./all_assets/CyberSlacker_x64.msi" -Algorithm SHA256).Hash
-          $h86 = (Get-FileHash "./all_assets/CyberSlacker_x86.msi" -Algorithm SHA256).Hash
-          $hArm = (Get-FileHash "./all_assets/CyberSlacker_arm64.msi" -Algorithm SHA256).Hash
+          $h64 = (Get-FileHash "./all_assets/Output/CyberSlacker_${ver}_x64.msi" -Algorithm SHA256).Hash
+          $h86 = (Get-FileHash "./all_assets/Output/CyberSlacker_${ver}_x86.msi" -Algorithm SHA256).Hash
+          $hArm = (Get-FileHash "./all_assets/Output/CyberSlacker_${ver}_arm64.msi" -Algorithm SHA256).Hash
 
           Write-Host "x64 Hash: $h64"
           Write-Host "x86 Hash: $h86"
