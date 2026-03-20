@@ -192,13 +192,17 @@ jobs:
           $nuspecPath = "choco/CyberSlacker.nuspec"
           $scriptPath = "choco/tools/chocolateyInstall.ps1"
 
-           (Get-Content $scriptPath) `
-            .Replace('[[VERSION]]', $ver) `
-            .Replace('[[HASH64]]', $h64) `
-            .Replace('[[HASH32]]', $h86) `
-            .Replace('[[HASHARM]]', $hArm) | Set-Content $ps1Path
+          $ps1Content = Get-Content $scriptPath -Raw
+          $ps1Content = $ps1Content.Replace('[[VERSION]]', $ver) `
+                                   .Replace('[[HASH64]]', $h64) `
+                                   .Replace('[[HASH32]]', $h86) `
+                                   .Replace('[[HASHARM]]', $hArm)
+          $ps1Content | Set-Content $scriptPath -Encoding UTF8
 
-          (Get-Content $nuspecPath).Replace('0.0.1', $ver) | Set-Content $nuspecPath
+          $nuspecContent = Get-Content $nuspecPath -Raw
+          $nuspecContent = $nuspecContent.Replace('0.0.1', $ver)
+          $nuspecContent | Set-Content $nuspecPath -Encoding UTF8
+          
       - name: Pack and Push to Chocolatey
         shell: pwsh
         run: |

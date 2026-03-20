@@ -216,5 +216,15 @@ namespace CyberSlacker.Util
         }
 
         #endregion
+
+
+        /// <summary>
+        /// 获取进程工作集
+        /// </summary>
+        /// <param name="hProcess"></param>
+        /// <returns></returns>
+        [LibraryImport("psapi.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static partial bool EmptyWorkingSet(nint hProcess);
     }
 }

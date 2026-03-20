@@ -18,6 +18,8 @@ namespace CyberSlacker.ViewModels
         private bool _hasNotifiedMeal = false;
         private bool _hasNotifiedToday = false;
 
+        private DateTime _nextTipUpdateTime = DateTime.MinValue;
+
         private DateTime _lastRestNotifyTime = DateTime.Now;
 
         [ObservableProperty] private string _offWorkCountdown = "计算中...";
@@ -66,23 +68,31 @@ namespace CyberSlacker.ViewModels
             // 3. 周末（现在内部有离线判定兜底，不会一直卡在“同步中”）
             WeekendCountdown = CountdownEngine.GetWeekendString(now, _holidayService);
 
-            // 4. 发薪日
-            PayDayCountdown = CountdownEngine.GetPaydayString(now, _holidayService);
 
-            // 5. 下一个节日
-            var (holidayName, holidayCountdown) = CountdownEngine.GetNextHolidayInfo(now, _holidayService);
-            NextHolidayName = holidayName;
-            NextHolidayCountdown = holidayCountdown;
 
-            DateTime startOfDay = new(now.Year, now.Month, now.Day);
-            TimeSpan timeSpan = now - startOfDay;
-            int seconds = (int)timeSpan.TotalSeconds;
-            int step = _rng.Next(30, 300);
-
-            // 6. 动态提示语 (每30秒换一次)
-            if (seconds % step == 0 || string.IsNullOrEmpty(HolidayTip) || HolidayTip == "正在加载...")
+            // 4, 动态提示语 (每30秒换一次)
+            if (now >= _nextTipUpdateTime)
             {
-                HolidayTip = CountdownEngine.GetDynamicTip(now, todayInfo, _holidayService, _lastRestNotifyTime);
+                int roll = _rng.Next(0, 100);
+                if (roll < 60)
+                {
+                    // 动态提示语
+                    HolidayTip = CountdownEngine.GetDynamicTip(now, todayInfo, _holidayService, _lastRestNotifyTime);
+                }
+                else if (roll < 80)
+                {
+                    // 发薪日
+                    PayDayCountdown = CountdownEngine.GetPaydayString(now, _holidayService);
+                }
+                else
+                {
+                    // 下一个节日
+                    var (holidayName, holidayCountdown) = CountdownEngine.GetNextHolidayInfo(now, _holidayService);
+                    NextHolidayName = holidayName;
+                    NextHolidayCountdown = holidayCountdown;
+                }
+                // 设置下次刷新时间：当前时间 + 30~300秒 之间的随机值
+                _nextTipUpdateTime = now.AddSeconds(_rng.Next(30, 301));
             }
 
             CheckOffWorkNotification(now);
@@ -91,6 +101,7 @@ namespace CyberSlacker.ViewModels
 
             CheckCyclicRestNotification(now);
 
+
             var (cpu, ram, netIn, netOut, gpu) = _hardwareService.GetStats();
             HwCpu = $"{cpu:F0}%";
             HwRam = $"{ram:F0}%";
@@ -98,11 +109,15 @@ namespace CyberSlacker.ViewModels
             HwNet = $"↓{netIn} ↑{netOut}";
 
             TaskbarTooltip = $"{HolidayTip}\n" +
-                             $"下班倒计时: {OffWorkCountdown}\n" +
-                             $"周末倒计时: {WeekendCountdown}\n" +
-                             $"发薪日倒计时: {PayDayCountdown}\n" +
-                             $"下一个节日: {NextHolidayName} ({NextHolidayCountdown})";
+                             $"⏳ 下班: {OffWorkCountdown}\n" +
+                             $"📅 周末: {WeekendCountdown}\n" +
+                             $"💰 发薪: {PayDayCountdown}\n" +
+                             $"🎁 下个节日: {NextHolidayName} ({NextHolidayCountdown})";
 
+            if (now.Second == 0)
+            {
+                App.FlushMemory();
+            }
         }
 
         /// <summary>

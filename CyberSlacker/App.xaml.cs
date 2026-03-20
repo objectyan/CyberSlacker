@@ -2,6 +2,7 @@
 using CyberSlacker.Properties;
 using CyberSlacker.Services;
 using Serilog;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -62,6 +63,19 @@ namespace CyberSlacker
             Log.Information(">>> 赛博摸鱼员 正常关闭 <<<");
             Log.CloseAndFlush();
             base.OnExit(e);
+        }
+
+
+
+        // 提供一个手动清理内存的方法
+        public static void FlushMemory()
+        {
+            try
+            {
+                using var process = Process.GetCurrentProcess();
+                Util.Interop.EmptyWorkingSet(process.Handle);
+            }
+            catch { }
         }
     }
 
