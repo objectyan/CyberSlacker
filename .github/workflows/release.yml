@@ -193,9 +193,9 @@ jobs:
           $scriptPath = "choco/tools/chocolateyInstall.ps1"
 
           $ps1Content = Get-Content $scriptPath -Raw
-          $ps1Content = $ps1Content.Replace('[[VERSION]]', $ver) `
-          $ps1Content = $ps1Content.Replace('[[HASH64]]', $h64) `
-          $ps1Content = $ps1Content.Replace('[[HASH32]]', $h86) `
+          $ps1Content = $ps1Content.Replace('[[VERSION]]', $ver) 
+          $ps1Content = $ps1Content.Replace('[[HASH64]]', $h64)
+          $ps1Content = $ps1Content.Replace('[[HASH32]]', $h86)
           $ps1Content = $ps1Content.Replace('[[HASHARM]]', $hArm)
           $ps1Content | Set-Content $scriptPath -Encoding UTF8
 
