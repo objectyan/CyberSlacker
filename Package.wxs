@@ -64,7 +64,7 @@
     <InstallExecuteSequence>
       <!-- 核心逻辑： OnExit="success" 配合 Condition -->
       <!-- NOT REMOVE="ALL" 表示：只要不是在彻底卸载，就执行启动（包含初装和升级） -->
-      <Custom Action="LaunchApp" OnExit="success" Condition="NOT REMOVE=&quot;ALL&quot;" />
+      <Custom Action="LaunchApp" OnExit="success" Condition="NOT Installed AND NOT REMOVE=&quot;ALL&quot; AND UILevel &gt; 3" />
     </InstallExecuteSequence>
 
     <ComponentGroup Id="MainComponents" Directory="INSTALLFOLDER">
