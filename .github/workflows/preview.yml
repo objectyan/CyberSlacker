@@ -5,8 +5,10 @@ on:
     branches:
       - master  # 当 main 分支有变动时触发
     paths-ignore:
-      - '**.md'
-      - 'manifests/**' # 忽略只修改文档或正式版清单的提交
+      - '.github/workflows/**' # 修改任何 yml 工作流文件都不触发编译
+      - '**.md'                # 修改 README 等文档不触发
+      - 'LICENSE'              # 修改授权协议不触发
+      - 'manifests/**'         # 忽略清单目录变动（防止机器人自己推代码导致死循环）
 
 permissions:
   contents: write
