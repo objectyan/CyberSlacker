@@ -52,30 +52,30 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        $latestTag = "v1.0.0" 
+        # 1. 默认起始版本
+        $latestTag = "v1.0.0"
 
-        try {
-            # 1. 直接获取最新正式发布的 Tag 名称 (例如 v1.0.1)
-            $response = gh api repos/${{ github.repository }}/releases/latest --jq '.tag_name' 2>$null
-            if ($LASTEXITCODE -eq 0 -and $response) {
-              $latestTag = $response
-              Write-Host "检测到云端已发布版本: $latestTag"
-            } else {
-              Write-Host "云端未发现发布记录，使用起始默认值: $latestTag"
-            }
-        } catch {
-            # 2. 如果从未发布过，给个初始版本
-            $latestTag = "v1.0.0"
+        # 2. 尝试获取版本，使用 2>$null 吞掉错误日志
+        $response = gh api repos/$env:GITHUB_REPOSITORY/releases/latest --jq '.tag_name' 2>$null
+
+        # 3. 这里的 $? 会检查上一个命令是否成功
+        if ($? -and $response) {
+            $latestTag = $response
+            Write-Host "检测到云端已发布版本: $latestTag"
+        } else {
+            Write-Host "云端未发现发布记录（或请求 404），采用默认起始值: $latestTag"
         }
-        
-        # 清洗：去掉前面的 'v'
+
+        # 4. 正常执行版本号清洗和拼接
         $baseVer = $latestTag.TrimStart('v')
-        
-        # 3. 构造预览版版本号：最新正式版.构建流水号
         $fullVer = "$baseVer.${{ github.run_number }}"
+
+        # 5. 写入环境变量
+        "PREVIEW_VER=$fullVer" | Out-File -FilePath $env:GITHUB_ENV -Append
+        Write-Host "最终生成的预览版本号为: $fullVer"
         
-        echo "PREVIEW_VER=$fullVer" >> $env:GITHUB_ENV
-        Write-Host "检测到云端最新版本: $latestTag, 最终预览版: $fullVer"
+        # 🌟 核心修复：强制设置退出码为 0，防止 404 导致整步变红
+        exit 0
     
     - name: Publish Application
       run: |
