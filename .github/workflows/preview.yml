@@ -52,9 +52,17 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+        $latestTag = "v1.0.0" 
+
         try {
             # 1. 直接获取最新正式发布的 Tag 名称 (例如 v1.0.1)
-            $latestTag = gh api repos/${{ github.repository }}/releases/latest --jq '.tag_name'
+            $response = gh api repos/${{ github.repository }}/releases/latest --jq '.tag_name' 2>$null
+            if ($LASTEXITCODE -eq 0 -and $response) {
+              $latestTag = $response
+              Write-Host "检测到云端已发布版本: $latestTag"
+            } else {
+              Write-Host "云端未发现发布记录，使用起始默认值: $latestTag"
+            }
         } catch {
             # 2. 如果从未发布过，给个初始版本
             $latestTag = "v1.0.0"
