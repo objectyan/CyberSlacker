@@ -6,18 +6,19 @@ on:
       - master  # 当 main 分支有变动时触发
     paths-ignore:
       - '**.md'
-      - 'manifests/Update_*.xml' # 忽略只修改文档或正式版清单的提交
+      - 'manifests/**' # 忽略只修改文档或正式版清单的提交
 
 permissions:
   contents: write
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true 
+  group: preview-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-preview:
     strategy:
+      fail-fast: false
       matrix:
         arch: [x64, x86, arm64] # 预览版只提供主流架构，加快编译速度
     runs-on: windows-latest
@@ -138,11 +139,13 @@ jobs:
       shell: pwsh
       run: |
         if (-not (Test-Path "manifests")) { mkdir manifests }
-        Move-Item -Force "./temp_preview/Update_preview_*.xml" "./manifests/"
+        Move-Item -Force "./temp_preview/manifests/Update_preview_*.xml" "./manifests/"
         
         git config --global user.name "github-actions"
         git config --global user.email "action@github.com"
 
+        git pull origin master --rebase
+        
         git add manifests/Update_preview_*.xml
         
         $status = git status --porcelain

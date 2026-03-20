@@ -120,7 +120,7 @@ jobs:
       - name: Sync XML to Repo
         shell: pwsh
         run: |
-          move -Force "./temp_all/Update_*.xml" "./manifests/"
+          move -Force "./temp_all/manifests/Update_*.xml" "./manifests/"
           git config --global user.name "github-actions"
           git config --global user.email "action@github.com"
           git add manifests/Update_*.xml

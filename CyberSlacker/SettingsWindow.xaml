@@ -40,7 +40,7 @@
                 <ComboBox x:Name="MealHour" Width="60"/>
                 <TextBlock Text=" : " VerticalAlignment="Center"/>
                 <ComboBox x:Name="MealMin" Width="60"/>
-                <TextBlock Text=" (通常设为11:50)" FontSize="10" Foreground="Gray" Margin="10,0,0,0"/>
+                <TextBlock Text=" (通常设置午休前10分钟)" FontSize="10" Foreground="Gray" Margin="10,0,0,0"/>
             </StackPanel>
 
             <!-- 午休设置 -->
