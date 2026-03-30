@@ -26,7 +26,7 @@ if ($isArm64) {
 
 # 4. 配置安装参数
 $packageArgs = @{
-  packageName    = 'laborlogic.cyberslacker'
+  packageName    = 'laborlogic-cyberslacker.install'
   fileType       = 'msi'
   
   # 如果是 32 位系统装 x86，如果是 64 位系统(含ARM)装对应的 64 位包

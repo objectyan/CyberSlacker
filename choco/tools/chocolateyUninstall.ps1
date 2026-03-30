@@ -2,7 +2,7 @@
 
 $ErrorActionPreference = 'Stop';
 
-$packageName = 'laborlogic.cyberslacker'
+$packageName = 'laborlogic-cyberslacker.install'
 $softwareName = 'CyberSlacker (赛博摸鱼员)'
 $installerType = 'MSI' 
 

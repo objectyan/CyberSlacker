@@ -219,7 +219,7 @@ namespace CyberSlacker.Util
 
 
         /// <summary>
-        /// 获取进程工作集
+        /// 清理内存
         /// </summary>
         /// <param name="hProcess"></param>
         /// <returns></returns>
