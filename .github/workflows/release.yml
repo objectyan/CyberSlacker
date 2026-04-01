@@ -37,6 +37,9 @@ jobs:
             --self-contained false `
             -p:PublishSingleFile=false `
             -p:Version=$ver `
+            -p:FileVersion="$ver" `
+            -p:AssemblyVersion="$ver" `
+            -p:IncludeSourceRevisionInInformationalVersion=false `
             -o ./publish-${{ matrix.arch }}
 
       - name: Install WiX Toolset
