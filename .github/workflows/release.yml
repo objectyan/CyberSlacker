@@ -153,6 +153,12 @@ jobs:
     needs: release
     runs-on: ubuntu-latest
     steps:
+      # 等待 GitHub API 索引同步
+      - name: Wait for Release assets to be ready
+        run: |
+          echo "Waiting for 60 seconds to ensure all MSI assets are indexed by GitHub API..."
+          sleep 60
+          
       - name: Submit to WinGet
         uses: vedantmgoyal9/winget-releaser@v2
         with:
