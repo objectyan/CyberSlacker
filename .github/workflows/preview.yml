@@ -168,6 +168,13 @@ jobs:
             git push origin master
         }
 
+    - name: Delete Old Preview Release
+      uses: dev-drprasad/delete-tag-and-release@v1.1
+      with:
+        tag_name: preview
+        delete_release: true
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Update Preview Release
       uses: ncipollo/release-action@v1
       with:
