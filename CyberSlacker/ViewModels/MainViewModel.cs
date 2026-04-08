@@ -71,7 +71,20 @@ namespace CyberSlacker.ViewModels
 
 
             // 4, 动态提示语 (每30秒换一次)
-            if (now >= _nextTipUpdateTime)
+            if (HolidayTip == "正在加载..." || PayDayCountdown == "加载中" || NextHolidayName == "" || NextHolidayCountdown == "")
+            {
+                // 动态提示语
+                HolidayTip = CountdownEngine.GetDynamicTip(now, todayInfo, _holidayService, _lastRestNotifyTime);
+                // 发薪日
+                PayDayCountdown = CountdownEngine.GetPaydayString(now, _holidayService);
+                // 下一个节日
+                var (holidayName, holidayCountdown) = CountdownEngine.GetNextHolidayInfo(now, _holidayService);
+                NextHolidayName = holidayName;
+                NextHolidayCountdown = holidayCountdown;
+                // 设置下次刷新时间：当前时间 + 30~300秒 之间的随机值
+                _nextTipUpdateTime = now.AddSeconds(_rng.Next(30, 301));
+            }
+            else if (now >= _nextTipUpdateTime)
             {
                 int roll = _rng.Next(0, 100);
                 if (roll < 60)
@@ -108,11 +121,12 @@ namespace CyberSlacker.ViewModels
             HwGpu = $"{gpu:F0}%";
             HwNet = $"↓{netIn} ↑{netOut}";
 
-            TaskbarTooltip = $"{HolidayTip}\n" +
+            TaskbarTooltip = $"{GetMaxString(HolidayTip, 30)}\n" +
                              $"⏳ 下班: {OffWorkCountdown}\n" +
                              $"📅 周末: {WeekendCountdown}\n" +
                              $"💰 发薪: {PayDayCountdown}\n" +
-                             $"🎁 下个节日: {NextHolidayName} ({NextHolidayCountdown})";
+                             $"🎁 下个节日: {NextHolidayName} ({NextHolidayCountdown})\n" +
+                             $"🚀 网速:{HwNet}";
 
             if (now.Second == 0)
             {
@@ -128,6 +142,12 @@ namespace CyberSlacker.ViewModels
             DateTime now = DateTime.Now;
             var todayInfo = _holidayService.GetDateInfo(now);
             HolidayTip = CountdownEngine.GetDynamicTip(now, todayInfo, _holidayService, _lastRestNotifyTime);
+        }
+
+        private string GetMaxString(string mes, int length)
+        {
+            if (String.IsNullOrWhiteSpace(mes) || mes.Length <= length || length - 3 <= 0) return mes;
+            return mes.Substring(0, length - 3) + "...";
         }
 
         private void CheckOffWorkNotification(DateTime now)

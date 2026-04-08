@@ -1,5 +1,4 @@
-﻿using AutoUpdaterDotNET;
-using CommunityToolkit.Mvvm.Messaging;
+﻿using CommunityToolkit.Mvvm.Messaging;
 using CyberSlacker.Properties;
 using CyberSlacker.Util;
 using CyberSlacker.ViewModels;
@@ -23,16 +22,20 @@ namespace CyberSlacker
             InitializeComponent();
 
             // 加载保存的值
-            this.Left = Properties.Settings.Default.WindowLeft;
-            this.Top = Properties.Settings.Default.WindowTop;
-            this.Width = Properties.Settings.Default.WindowWidth;
-            this.Height = Properties.Settings.Default.WindowHeight;
+            this.Left = Settings.Default.WindowLeft;
+            this.Top = Settings.Default.WindowTop;
+            this.Width = Settings.Default.WindowWidth;
+            this.Height = Settings.Default.WindowHeight;
 
             // 注入并持有引用
             _vm = new MainViewModel();
             this.DataContext = _vm;
 
-            AutoUpdater.Start(App.GetUpdateUrl());
+#if !DEBUG
+                AutoUpdater.Start(App.GetUpdateUrl());
+#endif
+
+
 
             WeakReferenceMessenger.Default.Register<string[], string>(this, "NotifyOffWork", (r, m) =>
             {
@@ -97,7 +100,10 @@ namespace CyberSlacker
                 });
             });
 
-            this.Loaded += MainWindow_Loaded;
+            this.Loaded += (s, e) =>
+            {
+                this.SetBinding(Window.OpacityProperty, new Binding("Opacity") { Source = Settings.Default });
+            };
 
             // 订阅窗口关闭事件进行资源释放
             this.Closed += (s, e) =>
@@ -105,17 +111,6 @@ namespace CyberSlacker
                 _vm.Dispose();
                 WeakReferenceMessenger.Default.UnregisterAll(this);
             };
-        }
-
-        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (Settings.Default.WindowLeft > 0)
-            {
-                this.Left = Settings.Default.WindowLeft;
-                this.Top = Settings.Default.WindowTop;
-            }
-            this.SetBinding(Window.OpacityProperty, new Binding("Opacity") { Source = Properties.Settings.Default });
-            EnsureWindowIsVisible();
         }
 
         private void OpenSettings_Click(object sender, RoutedEventArgs e)
@@ -154,9 +149,9 @@ namespace CyberSlacker
                 // 获取精确的物理位置
                 if (GetWindowRect(hWnd, out RECT rect))
                 {
-                    Properties.Settings.Default.WindowLeft = rect.Left;
-                    Properties.Settings.Default.WindowTop = rect.Top;
-                    Properties.Settings.Default.Save();
+                    Settings.Default.WindowLeft = rect.Left;
+                    Settings.Default.WindowTop = rect.Top;
+                    Settings.Default.Save();
                 }
             }
         }
@@ -167,35 +162,6 @@ namespace CyberSlacker
             {
                 // 调用 ViewModel 的方法
                 vm.RefreshHolidayTip();
-            }
-        }
-
-        private void EnsureWindowIsVisible()
-        {
-            double vLeft = SystemParameters.VirtualScreenLeft;
-            double vTop = SystemParameters.VirtualScreenTop;
-            double vWidth = SystemParameters.VirtualScreenWidth;
-            double vHeight = SystemParameters.VirtualScreenHeight;
-
-            this.Left = Properties.Settings.Default.WindowLeft;
-            this.Top = Properties.Settings.Default.WindowTop;
-
-            // 检查当前坐标是否在所有显示器围成的“大画布”内
-            bool isVisible = (this.Left >= vLeft &&
-                              this.Left < (vLeft + vWidth - 50) &&
-                              this.Top >= vTop &&
-                              this.Top < (vTop + vHeight - 50));
-
-            if (!isVisible)
-            {
-                // 跑丢了，重置回主屏幕坐标
-                this.Left = 100;
-                this.Top = 100;
-
-                // 同步更新保存的设置
-                Properties.Settings.Default.WindowLeft = 100;
-                Properties.Settings.Default.WindowTop = 100;
-                Properties.Settings.Default.Save();
             }
         }
 
@@ -222,7 +188,6 @@ namespace CyberSlacker
                 System.Diagnostics.Debug.WriteLine("无桌面环境，跳过托盘初始化");
             }
 
-
             IntPtr hwnd = new WindowInteropHelper(this).Handle;
             int exStyle = (int)Interop.GetWindowLong(hwnd, Interop.GWL_EXSTYLE);
             Interop.SetWindowLong(hwnd, Interop.GWL_EXSTYLE, exStyle | Interop.WS_EX_NOACTIVATE);
@@ -230,6 +195,7 @@ namespace CyberSlacker
             SetAsDesktopChild();
             SetNoActivate();
             SetAsToolWindow();
+
         }
 
         private void KeepWindowBehind()
@@ -276,10 +242,16 @@ namespace CyberSlacker
             _windowsScalingFactor = dpi / 96.0;
             POINT pt = new()
             {
-                X = (int)(100 * _windowsScalingFactor),
-                Y = (int)(100 * _windowsScalingFactor)
+                X = (int)(Settings.Default.WindowLeft * _windowsScalingFactor),
+                Y = (int)(Settings.Default.WindowTop * _windowsScalingFactor)
             };
             ScreenToClient(shellView, ref pt);
+
+            int width = (int)(Settings.Default.WindowWidth * _windowsScalingFactor);
+            int height = (int)(Settings.Default.WindowHeight * _windowsScalingFactor);
+
+            Interop.SetWindowPos(hwnd, IntPtr.Zero, pt.X, pt.Y, width, height, SWP_NOZORDER | SWP_SHOWWINDOW);
+
         }
 
         public void SetNoActivate()

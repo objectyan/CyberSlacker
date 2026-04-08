@@ -13,6 +13,13 @@ namespace CyberSlacker.Util
 
         #region 窗口与显示 (Window & Display)
 
+        /// <summary> 
+        /// 向窗口发送带超时的消息
+        /// 用于向 Progman 发送 0x052C，强制生成 WorkerW
+        /// </summary>
+        [LibraryImport(User32, EntryPoint = "SendMessageTimeoutW")]
+        internal static partial nint SendMessageTimeout(nint hWnd, uint Msg, nint wParam, nint lParam, uint fuFlags, uint uTimeout, out nint lpdwResult);
+
         /// <summary> 获取指定窗口的 DPI 缩放值（用于适配高分屏） </summary>
         [LibraryImport(User32)]
         internal static partial uint GetDpiForWindow(nint hwnd);
