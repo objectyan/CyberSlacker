@@ -20,7 +20,19 @@
 
             <!-- 2. 标题与版本 -->
             <TextBlock Text="赛博摸鱼员" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Foreground="#333"/>
-            <TextBlock x:Name="VersionText" Text="Version 1.0.0" FontSize="12" HorizontalAlignment="Center" Foreground="#888" Margin="0,5,0,20"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,20">
+                <TextBlock x:Name="VersionText" Text="Version 1.0.0" FontSize="12" HorizontalAlignment="Center" Foreground="#888"/>
+                <!-- 预览版标签：默认隐藏 -->
+                <Border x:Name="PreviewBadge" 
+                        Visibility="Collapsed" 
+                        Background="#FF9800" 
+                        CornerRadius="4" 
+                        Padding="6,2" 
+                        Margin="10,0,0,0"
+                        VerticalAlignment="Center">
+                    <TextBlock Text="PREVIEW" FontSize="10" FontWeight="Bold" Foreground="White"/>
+                </Border>
+            </StackPanel>
 
             <!-- 3. 宣言 -->
             <StackPanel Background="#E1F5FE" Margin="0,0,0,25">
