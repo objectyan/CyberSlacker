@@ -87,6 +87,9 @@ jobs:
             --self-contained false `
             -p:PublishSingleFile=false `
             -p:Version=${{ env.PREVIEW_VER }} `
+            -p:FileVersion="${{ env.PREVIEW_VER }}" `
+            -p:AssemblyVersion="${{ env.PREVIEW_VER }}" `
+            -p:IncludeSourceRevisionInInformationalVersion=false `
             -o ./publish-${{ matrix.arch }} 
             
     - name: Build MSI
