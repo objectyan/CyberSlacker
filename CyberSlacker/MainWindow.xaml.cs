@@ -32,11 +32,8 @@ namespace CyberSlacker
             this.DataContext = _vm;
 
 #if !DEBUG
-                AutoUpdater.Start(App.GetUpdateUrl());
+            AutoUpdaterDotNET.AutoUpdater.Start(App.GetUpdateUrl());      
 #endif
-
-
-
             WeakReferenceMessenger.Default.Register<string[], string>(this, "NotifyOffWork", (r, m) =>
             {
                 // m[0] 是标题，m[1] 是内容
