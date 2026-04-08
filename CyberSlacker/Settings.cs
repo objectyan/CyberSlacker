@@ -1,4 +1,7 @@
-﻿namespace CyberSlacker.Properties
+﻿using CyberSlacker.Util;
+using System.Configuration;
+
+namespace CyberSlacker.Properties
 {
 
 
@@ -7,6 +10,7 @@
     //  在更改某个设置的值之后将引发 PropertyChanged 事件。
     //  在加载设置值之后将引发 SettingsLoaded 事件。
     //  在保存设置值之前将引发 SettingsSaving 事件。
+    [SettingsProvider(typeof(FixedPathSettingsProvider))]
     internal sealed partial class Settings
     {
 

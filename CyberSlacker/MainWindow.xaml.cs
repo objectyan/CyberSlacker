@@ -21,6 +21,14 @@ namespace CyberSlacker
         {
             InitializeComponent();
 
+
+            if (Settings.Default.IsUpgradeRequired) // 假设你在设置里定义了这个 bool
+            {
+                Settings.Default.Upgrade();
+                Settings.Default.IsUpgradeRequired = false;
+                Settings.Default.Save();
+            }
+
             // 加载保存的值
             this.Left = Settings.Default.WindowLeft;
             this.Top = Settings.Default.WindowTop;
