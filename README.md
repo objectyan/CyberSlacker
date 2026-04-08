@@ -1,8 +1,8 @@
 # ⚡ CyberSlacker (赛博摸鱼员)
 
 
-[![Build Status](https://github.com/objectyan/CyberSlacker/actions/workflows/release.yml/badge.svg)](https://github.com/objectyan/CyberSlacker/actions)
-[![Preview Build Status](https://github.com/objectyan/CyberSlacker/actions/workflows/preview.yml/badge.svg)](https://github.com/objectyan/CyberSlacker/releases/tag/preview)
+[![Build Status](https://github.com/objectyan/CyberSlacker/actions/workflows/release.yml/badge.svg)](https://github.com/objectyan/CyberSlacker/actions/workflows/release.yml)
+[![Preview Build Status](https://github.com/objectyan/CyberSlacker/actions/workflows/preview.yml/badge.svg)](https://github.com/objectyan/CyberSlacker/actions/workflows/preview.yml)
 [![WinGet Version](https://img.shields.io/winget/v/LaborLogic.CyberSlacker?label=winget&style=flat-square)](https://github.com/microsoft/winget-pkgs)
 [![Latest Release](https://img.shields.io/github/v/release/objectyan/CyberSlacker?color=orange&logo=github)](https://github.com/objectyan/CyberSlacker/releases)
 [![License](https://img.shields.io/github/license/objectyan/CyberSlacker?color=blue)](https://github.com/objectyan/CyberSlacker/blob/master/LICENSE)
