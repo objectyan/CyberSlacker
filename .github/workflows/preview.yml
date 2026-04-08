@@ -168,13 +168,6 @@ jobs:
             git push origin master
         }
 
-    - name: Delete Old Preview Release
-      uses: dev-drprasad/delete-tag-and-release@v1.1
-      with:
-        tag_name: preview
-        delete_release: true
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-
     - name: Update Preview Release
       uses: ncipollo/release-action@v1
       with:
@@ -195,3 +188,12 @@ jobs:
         replacesArtifacts: true
         prerelease: true # 🌟 核心：标记为预发布版
         token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Push Preview to Top
+      run: |
+        curl -L \
+          -X PATCH \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          https://api.github.com/repos/${{ github.repository }}/releases/tags/preview \
+          -d "{\"published_at\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}"
