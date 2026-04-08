@@ -192,6 +192,7 @@ jobs:
           ---
           *警告：预览版可能包含未完成的功能，仅供测试。*
         artifacts: "./temp_preview/Output/*.msi"
+        generateReleaseNotes: true
         allowUpdates: true
         removeArtifacts: true # 删掉上一次预览版的文件，换成最新的
         replacesArtifacts: true
