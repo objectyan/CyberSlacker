@@ -1,4 +1,5 @@
 ﻿using AutoUpdaterDotNET;
+using CyberSlacker.Properties;
 using System.Diagnostics;
 using System.Reflection;
 using System.Windows;
@@ -17,6 +18,10 @@ namespace CyberSlacker
 
             var version = Assembly.GetExecutingAssembly().GetName().Version;
             VersionText.Text = $"Version {version?.Major}.{version?.Minor}.{version?.Build}";
+            if (Settings.Default.IsPreviewEnabled)
+            {
+                VersionText.Text += $".{version?.Revision}";
+            }
         }
 
         private void OnNavigate(object sender, RequestNavigateEventArgs e)
