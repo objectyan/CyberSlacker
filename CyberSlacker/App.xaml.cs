@@ -1,6 +1,7 @@
 ﻿using AutoUpdaterDotNET;
 using CyberSlacker.Properties;
 using CyberSlacker.Services;
+using CyberSlacker.Util;
 using Serilog;
 using System.Diagnostics;
 using System.IO;
@@ -38,6 +39,8 @@ namespace CyberSlacker
                 new FrameworkPropertyMetadata { DefaultValue = 20 } // 桌面挂件 20 帧足够，能省电
             );
 
+            // 优化是否开机重启
+            StartupHelper.SetStartup(Settings.Default.IsAutoStart);
             base.OnStartup(e);
         }
 

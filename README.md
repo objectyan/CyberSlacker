@@ -1,7 +1,7 @@
 # ⚡ CyberSlacker (赛博摸鱼员)
 
 
-[![Build Status](https://img.shields.io/github/actions/workflow/status/objectyan/CyberSlacker/release.yml?label=release&style=flat-square)](https://github.com/objectyan/CyberSlacker/actions/workflows/release.yml)
+[![Build Status](https://github.com/objectyan/CyberSlacker/actions/workflows/release.yml/badge.svg?branch=master)](https://github.com/objectyan/CyberSlacker/actions/workflows/release.yml)
 [![Preview Build Status](https://github.com/objectyan/CyberSlacker/actions/workflows/preview.yml/badge.svg?branch=master)](https://github.com/objectyan/CyberSlacker/actions/workflows/preview.yml)
 [![WinGet Version](https://img.shields.io/winget/v/LaborLogic.CyberSlacker?label=winget&style=flat-square)](https://github.com/microsoft/winget-pkgs)
 [![Latest Release](https://img.shields.io/github/v/release/objectyan/CyberSlacker?color=orange&logo=github)](https://github.com/objectyan/CyberSlacker/releases)
@@ -26,10 +26,10 @@
 
 ## 📸 界面预览
 
-| 主挂件界面 | 设置中心 |
-| :---: | :---: |
-| ![主界面](docs/screenshots/main_widget.png) | ![设置中心](docs/screenshots/settings_panel.png) |
-| *半透明磨砂质感，全屏自由拖动* | *精细化考勤与提醒配置* |
+| 主挂件界面 | 设置中心 | 关于界面 |
+| :---: | :---: | :---: |
+| ![主界面](docs/screenshots/main_widget.png) | ![设置中心](docs/screenshots/settings_panel.png) | ![关于界面](docs/screenshots/about_panel.png) |
+| *半透明磨砂质感，全屏自由拖动* | *精细化考勤与提醒配置* | *“关于”页面的温情提示* |
 
 ---
 
