@@ -22,13 +22,11 @@ namespace CyberSlacker
             {
                 VersionText.Text = $"Version {version.Major}.{version.Minor}.{version.Build}";
 
-                // 🌟 核心判定逻辑：
                 // 如果第四位（Revision）大于 0，说明是流水线自动生成的预览版
                 if (version.Revision > 0)
                 {
                     VersionText.Text += $".{version.Revision}"; // 补全第四位
                     PreviewBadge.Visibility = Visibility.Visible; // 显示 PREVIEW 标签
-                    // 可选：把标题也改了，更牛皮一点
                     this.Title += "(Preview)";
                 }
             }
