@@ -100,7 +100,9 @@
 
       <!-- 3. 清理组件 -->
       <Component Directory="StartMenuDir" Guid="*">
+        
         <RemoveFolder On="uninstall" />
+
         <RegistryValue Root="HKCU"
           Key="Software\LaborLogic\CyberSlacker"
           Name="installed"
