@@ -1,11 +1,23 @@
 changelog:
+  exclude:
+    labels:
+      - skip-changelog
+    authors:
+      - octocat
   categories:
-    - title: 🏕 Features
+    - title: "🚀 赛博特性 (Features)"
       labels:
-        - '*'
-      exclude:
-        labels:
-          - dependencies
-    - title: 👒 Dependencies
+        - feature
+        - feat
+    - title: "🐛 故障修复 (Bug Fixes)"
       labels:
-        - dependencies
+        - bug
+        - fix
+    - title: "📦 基础设施 (Maintenance)"
+      labels:
+        - chore
+        - ci
+  
+  render:
+    compact: false
+    include_commits: true
