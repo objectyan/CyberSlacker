@@ -178,26 +178,33 @@ jobs:
         git push -f origin preview
 
     - name: Update Preview Release
-      uses: ncipollo/release-action@v1
+      uses: softprops/action-gh-release@v2
       with:
-        tag: preview
-        name: "🛠️ 预览版 (Preview Build)"
+        tag_name: preview  # 保持使用固定的标签名
+        name: "🛠️ 预览版 (Preview Build) - v${{ env.PREVIEW_VER }}"
+        
+        generate_release_notes: true
+        
         body: |
-         🚀 **CyberSlacker 预览版更新**
+          🚀 **CyberSlacker 赛博预览版自动更新**
+          ---
           ### ⚠️ 实验性版本
           此版本由 GitHub Actions 自动编译。包含最新的开发特性，可能存在不稳定因素。
-          - **编译时间**: ${{ github.event.head_commit.timestamp }}
-          - **提交记录**: ${{ github.event.head_commit.message }}
-          - **构建编号**: ${{ github.run_number }}
+          - **编译时间**: `${{ github.event.head_commit.timestamp }}`
+          - **预览版本号**: `${{ env.PREVIEW_VER }}`
+          - **构建流水号**: `${{ github.run_number }}`
           ---
           *警告：预览版可能包含未完成的功能，仅供测试。*
-        artifacts: "./temp_preview/Output/*.msi"
-        generateReleaseNotes: true
-        allowUpdates: true
-        removeArtifacts: true # 删掉上一次预览版的文件，换成最新的
-        replacesArtifacts: true
-        prerelease: true # 🌟 核心：标记为预发布版
-        token: ${{ secrets.GITHUB_TOKEN }}
+        
+        # 指向下载的临时目录下的所有 MSI 文件
+        files: |
+          ./temp_preview/Output/*.msi
+        
+        prerelease: true      # 标记为预发布（带有黄色角标）
+        make_latest: false    # 预览版不应该抢占“最新正式版”的标志
+        
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
     - name: Push Preview to Top
       shell: bash
