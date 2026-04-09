@@ -61,7 +61,11 @@ namespace CyberSlacker
         [GeneratedRegex("[^0-9]+")]
         private static partial Regex NumericRegex();
 
-        // 仅允许输入数字的事件
+        /// <summary>
+        /// 仅允许输入数字的事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void NumberValidationTextBox(object sender, TextCompositionEventArgs e) => e.Handled = NumericRegex().IsMatch(e.Text);
 
 
@@ -163,6 +167,19 @@ namespace CyberSlacker
 
             Properties.Settings.Default.Save();
 
+            this.Close();
+        }
+
+
+        // 标题栏拖动
+        private void OnHeaderDrag(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed) this.DragMove();
+        }
+
+        // 关闭按钮
+        private void OnCloseClick(object sender, RoutedEventArgs e)
+        {
             this.Close();
         }
     }

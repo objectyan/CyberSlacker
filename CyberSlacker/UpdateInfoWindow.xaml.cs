@@ -1,4 +1,5 @@
 ﻿using AutoUpdaterDotNET;
+using CyberSlacker.Properties;
 using Microsoft.Web.WebView2.Core;
 using Serilog;
 using System.Windows;
@@ -11,6 +12,8 @@ namespace CyberSlacker
     public partial class UpdateInfoWindow : Window
     {
         private UpdateInfoEventArgs _args;
+
+        private string _lastVersion;
 
         public UpdateInfoWindow(UpdateInfoEventArgs args)
         {
@@ -26,10 +29,13 @@ namespace CyberSlacker
                 }
 
                 VersionFlow.Text = $"{args.InstalledVersion}  ➡  {remoteVersion}";
+
+                _lastVersion = remoteVersion.ToString();
             }
             else
             {
                 VersionFlow.Text = $"{args.InstalledVersion}  ➡  {args.CurrentVersion}";
+                _lastVersion = args.CurrentVersion;
             }
 
             InitBrowser();
@@ -99,10 +105,19 @@ namespace CyberSlacker
         {
             if (AutoUpdater.DownloadUpdate(_args))
             {
+                Settings.Default.LatestVersionSkipped = _lastVersion;
+                Settings.Default.LastUpdateCheck = DateTime.Today;
+                Settings.Default.Save();
                 Application.Current.Shutdown();
             }
         }
 
-        private void OnSkip(object sender, RoutedEventArgs e) => this.Close();
+        private void OnSkip(object sender, RoutedEventArgs e)
+        {
+            Settings.Default.LatestVersionSkipped = _lastVersion;
+            Settings.Default.LastUpdateCheck = DateTime.Today;
+            Settings.Default.Save();
+            this.Close();
+        }
     }
 }

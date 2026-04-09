@@ -1,12 +1,15 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
-using CyberSlacker.Properties;
+﻿using CyberSlacker.Properties;
+using CyberSlacker.Services;
 using CyberSlacker.Util;
 using CyberSlacker.ViewModels;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media.Animation;
+using System.Windows.Media.Effects;
 using static CyberSlacker.Util.Interop;
 
 namespace CyberSlacker
@@ -39,113 +42,18 @@ namespace CyberSlacker
             _vm = new MainViewModel();
             this.DataContext = _vm;
 
-            initNotify();
-
             this.Loaded += (s, e) =>
             {
                 this.SetBinding(Window.OpacityProperty, new Binding("Opacity") { Source = Settings.Default });
+
+                ApplyLockState(Settings.Default.IsLocked);
             };
 
             // 订阅窗口关闭事件进行资源释放
             this.Closed += (s, e) =>
             {
                 _vm.Dispose();
-                WeakReferenceMessenger.Default.UnregisterAll(this);
             };
-        }
-
-        /// <summary>
-        /// 初始化消息提示
-        /// </summary>
-        private void initNotify()
-        {
-            WeakReferenceMessenger.Default.Register<string[], string>(this, "NotifyOffWork", (r, m) =>
-            {
-                // m[0] 是标题，m[1] 是内容
-                string title = m[0];
-                string content = m[1];
-
-                this.Dispatcher.Invoke(() =>
-                {
-                    try
-                    {
-                        MyNotifyIcon.ShowNotification(
-                            title,
-                            content,
-                            H.NotifyIcon.Core.NotificationIcon.None);
-                    }
-                    catch
-                    {
-                    }
-                });
-            });
-
-            WeakReferenceMessenger.Default.Register<string[], string>(this, "NotifyMeal", (r, m) =>
-            {
-                // m[0] 是标题，m[1] 是内容
-                string title = m[0];
-                string content = m[1];
-
-                this.Dispatcher.Invoke(() =>
-                {
-                    try
-                    {
-                        MyNotifyIcon.ShowNotification(
-                            title,
-                            content,
-                            H.NotifyIcon.Core.NotificationIcon.None);
-                    }
-                    catch
-                    {
-                    }
-                });
-            });
-
-            WeakReferenceMessenger.Default.Register<string[], string>(this, "NotifyRest", (r, m) =>
-            {
-                // m[0] 是标题，m[1] 是内容
-                string title = m[0];
-                string content = m[1];
-
-                this.Dispatcher.Invoke(() =>
-                {
-                    try
-                    {
-                        MyNotifyIcon.ShowNotification(
-                            title,
-                            content,
-                            H.NotifyIcon.Core.NotificationIcon.None);
-                    }
-                    catch
-                    {
-                    }
-                });
-            });
-        }
-
-        private void OpenSettings_Click(object sender, RoutedEventArgs e)
-        {
-            SettingsWindow sw = new() { Owner = this };
-            sw.ShowDialog();
-        }
-
-        private void OnOpenAbout(object sender, RoutedEventArgs e)
-        {
-            AboutWindow aw = new() { Owner = this };
-            aw.ShowDialog();
-        }
-
-        private void ExitApp_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                Application.Current.Shutdown();
-                System.Environment.Exit(0);
-            }
-            catch
-            {
-                System.Diagnostics.Process.GetCurrentProcess().Kill();
-            }
         }
 
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -156,13 +64,7 @@ namespace CyberSlacker
                 ReleaseCapture();
                 SendMessage(hWnd, 0xA1, 0x2, 0);
 
-                // 获取精确的物理位置
-                if (GetWindowRect(hWnd, out RECT rect))
-                {
-                    Settings.Default.WindowLeft = rect.Left;
-                    Settings.Default.WindowTop = rect.Top;
-                    Settings.Default.Save();
-                }
+                SaveCurrentPosition();
             }
         }
 
@@ -247,20 +149,30 @@ namespace CyberSlacker
             style |= WS_CHILD; // add flag
             SetWindowLong(hwnd, GWL_STYLE, style);
 
-            // convert coords to parent-relative coords
-            uint dpi = GetDpiForWindow(hwnd);
-            _windowsScalingFactor = dpi / 96.0;
+            var source = PresentationSource.FromVisual(this);
+            double dpiX = source?.CompositionTarget.TransformToDevice.M11 ?? 1.0;
+            double dpiY = source?.CompositionTarget.TransformToDevice.M22 ?? 1.0;
+
+            Util.Interop.RECT parentRect;
+            Util.Interop.GetWindowRect(hwnd, out parentRect);
+
+            double virtualLeft = SystemParameters.VirtualScreenLeft;
+            double virtualTop = SystemParameters.VirtualScreenTop;
+
+            int width = (int)(Settings.Default.WindowWidth * dpiX);
+            int height = (int)(Settings.Default.WindowHeight * dpiY);
+            int x = (int)(Settings.Default.WindowLeft - virtualLeft * dpiX);
+            int y = (int)(Settings.Default.WindowTop - virtualTop * dpiY);
+
             POINT pt = new()
             {
-                X = (int)(Settings.Default.WindowLeft * _windowsScalingFactor),
-                Y = (int)(Settings.Default.WindowTop * _windowsScalingFactor)
+                X = x,
+                Y = y
             };
             ScreenToClient(shellView, ref pt);
 
-            int width = (int)(Settings.Default.WindowWidth * _windowsScalingFactor);
-            int height = (int)(Settings.Default.WindowHeight * _windowsScalingFactor);
 
-            Interop.SetWindowPos(hwnd, IntPtr.Zero, pt.X, pt.Y, width, height, SWP_NOZORDER | SWP_SHOWWINDOW);
+            Interop.SetWindowPos(hwnd, IntPtr.Zero, x, y, width, height, SWP_NOZORDER | SWP_SHOWWINDOW);
 
         }
 
@@ -278,5 +190,173 @@ namespace CyberSlacker
             IntPtr dwNew = new(((long)Interop.GetWindowLong(wih.Handle, Interop.GWL_EXSTYLE).ToInt32() | 128L | 0x00200000L) & 4294705151L);
             Interop.SetWindowLong((nint)new HandleRef(this, wih.Handle), Interop.GWL_EXSTYLE, dwNew);
         }
+
+
+        /// <summary>
+        /// 赛博闪烁动画：当用户点击通知唤醒挂件时调用
+        /// </summary>
+        public void PlayFlashAnimation()
+        {
+            // 更新提示语
+            _vm.RefreshHolidayTip();
+
+            // 定义发光强度动画 (从当前的 0.4 闪烁到 1.0 再回来)
+            DoubleAnimation glowAnim = new()
+            {
+                From = 0.4,
+                To = 1.0,
+                Duration = TimeSpan.FromMilliseconds(400),
+                AutoReverse = true, // 自动往返
+                EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseInOut }
+            };
+
+            // 定义窗口轻微缩放动画 (增加“跳出来”的感觉)
+            DoubleAnimation scaleAnim = new()
+            {
+                From = 1.0,
+                To = 1.05,
+                Duration = TimeSpan.FromMilliseconds(200),
+                AutoReverse = true
+            };
+
+            // 执行动画 对阴影透明度执行动画
+            MainShadow.BeginAnimation(DropShadowEffect.OpacityProperty, glowAnim);
+
+            // 可以给窗口透明度也加
+            this.BeginAnimation(Window.OpacityProperty, glowAnim);
+        }
+
+        /// <summary>
+        /// 保存当前窗口位置的“保命”脚本
+        /// </summary>
+        private void SaveCurrentPosition()
+        {
+            IntPtr hWnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+            if (Util.Interop.GetWindowRect(hWnd, out Util.Interop.RECT rect))
+            {
+                var source = PresentationSource.FromVisual(this);
+                double dpiX = source?.CompositionTarget.TransformToDevice.M11 ?? 1.0;
+                double dpiY = source?.CompositionTarget.TransformToDevice.M22 ?? 1.0;
+
+                // 🌟 核心：将物理像素转回逻辑坐标再保存
+                Settings.Default.WindowLeft = rect.Left / dpiX;
+                Settings.Default.WindowTop = rect.Top / dpiY;
+                Settings.Default.Save();
+            }
+        }
+
+        #region 托盘事件
+        /// <summary>
+        /// 显示/隐藏小组件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnToggleWidget(object sender, RoutedEventArgs e)
+        {
+            if (this.Visibility == Visibility.Visible)
+            {
+                SaveCurrentPosition();
+                this.Visibility = Visibility.Collapsed;
+                if (sender is MenuItem item) item.Header = "显示小组件";
+            }
+            else
+            {
+                this.Visibility = Visibility.Visible;
+                if (sender is MenuItem item) item.Header = "隐藏小组件";
+            }
+        }
+
+        /// <summary>
+        /// 锁定/解锁挂件 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnLockToggle(object sender, RoutedEventArgs e)
+        {
+            var item = sender as MenuItem;
+            if (item == null) return;
+
+            // 1. 获取当前状态（如果是 IsCheckable 模式）
+            bool isLocked = item.IsChecked;
+
+            Settings.Default.IsLocked = isLocked;
+            Settings.Default.Save();
+
+            // 3. 执行穿透逻辑
+            ApplyLockState(isLocked);
+
+            // 4. 发个彩色通知提醒一下（可选，更有仪式感）
+            if (isLocked)
+            {
+                NativeToastService.Show("🔒 挂件已锁定", "现在点击将直接穿透，防止摸鱼时误触。");
+            }
+        }
+
+        /// <summary>
+        /// 打开设置中心 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnOpenSettings(object sender, RoutedEventArgs e)
+        {
+            SettingsWindow sw = new SettingsWindow();
+            sw.Owner = this; // 居中于主窗口
+            sw.ShowDialog(); // 模式对话框
+        }
+
+        /// <summary>
+        /// 打开关于界面
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnOpenAbout(object sender, RoutedEventArgs e)
+        {
+            AboutWindow aw = new AboutWindow();
+            aw.Owner = this;
+            aw.ShowDialog();
+        }
+
+        /// <summary>
+        /// 5. 退出程序
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnExit(object sender, RoutedEventArgs e)
+        {
+            // 销毁托盘图标，防止残留
+            MyNotifyIcon?.Dispose();
+
+            // 释放 ViewModel 里的 Timer
+            if (_vm is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+
+            // 强制关闭所有进程线程，防止后台卡死
+            System.Windows.Application.Current.Shutdown();
+            System.Environment.Exit(0);
+        }
+
+        /// <summary>
+        /// 辅助：点击穿透逻辑实现
+        /// </summary>
+        /// <param name="isLocked"></param>
+        private void ApplyLockState(bool isLocked)
+        {
+            IntPtr hWnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+            nint exStyle = Util.Interop.GetWindowLong(hWnd, Util.Interop.GWL_EXSTYLE);
+
+            if (isLocked)
+            {
+                // 增加 WS_EX_TRANSPARENT (0x20) 达到点击穿透效果
+                Util.Interop.SetWindowLong(hWnd, Util.Interop.GWL_EXSTYLE, exStyle | 0x00000020);
+            }
+            else
+            {
+                // 移除穿透效果
+                Util.Interop.SetWindowLong(hWnd, Util.Interop.GWL_EXSTYLE, exStyle & ~0x00000020);
+            }
+        }
+        #endregion
     }
 }

@@ -2,260 +2,193 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:CyberSlacker.Converters"
-        Title="设置中心" 
-        SizeToContent="Height" 
-        MaxHeight="850" Width="420" 
-        WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#F3F3F3">
+        Title="设置中心" Width="460" Height="650"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        WindowStartupLocation="CenterScreen" FontFamily="Microsoft YaHei">
 
     <Window.Resources>
-        <!-- 引入转换器，用于 RadioButton 绑定 int 值 -->
         <local:EnumToBooleanConverter x:Key="IntToBool"/>
 
-        <!-- 定义统一的样式，让界面整洁 -->
+        <!-- 通用卡片样式 -->
+        <Style x:Key="SettingCard" TargetType="Border">
+            <Setter Property="Background" Value="#15FFFFFF"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="15"/>
+            <Setter Property="Margin" Value="0,0,0,15"/>
+            <Setter Property="BorderBrush" Value="#22FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <!-- 文字样式 -->
         <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#CCCCCC"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="FontSize" Value="13"/>
-            <Setter Property="Foreground" Value="#333"/>
         </Style>
 
-        <!-- 1. 滑块 Thumb 的样式 -->
-        <Style x:Key="ScrollBarThumb" TargetType="{x:Type Thumb}">
-            <Setter Property="OverridesDefaultStyle" Value="true"/>
-            <Setter Property="IsTabStop" Value="false"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Thumb}">
-                        <!-- 滑块外观：圆角矩形 -->
-                        <Border x:Name="rectangle"
-                            CornerRadius="3"
-                            Background="#CCCCCC" 
-                            Margin="2,0,2,0" />
-                        <ControlTemplate.Triggers>
-                            <!-- 鼠标悬停滑块变色 -->
-                            <Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="rectangle" Property="Background" Value="#2196F3" />
-                            </Trigger>
-                            <!-- 正在拖动滑块变色 -->
-                            <Trigger Property="IsDragging" Value="true">
-                                <Setter TargetName="rectangle" Property="Background" Value="#1976D2" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+        <Style x:Key="HeaderLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="Gold"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
         </Style>
 
-        <!-- 2. 整个 ScrollBar 的样式 -->
-        <Style TargetType="{x:Type ScrollBar}">
-            <Setter Property="Stylus.IsPressAndHoldEnabled" Value="false"/>
-            <Setter Property="Stylus.IsFlicksEnabled" Value="false"/>
-            <Setter Property="Width" Value="8"/>
-            <!-- 宽度设窄一些，更美观 -->
-            <Setter Property="Margin" Value="0,5,0,5"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type ScrollBar}">
-                        <Grid x:Name="Bg" Background="Transparent" SnapsToDevicePixels="true">
-                            <!-- 轨道部分 -->
-                            <Track x:Name="PART_Track"
-                               IsEnabled="{TemplateBinding IsEnabled}"
-                               IsDirectionReversed="true">
-                                <Track.Thumb>
-                                    <Thumb Style="{StaticResource ScrollBarThumb}" />
-                                </Track.Thumb>
-                            </Track>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+        <!-- 自定义 Slider 颜色 -->
+        <Style TargetType="Slider">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Style.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#00E5FF"/>
+            </Style.Resources>
         </Style>
 
-        <!-- 3. ScrollViewer 的样式（用于去掉边缘阴影） -->
-        <Style TargetType="{x:Type ScrollViewer}">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type ScrollViewer}">
-                        <Grid x:Name="Grid" Background="{TemplateBinding Background}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" 
-                                              CanContentScroll="{TemplateBinding CanContentScroll}" 
-                                              CanHorizontallyScroll="False" 
-                                              CanVerticallyScroll="False" 
-                                              ContentTemplate="{TemplateBinding ContentTemplate}" 
-                                              Content="{TemplateBinding Content}" 
-                                              Grid.Column="0" 
-                                              Margin="{TemplateBinding Padding}" 
-                                              Grid.Row="0"/>
-                            <!-- 垂直滚动条 -->
-                            <ScrollBar x:Name="PART_VerticalScrollBar" 
-                                  AutomationProperties.AutomationId="VerticalScrollBar" 
-                                  Cursor="Arrow" 
-                                  Grid.Column="1" 
-                                  Maximum="{TemplateBinding ScrollableHeight}" 
-                                  Minimum="0" 
-                                  Grid.Row="0" 
-                                  Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" 
-                                  Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" 
-                                  ViewportSize="{TemplateBinding ViewportHeight}"/>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+        <!-- 自定义 RadioButton 样式 (赛博蓝) -->
+        <Style TargetType="RadioButton">
+            <Setter Property="Foreground" Value="#AAA"/>
+            <Setter Property="Margin" Value="0,0,15,0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
     </Window.Resources>
 
-    <Border Padding="25 25 5 10">
+    <!-- 窗口外壳 -->
+    <Border Margin="15" Background="#F21A1A1A" CornerRadius="20" BorderBrush="#44FFFFFF" BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="15" ShadowDepth="0" Opacity="0.5"/>
+        </Border.Effect>
+
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <!-- 设置项区域：自动伸缩 -->
-                <RowDefinition Height="Auto" />
-                <!-- 按钮区域：固定高度 -->
+                <RowDefinition Height="Auto"/>
+                <!-- 标题 -->
+                <RowDefinition Height="*"/>
+                <!-- 内容 -->
+                <RowDefinition Height="Auto"/>
+                <!-- 底部按钮 -->
             </Grid.RowDefinitions>
-            <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
-                <StackPanel Margin="0,0,15,0">
-                    <TextBlock Text="打工人助手设置" FontSize="20" FontWeight="Bold" Margin="0,0,0,25"/>
 
-                    <TextBlock Text="精准工时" FontWeight="Bold" Margin="0,10,0,10"/>
-                    <!-- 考勤时间 -->
-                    <TextBlock Text="* 考勤时间" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <ComboBox x:Name="StartHour" Width="60"/>
-                        <TextBlock Text=" : " Margin="5,0"/>
-                        <ComboBox x:Name="StartMin" Width="60"/>
-                        <TextBlock Text=" 至 " Margin="15,0"/>
-                        <ComboBox x:Name="EndHour" Width="60"/>
-                        <TextBlock Text=" : " Margin="5,0"/>
-                        <ComboBox x:Name="EndMin" Width="60"/>
-                    </StackPanel>
+            <!-- 1. 标题栏 (支持拖动) -->
+            <Grid Grid.Row="0" Margin="25,20,25,10" MouseLeftButtonDown="OnHeaderDrag">
+                <TextBlock Text="赛博助手设置" FontSize="20" FontWeight="Bold" Foreground="White"/>
+                <Button Content="✕" HorizontalAlignment="Right" VerticalAlignment="Center" 
+                        Background="Transparent" BorderThickness="0" Foreground="#666" 
+                        FontSize="18" Cursor="Hand" Click="OnCloseClick"/>
+            </Grid>
 
-                    <!-- 点饭提醒 -->
-                    <TextBlock Text="* 点饭提醒："  FontWeight="SemiBold" Margin="0,0,0,8"/>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <ComboBox x:Name="MealHour" Width="60"/>
-                        <TextBlock Text=" : " VerticalAlignment="Center"/>
-                        <ComboBox x:Name="MealMin" Width="60"/>
-                        <TextBlock Text=" (通常设置午休前10分钟)" FontSize="10" Foreground="Gray" Margin="10,0,0,0"/>
-                    </StackPanel>
+            <!-- 2. 设置内容区 -->
+            <ScrollViewer Grid.Row="1" Margin="20,10" VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="0,0,10,0">
 
-                    <!-- 午休设置 -->
-                    <TextBlock Text="* 午休时间：" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <ComboBox x:Name="LunchStartHour" Width="60"/>
-                        <TextBlock Text=" : " Margin="5,0"/>
-                        <ComboBox x:Name="LunchStartMin" Width="60"/>
-                        <TextBlock Text=" 至 " Margin="15,0"/>
-                        <ComboBox x:Name="LunchEndHour" Width="60"/>
-                        <TextBlock Text=" : "  Margin="5,0"/>
-                        <ComboBox x:Name="LunchEndMin" Width="60"/>
-                    </StackPanel>
-
-                    <!-- 发薪设置 -->
-                    <TextBlock Text="* 发薪日设置" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                        <TextBlock Text="每月 "/>
-                        <TextBox x:Name="PayDayInput"  Text="{Binding PayDay, UpdateSourceTrigger=PropertyChanged}" Width="50" Padding="3" HorizontalContentAlignment="Center"  PreviewTextInput="NumberValidationTextBox"/>
-                        <TextBlock Text=" 号发放"/>
-                    </StackPanel>
-
-                    <TextBlock Text="发薪日遇周末策略：" FontSize="12" Foreground="#666" Margin="0,0,0,5"/>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <RadioButton Content="提前发放" Margin="0,0,15,0"
-                             IsChecked="{Binding PaydayStrategy, Converter={StaticResource IntToBool}, ConverterParameter=0}"/>
-                        <RadioButton Content="延后发放" 
-                             IsChecked="{Binding PaydayStrategy, Converter={StaticResource IntToBool}, ConverterParameter=1}"/>
-                    </StackPanel>
-
-                    <!-- 工作制 -->
-                    <TextBlock Text="* 工作制" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                        <RadioButton Content="双休" Margin="0,0,15,0"
-                             IsChecked="{Binding WorkMode, Converter={StaticResource IntToBool}, ConverterParameter=0}"/>
-                        <RadioButton Content="大小周" Margin="0,0,15,0"
-                             IsChecked="{Binding WorkMode, Converter={StaticResource IntToBool}, ConverterParameter=1}"/>
-                        <RadioButton Content="单休" 
-                             IsChecked="{Binding WorkMode, Converter={StaticResource IntToBool}, ConverterParameter=2}"/>
-                    </StackPanel>
-                    <TextBlock Text="大小周按单周单休、双周双休计算" FontSize="11" Foreground="Gray" Margin="0,0,0,20"/>
-
-                    <Border BorderBrush="#DDD" BorderThickness="0,1,0,0" Padding="0,15,0,0">
-                    </Border>
-
-                    <!-- 周期性小憩设置 -->
-                    <StackPanel Margin="0,0,0,20">
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                            <CheckBox x:Name="RestEnabledCheck" Content="开启久坐提醒" 
-       IsChecked="{Binding IsRestEnabled}" VerticalAlignment="Center"/>
-                            <TextBlock Text="(每隔一段时间提醒活动)" FontSize="11" Foreground="Gray" Margin="10,0,0,0"/>
-                        </StackPanel>
-
-                        <StackPanel Orientation="Horizontal" IsEnabled="{Binding IsRestEnabled}">
-                            <TextBlock Text="提醒间隔：" Width="80"/>
-                            <!-- 使用 Slider 滑动选择 30-120 分钟 -->
-                            <Slider x:Name="RestIntervalSlider" Minimum="30" Maximum="120" Width="180" 
-     Value="{Binding RestInterval}" TickFrequency="5" IsSnapToTickEnabled="True"/>
-                            <TextBlock Text="{Binding RestInterval}" Margin="10,0,0,0" FontWeight="Bold"/>
-                            <TextBlock Text=" 分钟"/>
-                        </StackPanel>
-                    </StackPanel>
-
-                    <!-- 下班提醒 -->
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Text="下班提醒："  Width="80"/>
-                        <TextBlock Text="提前 " Margin="10,0,0,0"/>
-                        <Slider Minimum="5" Maximum="120" Width="150" Value="{Binding PreOffWorkMins}" TickFrequency="5" IsSnapToTickEnabled="True"/>
-                        <TextBlock Text="{Binding PreOffWorkMins}" FontWeight="Bold"/>
-                        <TextBlock Text=" 分钟"/>
-                    </StackPanel>
-
-                    <!-- 外观设置 -->
-                    <Border BorderBrush="#DDD" BorderThickness="0,1,0,0" Padding="0,5,0,0">
-                    </Border>
-                    <TextBlock Text="外观设置" FontWeight="Bold" Margin="0,10,0,10"/>
-                    <StackPanel Margin="0,0,0,20">
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                            <TextBlock Text="透明度：" Width="80"/>
-                            <Slider Value="{Binding Opacity, Mode=TwoWay}" Minimum="0.2" Maximum="1.0" Width="200" TickFrequency="0.1" IsSnapToTickEnabled="True"/>
-                            <TextBlock Text="{Binding Opacity, StringFormat={}{0:P0}}" Margin="10,0,0,0"/>
-                        </StackPanel>
-                    </StackPanel>
-
-                    <!-- 系统设置 -->
-                    <Border BorderBrush="#DDD" BorderThickness="0,1,0,0" Padding="0,15,0,0">
-                        <CheckBox Content="开机自动启动" FontSize="13"
-                          IsChecked="{Binding IsAutoStart, Mode=TwoWay}"/>
-                    </Border>
-                    <Border BorderBrush="#DDD" BorderThickness="0,1,0,0" Padding="0,15,0,0" Margin="0,10">
+                    <!-- 分区：考勤与点餐配置 -->
+                    <Border Style="{StaticResource SettingCard}">
                         <StackPanel>
-                            <CheckBox Content="参与预览体验计划 (接收开发版更新)" 
-                  IsChecked="{Binding IsPreviewEnabled, Mode=TwoWay}"
-                  FontSize="13"/>
-                            <TextBlock Text="* 开启后将优先收到包含新功能但可能不稳定的版本推送。" 
-                   FontSize="11" Foreground="#FF8C00" Margin="25,5,0,0"/>
+                            <TextBlock Text="⏱️ 精准工时" Style="{StaticResource HeaderLabel}"/>
+
+                            <!-- 考勤时间 -->
+                            <TextBlock Text="考勤时间" Margin="0,0,0,5"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                                <ComboBox x:Name="StartHour" Width="55"/>
+                                <TextBlock Text=":" Margin="5,0"/>
+                                <ComboBox x:Name="StartMin" Width="55"/>
+                                <TextBlock Text="至" Margin="10,0"/>
+                                <ComboBox x:Name="EndHour" Width="55"/>
+                                <TextBlock Text=":" Margin="5,0"/>
+                                <ComboBox x:Name="EndMin" Width="55"/>
+                            </StackPanel>
+
+                            <!-- 🌟 补全：点餐提醒 -->
+                            <TextBlock Text="点餐提醒" Margin="0,0,0,5"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                                <ComboBox x:Name="MealHour" Width="55"/>
+                                <TextBlock Text=":" Margin="5,0"/>
+                                <ComboBox x:Name="MealMin" Width="55"/>
+                                <TextBlock Text="(通常设为午休前10分钟)" FontSize="10" Foreground="#666" Margin="10,0,0,0"/>
+                            </StackPanel>
+
+                            <!-- 午休时段 -->
+                            <TextBlock Text="午休时段" Margin="0,0,0,5"/>
+                            <StackPanel Orientation="Horizontal">
+                                <ComboBox x:Name="LunchStartHour" Width="55"/>
+                                <TextBlock Text=":" Margin="5,0"/>
+                                <ComboBox x:Name="LunchStartMin" Width="55"/>
+                                <TextBlock Text="至" Margin="10,0"/>
+                                <ComboBox x:Name="LunchEndHour" Width="55"/>
+                                <TextBlock Text=":" Margin="5,0"/>
+                                <ComboBox x:Name="LunchEndMin" Width="55"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- 分区：金钱与制度 -->
+                    <Border Style="{StaticResource SettingCard}">
+                        <StackPanel>
+                            <TextBlock Text="💰 财务与工作制" Style="{StaticResource HeaderLabel}"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                                <TextBlock Text="发薪日：每月 "/>
+                                <TextBox x:Name="PayDayInput" Width="40" Background="#33000000" Foreground="White" BorderBrush="#44FFFFFF"
+                                         Text="{Binding PayDay, UpdateSourceTrigger=PropertyChanged}" 
+                                         HorizontalContentAlignment="Center" PreviewTextInput="NumberValidationTextBox"/>
+                                <TextBlock Text=" 号"/>
+                            </StackPanel>
+
+                            <TextBlock Text="发薪策略 (遇周末)" FontSize="12" Margin="0,0,0,5"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                                <RadioButton Content="提前发放" IsChecked="{Binding PaydayStrategy, Converter={StaticResource IntToBool}, ConverterParameter=0}"/>
+                                <RadioButton Content="延后发放" IsChecked="{Binding PaydayStrategy, Converter={StaticResource IntToBool}, ConverterParameter=1}"/>
+                            </StackPanel>
+
+                            <TextBlock Text="工作制" FontSize="12" Margin="0,0,0,5"/>
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton Content="双休" IsChecked="{Binding WorkMode, Converter={StaticResource IntToBool}, ConverterParameter=0}"/>
+                                <RadioButton Content="大小周" IsChecked="{Binding WorkMode, Converter={StaticResource IntToBool}, ConverterParameter=1}"/>
+                                <RadioButton Content="单休" IsChecked="{Binding WorkMode, Converter={StaticResource IntToBool}, ConverterParameter=2}"/>
+                            </StackPanel>
                         </StackPanel>
                     </Border>
 
+                    <!-- 分区：健康提醒 -->
+                    <Border Style="{StaticResource SettingCard}">
+                        <StackPanel>
+                            <TextBlock Text="💧 赛博回血" Style="{StaticResource HeaderLabel}"/>
+                            <CheckBox Content="开启久坐提醒" Foreground="White" IsChecked="{Binding IsRestEnabled}"/>
+                            <StackPanel Margin="0,10,0,0" IsEnabled="{Binding IsRestEnabled}">
+                                <Grid>
+                                    <TextBlock Text="提醒间隔"/>
+                                    <TextBlock Text="{Binding RestInterval, StringFormat={}{0} 分钟}" HorizontalAlignment="Right" Foreground="#00E5FF"/>
+                                </Grid>
+                                <Slider Minimum="30" Maximum="120" TickFrequency="5" IsSnapToTickEnabled="True" Value="{Binding RestInterval}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
 
+                    <!-- 分区：系统与外观 -->
+                    <Border Style="{StaticResource SettingCard}">
+                        <StackPanel>
+                            <TextBlock Text="🛠️ 系统环境" Style="{StaticResource HeaderLabel}"/>
+                            <Grid Margin="0,0,0,10">
+                                <TextBlock Text="挂件透明度"/>
+                                <TextBlock Text="{Binding Opacity, StringFormat={}{0:P0}}" HorizontalAlignment="Right" Foreground="#00E5FF"/>
+                            </Grid>
+                            <Slider Minimum="0.2" Maximum="1.0" TickFrequency="0.05" IsSnapToTickEnabled="True" Value="{Binding Opacity}"/>
 
+                            <CheckBox Content="开机自动启动" Margin="0,15,0,5" IsChecked="{Binding IsAutoStart}"/>
+                            <CheckBox Content="预览版计划" IsChecked="{Binding IsPreviewEnabled}"/>
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
             </ScrollViewer>
-            <!-- 底部按钮 -->
-            <Button Grid.Row="1" Content="保存并应用" Click="OnSave_Click" 
-                Margin="0,15,0,0" Height="35" Width="120" 
-                HorizontalAlignment="Right" Background="#2196F3" Foreground="White" BorderThickness="0">
-                <Button.Resources>
-                    <Style TargetType="Border">
-                        <Setter Property="CornerRadius" Value="4"/>
-                    </Style>
-                </Button.Resources>
-            </Button>
+
+            <!-- 3. 底部按钮 -->
+            <Grid Grid.Row="2" Margin="25,0,25,25">
+                <Button Content="保 存 并 应 用" Click="OnSave_Click" Height="40"
+                        Background="#2196F3" Foreground="White" FontSize="14" FontWeight="Bold" Cursor="Hand">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" CornerRadius="20">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </Grid>
         </Grid>
     </Border>
 </Window>

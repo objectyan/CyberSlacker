@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Messaging;
 using CyberSlacker.Services;
 using CyberSlacker.Util;
 using Timer = System.Timers.Timer;
@@ -67,8 +66,6 @@ namespace CyberSlacker.ViewModels
 
             // 3. 周末（现在内部有离线判定兜底，不会一直卡在“同步中”）
             WeekendCountdown = CountdownEngine.GetWeekendString(now, _holidayService);
-
-
 
             // 4, 动态提示语 (每30秒换一次)
             if (HolidayTip == "正在加载..." || PayDayCountdown == "加载中" || NextHolidayName == "" || NextHolidayCountdown == "")
@@ -176,9 +173,7 @@ namespace CyberSlacker.ViewModels
                     _hasNotifiedToday = true; // 标记今日已完成通知
 
                     var (title, content) = CountdownEngine.GetRandomOffWorkCheer();
-                    // 发送一条“下班啦”的消息给 MainWindow
-                    // 这种方式不需要 ViewModel 引用 MainWindow，非常解耦
-                    WeakReferenceMessenger.Default.Send(new string[] { title, content }, "NotifyOffWork");
+                    NativeToastService.ShowGeneralNotification(title, content);
                 }
             }
         }
@@ -199,7 +194,7 @@ namespace CyberSlacker.ViewModels
                 {
                     _hasNotifiedMeal = true;
                     var (title, content) = CountdownEngine.GetRandomMealCheer();
-                    WeakReferenceMessenger.Default.Send(new string[] { title, content }, "NotifyMeal");
+                    NativeToastService.ShowGeneralNotification(title, content);
                 }
             }
         }
@@ -220,11 +215,7 @@ namespace CyberSlacker.ViewModels
 
                 var (title, content) = CountdownEngine.GetRandomRestCheer(Properties.Settings.Default.RestInterval);
 
-                // 2. 发送彩色通知消息
-                WeakReferenceMessenger.Default.Send(new string[] {
-                    title,
-                   content
-                }, "NotifyRest");
+                NativeToastService.ShowGeneralNotification(title, content);
             }
         }
 

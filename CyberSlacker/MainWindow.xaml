@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:tb="clr-namespace:H.NotifyIcon;assembly=H.NotifyIcon.Wpf"
         xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
+        xmlns:prop="clr-namespace:CyberSlacker.Properties"
         Title="打工人小组件"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         ShowInTaskbar="False" Topmost="False" 
@@ -13,34 +14,71 @@
         Height="300" 
         Width="300">
 
-    
     <Grid Background="#01000000" MouseLeftButtonDown="Window_MouseLeftButtonDown"  Margin="0,0,0,0">
         <!-- 系统托盘图标 -->
-        <tb:TaskbarIcon x:Name="MyNotifyIcon"  ToolTipText="{Binding TaskbarTooltip}" Margin="0,0,0,36">
+        <tb:TaskbarIcon x:Name="MyNotifyIcon" ToolTipText="{Binding TaskbarTooltip}" >
             <tb:TaskbarIcon.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="设置信息" Click="OpenSettings_Click">
+                <ContextMenu Style="{StaticResource CyberContextMenu}">
+                    <!-- 1. 显示/隐藏切换 -->
+                    <MenuItem Header="隐藏小组件" Click="OnToggleWidget">
                         <MenuItem.Icon>
+                            <TextBlock Text="👁️" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+
+                    <!-- 2. 锁定位置（点击穿透） -->
+                    <MenuItem IsCheckable="True" 
+                          IsChecked="{Binding IsLocked, Source={x:Static prop:Settings.Default}, Mode=TwoWay}" 
+                          Click="OnLockToggle"> 
+                        <MenuItem.Style>
+                            <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+                                <!-- 默认文字 -->
+                                <Setter Property="Header" Value="锁定挂件"/>
+                                <Style.Triggers>
+                                    <!-- 🌟 当绑定值为 True 时，切换文字 -->
+                                    <DataTrigger Binding="{Binding IsLocked, Source={x:Static prop:Settings.Default}}" Value="True">
+                                        <Setter Property="Header" Value="取消锁定"/>
+                                        <!-- 甚至可以顺便改下颜色 -->
+                                        <Setter Property="Foreground" Value="#00E5FF"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </MenuItem.Style>
+                        <MenuItem.Icon>
+                            <!-- 这里放你的锁图标 -->
                             <Viewbox Width="16" Height="16">
-                                <Path Data="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.97 19.05,5.05L16.56,6.05C16.04,5.66 15.47,5.34 14.86,5.12L14.47,2.47C14.44,2.23 14.24,2.05 14,2.05H10C9.76,2.05 9.56,2.23 9.53,2.47L9.14,5.12C8.53,5.34 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.97 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.95C7.96,18.34 8.53,18.66 9.14,18.88L9.53,21.53C9.56,21.77 9.76,21.95 10,21.95H14C14.24,21.95 14.44,21.77 14.47,21.53L14.86,18.88C15.47,18.66 16.04,18.34 16.56,17.95L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z" 
-                          Fill="#FFD700" Stretch="Uniform"/>
+                                <Path Data="M12,17A2,2 0 0,0 14,15C14,13.89 13.11,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z" 
+Fill="White" Stretch="Uniform"/>
                             </Viewbox>
                         </MenuItem.Icon>
                     </MenuItem>
+
+                    <Separator Background="#33FFFFFF" Margin="5,2"/>
+
+                    <!-- 3. 设置中心 -->
+                    <MenuItem Header="设置中心" Click="OnOpenSettings">
+                        <MenuItem.Icon>
+                            <Viewbox Width="16" Height="16">
+                                <Path Data="M12,15.5 A3.5,3.5 0 0 1 8.5,12 A3.5,3.5 0 0 1 12,8.5 A3.5,3.5 0 0 1 15.5,12 A3.5,3.5 0 0 1 12,15.5 M19.43,12.97 C19.47,12.65 19.5,12.33 19.5,12 C19.5,11.67 19.47,11.34 19.43,11 L21.54,9.37 C21.73,9.22 21.78,8.95 21.66,8.73 L19.66,5.27 C19.54,5.05 19.27,4.97 19.05,5.05 L16.56,6.05 C16.04,5.66 15.47,5.34 14.86,5.12 L14.47,2.47 C14.44,2.23 14.24,2.05 14,2.05 H10 C9.76,2.05 9.56,2.23 9.53,2.47 L9.14,5.12 C8.53,5.34 7.96,5.66 7.44,6.05 L4.95,5.05 C4.73,4.97 4.46,5.05 4.34,5.27 L2.34,8.73 C2.21,8.95 2.27,9.22 2.46,9.37 L4.57,11 C4.53,11.34 4.5,11.67 4.5,12 C4.5,12.33 4.53,12.65 4.57,12.97 L2.46,14.63 C2.27,14.78 2.21,15.05 2.34,15.27 L4.34,18.73 C4.46,18.95 4.73,19.03 4.95,18.95 L7.44,17.95 C7.96,18.34 8.53,18.66 9.14,18.88 L9.53,21.53 C9.56,21.77 9.76,21.95 10,21.95 H14 C14.24,21.95 14.44,21.77 14.47,21.53 L14.86,18.88 C15.47,18.66 16.04,18.34 16.56,17.95 L19.05,18.95 C19.27,19.03 19.54,18.95 19.66,18.73 L21.66,15.27 C21.78,15.05 21.73,14.78 21.54,14.63 L19.43,12.97 Z" 
+                                    Fill="Gold" Stretch="Uniform"/>
+                            </Viewbox>
+                        </MenuItem.Icon>
+                    </MenuItem>
+
+                    <!-- 4. 关于 -->
                     <MenuItem Header="关于软件" Click="OnOpenAbout">
                         <MenuItem.Icon>
-                            <Viewbox Width="16" Height="16">
-                                <Path Data="M11,9H13V7H11V9M11,17H13V11H11V17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" 
-                          Fill="#00E5FF" Stretch="Uniform"/>
-                            </Viewbox>
+                            <TextBlock Text="🚀" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                         </MenuItem.Icon>
                     </MenuItem>
-                    <Separator/>
-                    <MenuItem Header="退出程序" Click="ExitApp_Click">
+
+                    <Separator Background="#33FFFFFF" Margin="5,2"/>
+
+                    <!-- 5. 退出程序 -->
+                    <MenuItem Header="退出程序" Click="OnExit">
                         <MenuItem.Icon>
                             <Viewbox Width="14" Height="14">
-                                <Path Data="M12,2V12M7.5,6.5A9,9 0 1,0 16.5,6.5" 
-                          Stroke="#FF5252" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Fill="Transparent"/>
+                                <Path Data="M12,2 L12,12 M7.5,6.5 A9,9 0 1 0 16.5,6.5" Stroke="#FF5252" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
                             </Viewbox>
                         </MenuItem.Icon>
                     </MenuItem>
@@ -49,11 +87,12 @@
         </tb:TaskbarIcon>
 
         <!-- 主体视觉部分 -->
-        <Border Background="#CC111111" CornerRadius="20" BorderBrush="#33FFFFFF" BorderThickness="1" CacheMode="BitmapCache">
+        <Border x:Name="MainBorder" Background="#CC111111" CornerRadius="20" BorderBrush="#33FFFFFF" BorderThickness="1" CacheMode="BitmapCache">
             <Border.Effect>
-                <DropShadowEffect BlurRadius="15" 
+                <DropShadowEffect x:Name="MainShadow" 
+                      BlurRadius="15" 
                       ShadowDepth="0" 
-                      Color="Black" 
+                      Color="#00E5FF" 
                       Opacity="0.4" 
                       RenderingBias="Performance"/>
             </Border.Effect>
