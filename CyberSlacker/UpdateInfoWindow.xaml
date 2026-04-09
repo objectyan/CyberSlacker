@@ -1,0 +1,90 @@
+﻿<Window x:Class="CyberSlacker.UpdateInfoWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        x:Name="ThisWin" Title="赛博进化" Height="500" Width="450"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        WindowStartupLocation="CenterScreen" Topmost="True">
+
+    <Border Background="#F21A1A1A" CornerRadius="20" BorderBrush="#44FFFFFF" BorderThickness="1">
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- 标题 -->
+                <RowDefinition Height="*"/>
+                <!-- 网页预览 -->
+                <RowDefinition Height="Auto"/>
+                <!-- 按钮 -->
+            </Grid.RowDefinitions>
+
+            <!-- 1. 标题区域 -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,15">
+                <TextBlock x:Name="TitleText" Text="🚀 发现新基因" FontSize="20" FontWeight="Bold" Foreground="Gold"/>
+                <TextBlock Margin="0,5,0,0" Foreground="#888" FontSize="15">
+                    <Run Text="版本演进: "/>
+                    <Run x:Name="VersionFlow" Text="1.0.0 -> 1.0.1" Foreground="AliceBlue" FontWeight="Bold"/>
+                </TextBlock>
+            </StackPanel>
+
+            <!-- 2. 网页预览区域 (展示 GitHub Release 内容) -->
+            <Border Grid.Row="1" Background="#1A1A1A" CornerRadius="8" ClipToBounds="True">
+                <Grid>
+                    <!-- 赛博风加载提示 -->
+                    <StackPanel x:Name="LoadingStack" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <!-- 加上一个转圈或者发光的图标 -->
+                        <TextBlock Text="⚡ 正在注入赛博基因..." 
+                               FontSize="16" 
+                               FontWeight="Bold" 
+                               Foreground="#00E5FF" 
+                               HorizontalAlignment="Center">                        
+                            <!-- 加上霓虹发光效果 -->
+                            <TextBlock.Effect>
+                                <DropShadowEffect BlurRadius="15" Color="#00E5FF" ShadowDepth="0" Opacity="0.8"/>
+                            </TextBlock.Effect>
+                
+                            <!-- 加上呼吸灯动画 -->
+                            <TextBlock.Triggers>
+                                <EventTrigger RoutedEvent="Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard RepeatBehavior="Forever">
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                 From="1.0" To="0.3" Duration="0:0:1" 
+                                                 AutoReverse="True"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </TextBlock.Triggers>
+                        </TextBlock>
+
+                        <TextBlock Text="Syncing Cyber Logs" 
+                       FontSize="9" 
+                       Foreground="#444" 
+                       HorizontalAlignment="Center" 
+                       Margin="0,5,0,0"
+                       FontFamily="Consolas"/>
+                    </StackPanel>
+
+                    <!-- WebView 依然保持隐藏，直到加载完成 -->
+                    <wv2:WebView2 x:Name="WebView" 
+                      Visibility="Hidden"
+                      DefaultBackgroundColor="Transparent"/>
+                </Grid>
+            </Border>
+
+
+            <!-- 3. 底部按钮 -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+                <Button Content="以后再说" Click="OnSkip" Width="80" Margin="0,0,10,0" 
+                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Foreground="#888"/>
+                <Button Content="立即进化" Click="OnUpdate" Width="110" Height="34" 
+                        Background="#2196F3" Foreground="White" FontWeight="Bold">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="17"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

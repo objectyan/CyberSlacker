@@ -56,23 +56,6 @@ namespace CyberSlacker
         {
             // 立即取消订阅，防止干扰其他地方的更新检查
             AutoUpdater.CheckForUpdateEvent -= AutoUpdater_CheckForUpdateEvent;
-
-            if (args.Error == null)
-            {
-                if (args.IsUpdateAvailable)
-                {
-                    AutoUpdater.ShowUpdateForm(args);
-                }
-                else
-                {
-                    MessageBox.Show("当前已是最新版本，摸鱼愉快！", "检查更新",
-                        MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-            }
-            else
-            {
-                MessageBox.Show("网络连接失败，请检查 GitHub 访问是否正常。", "提示");
-            }
             this.updateBtn.IsEnabled = true;
         }
     }

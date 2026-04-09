@@ -41,9 +41,45 @@ namespace CyberSlacker
 
             // 优化是否开机重启
             StartupHelper.SetStartup(Settings.Default.IsAutoStart);
+
+            AutoUpdater.CheckForUpdateEvent += AutoUpdater_CheckForUpdateEvent;
+
+#if !DEBUG
+            AutoUpdaterDotNET.AutoUpdater.Start(App.GetUpdateUrl());      
+#endif
             base.OnStartup(e);
         }
 
+        /// <summary>
+        /// 不自动弹出默认窗体
+        /// </summary>
+        /// <param name="args"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void AutoUpdater_CheckForUpdateEvent(UpdateInfoEventArgs args)
+        {
+            if (args.Error == null)
+            {
+                if (args.IsUpdateAvailable)
+                {
+                    var updateWin = new UpdateInfoWindow(args);
+
+                    if (Current.MainWindow != null && Current.MainWindow.IsVisible)
+                        updateWin.Owner = Current.MainWindow;
+
+                    updateWin.ShowDialog();
+                }
+                else
+                {
+                    MessageBox.Show("当前已是最新版本，摸鱼愉快！", "检查更新",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            else
+            {
+                MessageBox.Show("网络连接失败，请检查 GitHub 访问是否正常。", "提示");
+            }
+
+        }
 
         /// <summary>
         /// 获取更新地址

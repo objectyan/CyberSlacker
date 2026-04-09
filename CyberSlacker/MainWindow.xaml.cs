@@ -39,9 +39,26 @@ namespace CyberSlacker
             _vm = new MainViewModel();
             this.DataContext = _vm;
 
-#if !DEBUG
-            AutoUpdaterDotNET.AutoUpdater.Start(App.GetUpdateUrl());      
-#endif
+            initNotify();
+
+            this.Loaded += (s, e) =>
+            {
+                this.SetBinding(Window.OpacityProperty, new Binding("Opacity") { Source = Settings.Default });
+            };
+
+            // 订阅窗口关闭事件进行资源释放
+            this.Closed += (s, e) =>
+            {
+                _vm.Dispose();
+                WeakReferenceMessenger.Default.UnregisterAll(this);
+            };
+        }
+
+        /// <summary>
+        /// 初始化消息提示
+        /// </summary>
+        private void initNotify()
+        {
             WeakReferenceMessenger.Default.Register<string[], string>(this, "NotifyOffWork", (r, m) =>
             {
                 // m[0] 是标题，m[1] 是内容
@@ -104,18 +121,6 @@ namespace CyberSlacker
                     }
                 });
             });
-
-            this.Loaded += (s, e) =>
-            {
-                this.SetBinding(Window.OpacityProperty, new Binding("Opacity") { Source = Settings.Default });
-            };
-
-            // 订阅窗口关闭事件进行资源释放
-            this.Closed += (s, e) =>
-            {
-                _vm.Dispose();
-                WeakReferenceMessenger.Default.UnregisterAll(this);
-            };
         }
 
         private void OpenSettings_Click(object sender, RoutedEventArgs e)
