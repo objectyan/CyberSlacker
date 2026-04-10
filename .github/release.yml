@@ -17,7 +17,3 @@ changelog:
       labels:
         - chore
         - ci
-  
-  render:
-    compact: false
-    include_commits: true
