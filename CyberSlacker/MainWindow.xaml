@@ -99,7 +99,7 @@ Fill="White" Stretch="Uniform"/>
             <StackPanel Margin="20">
                 <!-- 1. 顶部提示语 (依然横跨整行) -->
                 <Border Background="#22FFFFFF" Padding="10,5" CornerRadius="8" Margin="0,0,0,15" MinHeight="50" MaxHeight="70">
-                    <TextBlock Text="{Binding HolidayTip}" Foreground="White" FontSize="12" 
+                    <emoji:TextBlock Text="{Binding HolidayTip}" Foreground="White" FontSize="12" 
                        TextWrapping="Wrap" TextAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
 
@@ -157,7 +157,7 @@ Fill="White" Stretch="Uniform"/>
                 </Grid>
                 <StackPanel Margin="0, 5, 0, 0" Orientation="Horizontal" HorizontalAlignment="Center">
                     <!-- 网速字号稍小防止溢出 -->
-                    <TextBlock Text="{Binding HwNet}" Foreground="#CCC" FontSize="11"/>
+                    <emoji:TextBlock Text="{Binding HwNet}" Foreground="#CCC" FontSize="11"/>
                 </StackPanel>
             </StackPanel>
         </Border>

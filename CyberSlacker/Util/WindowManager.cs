@@ -36,9 +36,8 @@ namespace CyberSlacker.Util
             if (owner != null && owner.IsVisible)
             {
                 newWindow.Owner = owner;
-                newWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             }
-
+            newWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             newWindow.Show();
         }
     }
