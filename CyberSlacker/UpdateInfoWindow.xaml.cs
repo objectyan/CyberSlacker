@@ -1,7 +1,8 @@
-﻿using AutoUpdaterDotNET;
-using CyberSlacker.Properties;
+﻿using CyberSlacker.Properties;
+using CyberSlacker.Services;
 using Microsoft.Web.WebView2.Core;
 using Serilog;
+using System.Reflection;
 using System.Windows;
 
 namespace CyberSlacker
@@ -11,37 +12,37 @@ namespace CyberSlacker
     /// </summary>
     public partial class UpdateInfoWindow : Window
     {
-        private UpdateInfoEventArgs _args;
-
         private string _lastVersion;
 
-        public UpdateInfoWindow(UpdateInfoEventArgs args)
+        public UpdateInfoWindow(UpdateInfo info)
         {
             InitializeComponent();
-            _args = args;
 
-            if (System.Version.TryParse(args.CurrentVersion, out System.Version? remoteVersion))
+            // 获取本地版本
+            var localVersion = Assembly.GetExecutingAssembly().GetName().Version;
+            string localVerStr = localVersion != null ? $"{localVersion.Major}.{localVersion.Minor}.{localVersion.Build}" : "Unknown";
+            if (localVersion?.Revision > 0) localVerStr += $".{localVersion.Revision}";
+
+            // 赋值（现在红线应该消失了）
+            CurrentVerTxt.Text = localVerStr;
+            NewVerTxt.Text = info.RemoteVersion.ToString();
+
+            // 动态标题判定
+            if (info.RemoteVersion.Revision > 0)
             {
-                if (remoteVersion.Revision > 0)
-                {
-                    TitleText.Text = "🛠️ 发现新基因 (Preview)";
-                    TitleText.Foreground = System.Windows.Media.Brushes.Orange;
-                }
-
-                VersionFlow.Text = $"{args.InstalledVersion}  ➡  {remoteVersion}";
-
-                _lastVersion = remoteVersion.ToString();
-            }
-            else
-            {
-                VersionFlow.Text = $"{args.InstalledVersion}  ➡  {args.CurrentVersion}";
-                _lastVersion = args.CurrentVersion;
+                TitleText.Text = "🛠️ 发现新基因 (Preview)";
+                TitleText.Foreground = System.Windows.Media.Brushes.Orange;
             }
 
-            InitBrowser();
+            if (!string.IsNullOrEmpty(info.Changelog))
+            {
+                InitBrowser(info.Changelog);
+            }
+
+            this.Tag = info.DownloadUrl;
         }
 
-        private async void InitBrowser()
+        private async void InitBrowser(string changLogUrl)
         {
             try
             {
@@ -57,9 +58,9 @@ namespace CyberSlacker
 
                 WebView.NavigationCompleted += WebView_NavigationCompleted;
 
-                if (!string.IsNullOrEmpty(_args.ChangelogURL))
+                if (!string.IsNullOrEmpty(changLogUrl))
                 {
-                    WebView.Source = new Uri(_args.ChangelogURL);
+                    WebView.Source = new Uri(changLogUrl);
                 }
             }
             catch (Exception ex)
@@ -71,8 +72,8 @@ namespace CyberSlacker
 
         private void CoreWebView2_NavigationStarting(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs e)
         {
-            // 如果当前的链接不是我们最初设置的 ChangelogURL (即用户点击了里面的链接)
-            if (e.Uri != _args.ChangelogURL)
+            // 如果当前的链接不是我们最初设置的 Changelog (即用户点击了里面的链接)
+            if (e.Uri != this.WebView.Source.ToString())
             {
                 // A. 拦截 WebView2 内部的跳转
                 e.Cancel = true;
@@ -130,14 +131,21 @@ namespace CyberSlacker
 
         private void OnUpdate(object sender, RoutedEventArgs e)
         {
-            if (AutoUpdater.DownloadUpdate(_args))
+            // 1. 关掉当前的更新明细窗口
+            this.Close();
+
+            var downloadUrl = this.Tag as string;
+            if (string.IsNullOrWhiteSpace(downloadUrl))
             {
-                Settings.Default.LatestVersionSkipped = _lastVersion;
-                Settings.Default.LastUpdateCheck = DateTime.Today;
-                Settings.Default.Save();
-                System.Windows.Application.Current.Shutdown();
-                System.Environment.Exit(0);
+                Log.Error("更新失败：下载地址为空。");
+                NativeToastService.Show("错误", "无法获取更新下载地址。");
+                return;
             }
+
+            // 2. 启动自定义下载进度窗口
+            // 传入下载地址
+            var downloadWin = new DownloadWindow(downloadUrl);
+            downloadWin.Show();
         }
 
         private void OnSkip(object sender, RoutedEventArgs e)

@@ -2,6 +2,7 @@
 using CyberSlacker.Services;
 using CyberSlacker.Util;
 using CyberSlacker.ViewModels;
+using Serilog;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -83,7 +84,7 @@ namespace CyberSlacker
 
             try
             {
-                if (System.Windows.Forms.SystemInformation.TerminalServerSession == false)
+                if (Environment.UserInteractive)
                 {
                     try
                     {
@@ -97,7 +98,7 @@ namespace CyberSlacker
             }
             catch
             {
-                System.Diagnostics.Debug.WriteLine("无桌面环境，跳过托盘初始化");
+                Log.Error("无桌面环境，跳过托盘初始化");
             }
 
             IntPtr hwnd = new WindowInteropHelper(this).Handle;
@@ -299,9 +300,7 @@ namespace CyberSlacker
         /// <param name="e"></param>
         private void OnOpenSettings(object sender, RoutedEventArgs e)
         {
-            SettingsWindow sw = new SettingsWindow();
-            sw.Owner = this; // 居中于主窗口
-            sw.ShowDialog(); // 模式对话框
+            WindowManager.ShowUnique<SettingsWindow>(this);
         }
 
         /// <summary>
@@ -311,9 +310,7 @@ namespace CyberSlacker
         /// <param name="e"></param>
         private void OnOpenAbout(object sender, RoutedEventArgs e)
         {
-            AboutWindow aw = new AboutWindow();
-            aw.Owner = this;
-            aw.ShowDialog();
+            WindowManager.ShowUnique<AboutWindow>(this);
         }
 
         /// <summary>

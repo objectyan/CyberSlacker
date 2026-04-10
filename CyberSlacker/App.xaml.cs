@@ -1,12 +1,9 @@
-﻿using AutoUpdaterDotNET;
-using CyberSlacker.Properties;
+﻿using CyberSlacker.Properties;
 using CyberSlacker.Services;
 using CyberSlacker.Util;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Serilog;
 using System.Diagnostics;
-using System.IO;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Media.Animation;
 
@@ -52,86 +49,11 @@ namespace CyberSlacker
             StartupHelper.SetStartup(Settings.Default.IsAutoStart);
 
 #if !DEBUG
-            AutoUpdaterDotNET.AutoUpdater.Start(App.GetUpdateUrl()); 
+            CyberSlacker.Services.NativeUpdateService.StartUpdateFlow();
 #endif
 
-            AutoUpdater.CheckForUpdateEvent += AutoUpdater_CheckForUpdateEvent;
 
             base.OnStartup(e);
-        }
-
-        /// <summary>
-        /// 不自动弹出默认窗体
-        /// </summary>
-        /// <param name="args"></param>
-        /// <exception cref="NotImplementedException"></exception>
-        private void AutoUpdater_CheckForUpdateEvent(UpdateInfoEventArgs args)
-        {
-            if (args.Error == null)
-            {
-                if (args.IsUpdateAvailable)
-                {
-                    if (_isUpdateWindowOpen) return;
-                    _isUpdateWindowOpen = true;
-
-                    // 动态寻找合适的 Owner
-                    Window bestOwner = null;
-
-                    // 按照窗口打开的逆序查找（通常最后打开的在最前面）
-                    var windows = Application.Current.Windows.Cast<Window>().ToList();
-                    for (int i = windows.Count - 1; i >= 0; i--)
-                    {
-                        var win = windows[i];
-                        // 排除掉自己（防止死循环）且必须是可见的
-                        if (win.IsVisible && win is not UpdateInfoWindow)
-                        {
-                            // 如果这个窗口正在被激活，那就是它了！
-                            if (win.IsActive)
-                            {
-                                bestOwner = win;
-                                break;
-                            }
-                            // 否则先保存在候选人里，以备没有 Active 窗口
-                            bestOwner ??= win;
-                        }
-                    }
-
-                    var updateWin = new UpdateInfoWindow(args);
-
-                    if (bestOwner != null)
-                    {
-                        updateWin.Owner = bestOwner;
-                        // 配合 CenterOwner，它会自动跳到 Owner 所在的那个显示器
-                        updateWin.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-                    }
-                    else
-                    {
-                        updateWin.Owner = Current.MainWindow;
-                        // 如果连 MainWindow 都没有，就屏幕居中
-                        updateWin.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-                    }
-
-                    updateWin.Closed += (s, e) => { _isUpdateWindowOpen = false; };
-                    updateWin.ShowDialog();
-                }
-            }
-
-        }
-
-        /// <summary>
-        /// 获取更新地址
-        /// </summary>
-        /// <returns></returns>
-        public static string GetUpdateUrl()
-        {
-            AutoUpdater.DownloadPath = Path.Combine(Path.GetTempPath(), "CyberSlackerUpdates");
-            AutoUpdater.RunUpdateAsAdmin = true;
-
-            string arch = RuntimeInformation.ProcessArchitecture.ToString().ToLower();
-
-            string prefix = Settings.Default.IsPreviewEnabled ? "Update_preview_" : "Update_";
-
-            return $"https://raw.githubusercontent.com/objectyan/CyberSlacker/master/manifests/{prefix}{arch}.xml";
         }
 
         protected override void OnExit(ExitEventArgs e)

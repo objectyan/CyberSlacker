@@ -50,7 +50,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Autoupdater.NET.Official" Version="1.9.2" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 		<PackageReference Include="Emoji.Wpf" Version="0.3.4" />
 		<PackageReference Include="H.NotifyIcon.Wpf" Version="2.3.2" />

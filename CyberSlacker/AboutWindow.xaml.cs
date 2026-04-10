@@ -1,4 +1,6 @@
-﻿using AutoUpdaterDotNET;
+﻿using CyberSlacker.Services;
+using CyberSlacker.Util;
+using Serilog;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
@@ -42,28 +44,39 @@ namespace CyberSlacker
             }
             catch (Exception ex)
             {
-                MessageBox.Show("无法打开链接: " + ex.Message);
+                NativeToastService.Show("错误", "无法打开链接: " + ex.Message);
             }
         }
 
-        private void OnCheckUpdate(object sender, RoutedEventArgs e)
+        private async void OnCheckUpdate(object sender, RoutedEventArgs e)
         {
+
             this.updateBtn.IsEnabled = false;
             this.updateBtn.Content = "正在检查基因中...";
-            AutoUpdater.CheckForUpdateEvent += AutoUpdater_CheckForUpdateEvent;
-            AutoUpdater.Start(App.GetUpdateUrl());
-        }
 
-        private void AutoUpdater_CheckForUpdateEvent(UpdateInfoEventArgs args)
-        {
-            // 立即取消订阅，防止干扰其他地方的更新检查
-            AutoUpdater.CheckForUpdateEvent -= AutoUpdater_CheckForUpdateEvent;
-
-            this.Dispatcher.Invoke(() =>
+            try
             {
+                var info = await CyberSlacker.Services.NativeUpdateService.CheckForUpdateAsync();
+
+                if (info != null)
+                {
+                    WindowManager.ShowUnique<UpdateInfoWindow>(
+                           null,
+                           () => new UpdateInfoWindow(info)
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                // 网络报错处理
+                Log.Error("赛博链路异常，无法连接 GitHub", ex);
+            }
+            finally
+            {
+                // 无论成功失败，恢复按钮状态
                 this.updateBtn.IsEnabled = true;
                 this.updateBtn.Content = "检 查 更 新";
-            });
+            }
         }
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)

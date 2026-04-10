@@ -3,6 +3,8 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace CyberSlacker
 {
@@ -80,94 +82,113 @@ namespace CyberSlacker
             catch { hBox.SelectedIndex = 0; mBox.SelectedIndex = 0; }
         }
 
-        private void OnSave_Click(object sender, RoutedEventArgs e)
+        private async void OnSave_Click(object sender, RoutedEventArgs e)
         {
-            // --- 1. 非空与合法性校验 ---
-
-            // 检查 ComboBox 是否选择了值
-            if (StartHour.SelectedItem == null || StartMin.SelectedItem == null ||
-                EndHour.SelectedItem == null || EndMin.SelectedItem == null)
+            try
             {
-                MessageBox.Show("请选择完整的考勤时间！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
+                this.SaveButton.IsEnabled = false;
+                // --- 1. 非空与合法性校验 ---
 
-            if (MealHour.SelectedItem == null || MealMin.SelectedItem == null)
-            {
-                MessageBox.Show("请选择干饭时间！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (LunchStartHour.SelectedItem == null || LunchStartMin.SelectedItem == null ||
-               LunchEndHour.SelectedItem == null || LunchEndMin.SelectedItem == null)
-            {
-                MessageBox.Show("请选择完整的午休时间！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            // 检查发薪日是否为空或非数字
-            if (string.IsNullOrWhiteSpace(PayDayInput.Text))
-            {
-                MessageBox.Show("发薪日不能为空！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (int.TryParse(PayDayInput.Text, out int payday))
-            {
-                if (payday < 1 || payday > 31)
+                // 检查 ComboBox 是否选择了值
+                if (StartHour.SelectedItem == null || StartMin.SelectedItem == null ||
+                    EndHour.SelectedItem == null || EndMin.SelectedItem == null)
                 {
-                    MessageBox.Show("发薪日必须在 1 到 31 号之间！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    ShowMsg("请选择完整的考勤时间！");
                     return;
                 }
+
+                if (MealHour.SelectedItem == null || MealMin.SelectedItem == null)
+                {
+                    ShowMsg("请选择干饭时间！");
+                    return;
+                }
+
+                if (LunchStartHour.SelectedItem == null || LunchStartMin.SelectedItem == null ||
+                   LunchEndHour.SelectedItem == null || LunchEndMin.SelectedItem == null)
+                {
+                    ShowMsg("请选择完整的午休时间！");
+                    return;
+                }
+
+                // 检查发薪日是否为空或非数字
+                if (string.IsNullOrWhiteSpace(PayDayInput.Text))
+                {
+                    ShowMsg("发薪日不能为空！");
+                    return;
+                }
+
+                if (int.TryParse(PayDayInput.Text, out int payday))
+                {
+                    if (payday < 1 || payday > 31)
+                    {
+                        ShowMsg("发薪日必须在 1 到 31 号之间！");
+                        return;
+                    }
+                }
+                else
+                {
+                    ShowMsg("发薪日格式不正确！");
+                    return;
+                }
+
+                // --- 2. 逻辑校验 (可选) ---
+                string sTime = $"{StartHour.SelectedItem}:{StartMin.SelectedItem}";
+                string eTime = $"{EndHour.SelectedItem}:{EndMin.SelectedItem}";
+
+                string lsTime = $"{LunchStartHour.SelectedItem}:{LunchStartMin.SelectedItem}";
+                string leTime = $"{LunchEndHour.SelectedItem}:{LunchEndMin.SelectedItem}";
+
+                if (TimeSpan.Parse(sTime) >= TimeSpan.Parse(eTime))
+                {
+                    ShowMsg("下班时间不能早于上班时间！");
+                    return;
+                }
+
+                if (TimeSpan.Parse(lsTime) >= TimeSpan.Parse(leTime))
+                {
+                    ShowMsg("午休结束时间必须晚于开始时间！");
+                    return;
+                }
+
+                if (TimeSpan.Parse(leTime) <= TimeSpan.Parse(sTime))
+                {
+                    ShowMsg("午休结束时间必须晚于上班时间！");
+                    return;
+                }
+
+                // --- 3. 执行保存 ---
+                Properties.Settings.Default.StartTime = sTime;
+                Properties.Settings.Default.EndTime = eTime;
+                Properties.Settings.Default.MealTime = $"{MealHour.SelectedItem}:{MealMin.SelectedItem}";
+
+                Properties.Settings.Default.LunchStart = lsTime;
+                Properties.Settings.Default.LunchEnd = leTime;
+
+
+                if (Properties.Settings.Default.IsAutoStart != _initialAutoStart)
+                {
+                    StartupHelper.SetStartup(Properties.Settings.Default.IsAutoStart);
+                }
+
+                Properties.Settings.Default.Save();
+
+                await ShowStatus("同步成功，赛博核心已更新！💾", isSuccess: true, CloseWindowWithFade);
+
             }
-            else
+            finally
             {
-                MessageBox.Show("发薪日格式不正确！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
+                this.SaveButton.IsEnabled = true;
             }
+        }
 
-            // --- 2. 逻辑校验 (可选) ---
-            string sTime = $"{StartHour.SelectedItem}:{StartMin.SelectedItem}";
-            string eTime = $"{EndHour.SelectedItem}:{EndMin.SelectedItem}";
-
-            string lsTime = $"{LunchStartHour.SelectedItem}:{LunchStartMin.SelectedItem}";
-            string leTime = $"{LunchEndHour.SelectedItem}:{LunchEndMin.SelectedItem}";
-
-            if (TimeSpan.Parse(sTime) >= TimeSpan.Parse(eTime))
-            {
-                MessageBox.Show("下班时间不能早于上班时间！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (TimeSpan.Parse(lsTime) >= TimeSpan.Parse(leTime))
-            {
-                MessageBox.Show("午休结束时间必须晚于开始时间！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (TimeSpan.Parse(leTime) <= TimeSpan.Parse(sTime))
-            {
-                MessageBox.Show("午休结束时间必须晚于上班时间！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            // --- 3. 执行保存 ---
-            Properties.Settings.Default.StartTime = sTime;
-            Properties.Settings.Default.EndTime = eTime;
-            Properties.Settings.Default.MealTime = $"{MealHour.SelectedItem}:{MealMin.SelectedItem}";
-
-            Properties.Settings.Default.LunchStart = lsTime;
-            Properties.Settings.Default.LunchEnd = leTime;
-
-
-            if (Properties.Settings.Default.IsAutoStart != _initialAutoStart)
-            {
-                StartupHelper.SetStartup(Properties.Settings.Default.IsAutoStart);
-            }
-
-            Properties.Settings.Default.Save();
-
-            this.Close();
+        /// <summary>
+        /// 🌟 独立的窗口退出特效，不再跟提示条耦合
+        /// </summary>
+        private void CloseWindowWithFade()
+        {
+            DoubleAnimation windowFade = new(1, 0, TimeSpan.FromMilliseconds(100));
+            windowFade.Completed += (s, ev) => this.Close();
+            this.BeginAnimation(OpacityProperty, windowFade);
         }
 
 
@@ -181,6 +202,61 @@ namespace CyberSlacker
         private void OnCloseClick(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+        private bool _isShowingMsg = false;
+
+        /// <summary>
+        /// 🌟 通用提示：支持成功(绿)和错误(红)
+        /// </summary>
+        private async Task ShowStatus(string message, bool isSuccess = false, Action onFinished = null)
+        {
+            if (_isShowingMsg) return;
+            _isShowingMsg = true;
+
+            // 1. 根据状态切换颜色和图标
+            if (isSuccess)
+            {
+                // 赛博绿 (#00E676)
+                MsgBar.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F200E676"));
+                MsgGlow.Color = (Color)ColorConverter.ConvertFromString("#00E676");
+                MsgIcon.Text = "✅";
+            }
+            else
+            {
+                // 赛博红 (#FF5252)
+                MsgBar.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F2FF5252"));
+                MsgGlow.Color = (Color)ColorConverter.ConvertFromString("#FF5252");
+                MsgIcon.Text = "⚠️";
+            }
+
+            MsgText.Text = message;
+
+            // 2. 动画显示 (保持之前的 BackEase 效果)
+            DoubleAnimation fadeIn = new(0, 1, TimeSpan.FromMilliseconds(300));
+            DoubleAnimation moveUp = new(30, 0, TimeSpan.FromMilliseconds(400))
+            {
+                EasingFunction = new BackEase { Amplitude = 0.8, EasingMode = EasingMode.EaseOut }
+            };
+            MsgBar.BeginAnimation(OpacityProperty, fadeIn);
+            MsgTransform.BeginAnimation(TranslateTransform.YProperty, moveUp);
+
+            // 3. 无论成功失败，都只负责显示提示
+            await Task.Delay(2500);
+
+            // 4. 播放滑出动画
+            DoubleAnimation fadeOut = new(1, 0, TimeSpan.FromMilliseconds(300));
+            MsgBar.BeginAnimation(OpacityProperty, fadeOut);
+
+            await Task.Delay(300);
+            _isShowingMsg = false;
+
+            onFinished?.Invoke();
+        }
+
+        private async void ShowMsg(string message)
+        {
+            ShowStatus(message, false);
         }
     }
 }
