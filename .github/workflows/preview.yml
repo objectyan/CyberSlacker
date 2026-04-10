@@ -168,38 +168,26 @@ jobs:
             git push origin master
         }
 
-    - name: Force Generate Release Notes
-      shell: pwsh
+    - name: Generate Changelog
+      uses: mikepenz/release-changelog-builder-action@v4
+      id: build_changelog
+      with:
+        configuration: |
+          categories:
+            - title: "🚀 赛博特性 (Features)"
+              labels: [feature, feat]
+            - title: "🐛 故障修复 (Bug Fixes)"
+              labels: [bug, fix]
+            - title: "📦 基础设施 (Maintenance)"
+              labels: [chore, ci]
+          exclude:
+            labels: [skip-changelog]
+            authors: [octocat]
+          render:
+            compact: false
+            include_commits: true
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        $tag = "preview"
-        $repo = $env:GITHUB_REPOSITORY
-        
-        # 1. 获取系统生成的明细
-        $notes = gh api "repos/$repo/releases/generate-notes" -f tag_name="$tag" | ConvertFrom-Json
-        $changelog = $notes.body
-
-        # 2. 定义你的固定头部 (使用 Here-String 保持排版)
-        $header = @"
-        🚀 **CyberSlacker 赛博预览版自动更新**
-        ---
-        ### ⚠️ 实验性版本
-        此版本由 GitHub Actions 自动编译。包含最新的开发特性，可能存在不稳定因素。
-        - **编译时间**: `${{ github.event.head_commit.timestamp }}`
-        - **预览版本号**: `${{ env.PREVIEW_VER }}`
-        - **构建流水号**: `${{ github.run_number }}`
-        ---
-        *警告：预览版可能包含未完成的功能，仅供测试。*
-        ### 📝 变动明细 (What's Changed)
-        "@
-
-        # 3. 【核心动作】合并头部和明细，存入最终文件
-        $finalBody = $header + "`n`n" + $changelog
-        $finalBody | Out-File -FilePath "final_notes.md" -Encoding utf8
-        
-        Write-Host "最终日志预览："
-        Get-Content "final_notes.md"
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
     - name: Force Update Preview Tag
       run: |
@@ -215,9 +203,19 @@ jobs:
       with:
         tag_name: preview  # 保持使用固定的标签名
         name: "🛠️ 预览版 (Preview Build) - v${{ env.PREVIEW_VER }}"
-      
-        body_path: generated_notes.md
-        
+        body: |
+          🚀 **CyberSlacker 赛博预览版自动更新**
+          ---
+          ### ⚠️ 实验性版本
+          此版本由 GitHub Actions 自动编译。包含最新的开发特性，可能存在不稳定因素。
+          - **编译时间**: `${{ github.event.head_commit.timestamp }}`
+          - **预览版本号**: `${{ env.PREVIEW_VER }}`
+          - **构建流水号**: `${{ github.run_number }}`
+          ---
+          ### 📝 变动明细 
+          ${{ steps.build_changelog.outputs.changelog }}
+          ---
+          *警告：预览版可能包含未完成的功能，仅供测试。*          
         # 指向下载的临时目录下的所有 MSI 文件
         files: |
           ./temp_preview/Output/*.msi
