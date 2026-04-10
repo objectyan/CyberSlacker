@@ -51,11 +51,11 @@ namespace CyberSlacker
             // 优化是否开机重启
             StartupHelper.SetStartup(Settings.Default.IsAutoStart);
 
-            AutoUpdater.CheckForUpdateEvent += AutoUpdater_CheckForUpdateEvent;
-
 #if !DEBUG
             AutoUpdaterDotNET.AutoUpdater.Start(App.GetUpdateUrl());      
 #endif
+
+            AutoUpdater.CheckForUpdateEvent += AutoUpdater_CheckForUpdateEvent;
 
             base.OnStartup(e);
         }

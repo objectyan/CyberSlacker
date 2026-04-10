@@ -52,6 +52,9 @@ namespace CyberSlacker
                 var env = await CoreWebView2Environment.CreateAsync(null, userDataFolder);
                 await WebView.EnsureCoreWebView2Async(env);
 
+
+                WebView.CoreWebView2.NavigationStarting += CoreWebView2_NavigationStarting;
+
                 WebView.NavigationCompleted += WebView_NavigationCompleted;
 
                 if (!string.IsNullOrEmpty(_args.ChangelogURL))
@@ -62,6 +65,30 @@ namespace CyberSlacker
             catch (Exception ex)
             {
                 Log.Error("WebView2 初始化失败: ", ex);
+            }
+        }
+
+
+        private void CoreWebView2_NavigationStarting(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs e)
+        {
+            // 如果当前的链接不是我们最初设置的 ChangelogURL (即用户点击了里面的链接)
+            if (e.Uri != _args.ChangelogURL)
+            {
+                // A. 拦截 WebView2 内部的跳转
+                e.Cancel = true;
+
+                // B. 唤醒系统默认浏览器打开该链接
+                try
+                {
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(e.Uri)
+                    {
+                        UseShellExecute = true // .NET 8 下必须设为 true 才能打开 URL
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("无法打开浏览器: ", ex);
+                }
             }
         }
 
