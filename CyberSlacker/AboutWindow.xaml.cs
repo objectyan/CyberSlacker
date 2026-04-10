@@ -58,8 +58,12 @@ namespace CyberSlacker
         {
             // 立即取消订阅，防止干扰其他地方的更新检查
             AutoUpdater.CheckForUpdateEvent -= AutoUpdater_CheckForUpdateEvent;
-            this.updateBtn.IsEnabled = true;
-            this.updateBtn.Content = "检 查 更 新";
+
+            this.Dispatcher.Invoke(() =>
+            {
+                this.updateBtn.IsEnabled = true;
+                this.updateBtn.Content = "检 查 更 新";
+            });
         }
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)

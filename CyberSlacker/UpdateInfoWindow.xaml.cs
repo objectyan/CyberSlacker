@@ -135,7 +135,8 @@ namespace CyberSlacker
                 Settings.Default.LatestVersionSkipped = _lastVersion;
                 Settings.Default.LastUpdateCheck = DateTime.Today;
                 Settings.Default.Save();
-                Application.Current.Shutdown();
+                System.Windows.Application.Current.Shutdown();
+                System.Environment.Exit(0);
             }
         }
 

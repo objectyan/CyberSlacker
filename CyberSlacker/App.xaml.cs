@@ -52,7 +52,7 @@ namespace CyberSlacker
             StartupHelper.SetStartup(Settings.Default.IsAutoStart);
 
 #if !DEBUG
-            AutoUpdaterDotNET.AutoUpdater.Start(App.GetUpdateUrl());      
+            AutoUpdaterDotNET.AutoUpdater.Start(App.GetUpdateUrl()); 
 #endif
 
             AutoUpdater.CheckForUpdateEvent += AutoUpdater_CheckForUpdateEvent;
@@ -114,15 +114,6 @@ namespace CyberSlacker
                     updateWin.Closed += (s, e) => { _isUpdateWindowOpen = false; };
                     updateWin.ShowDialog();
                 }
-                else
-                {
-                    MessageBox.Show("当前已是最新版本，摸鱼愉快！", "检查更新",
-                        MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-            }
-            else
-            {
-                MessageBox.Show("网络连接失败，请检查 GitHub 访问是否正常。", "提示");
             }
 
         }

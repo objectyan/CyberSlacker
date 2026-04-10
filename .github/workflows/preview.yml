@@ -49,7 +49,6 @@ jobs:
         Start-Service -Name "msiserver" -ErrorAction SilentlyContinue
 
     - name: Fetch Latest Version from GitHub
-      id: get_latest
       shell: pwsh
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -173,16 +172,24 @@ jobs:
       id: build_changelog
       with:
         configuration: |
+          exclude:
+            labels:
+              - skip-changelog
+            authors:
+              - octocat
           categories:
             - title: "🚀 赛博特性 (Features)"
-              labels: [feature, feat]
+              labels:
+                - feature
+                - feat
             - title: "🐛 故障修复 (Bug Fixes)"
-              labels: [bug, fix]
+              labels:
+                - bug
+                - fix
             - title: "📦 基础设施 (Maintenance)"
-              labels: [chore, ci]
-          exclude:
-            labels: [skip-changelog]
-            authors: [octocat]
+              labels:
+                - chore
+                - ci
           render:
             compact: false
             include_commits: true
@@ -198,6 +205,35 @@ jobs:
         # 强制推送到远程
         git push -f origin preview
 
+    - name: Fetch Latest Version from GitHub
+      shell: pwsh
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # 1. 默认起始版本
+        $latestTag = "v1.0.0"
+
+        # 2. 尝试获取版本，使用 2>$null 吞掉错误日志
+        $response = gh api repos/$env:GITHUB_REPOSITORY/releases/latest --jq '.tag_name' 2>$null
+
+        # 3. 这里的 $? 会检查上一个命令是否成功
+        if ($? -and $response) {
+            $latestTag = $response
+            Write-Host "检测到云端已发布版本: $latestTag"
+        } else {
+            Write-Host "云端未发现发布记录（或请求 404），采用默认起始值: $latestTag"
+        }
+
+        # 4. 正常执行版本号清洗和拼接
+        $baseVer = $latestTag.TrimStart('v')
+        $fullVer = "$baseVer.${{ github.run_number }}"
+
+        # 5. 写入环境变量
+        "PREVIEW_VER=$fullVer" | Out-File -FilePath $env:GITHUB_ENV -Append
+        Write-Host "最终生成的预览版本号为: $fullVer"
+        
+        # 🌟 核心修复：强制设置退出码为 0，防止 404 导致整步变红
+        exit 0
     - name: Update Preview Release
       uses: softprops/action-gh-release@v2
       with:
