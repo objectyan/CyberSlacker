@@ -19,10 +19,10 @@ namespace CyberSlacker.Services
         public async Task InitializeAsync(int year)
         {
 
-            // --- 1. 防止并发锁 ---
+            // 防止并发锁
             if (_isUpdating) return;
 
-            // --- 2. 预检查：如果今天已经更新过了，且内存里有数据，直接跳过 ---
+            // 预检查：如果今天已经更新过了，且内存里有数据，直接跳过
             if (IsDataReady && Properties.Settings.Default.LastHolidayUpdate.Date == DateTime.Today)
             {
                 return;
