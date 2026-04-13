@@ -1,5 +1,8 @@
 ﻿using CyberSlacker.Util;
+using System;
+using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -209,7 +212,7 @@ namespace CyberSlacker
         /// <summary>
         /// 🌟 通用提示：支持成功(绿)和错误(红)
         /// </summary>
-        private async Task ShowStatus(string message, bool isSuccess = false, Action onFinished = null)
+        private async Task ShowStatus(string message, bool isSuccess = false, Action? onFinished = null)
         {
             if (_isShowingMsg) return;
             _isShowingMsg = true;
@@ -256,7 +259,7 @@ namespace CyberSlacker
 
         private async void ShowMsg(string message)
         {
-            ShowStatus(message, false);
+            _ = Task.Run(async () => await ShowStatus(message, false));
         }
     }
 }

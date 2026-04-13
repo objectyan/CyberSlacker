@@ -96,6 +96,9 @@ Fill="White" Stretch="Uniform"/>
                       Opacity="0.4" 
                       RenderingBias="Performance"/>
             </Border.Effect>
+            <Border.RenderTransform>
+                <ScaleTransform x:Name="MainScaleTransform" ScaleX="1" ScaleY="1"/>
+            </Border.RenderTransform>
             <StackPanel Margin="20">
                 <!-- 1. 顶部提示语 (依然横跨整行) -->
                 <Border Background="#22FFFFFF" Padding="10,5" CornerRadius="8" Margin="0,0,0,15" MinHeight="50" MaxHeight="70">

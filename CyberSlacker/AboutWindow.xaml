@@ -6,110 +6,136 @@
         WindowStartupLocation="CenterScreen" WindowStyle="None" 
         AllowsTransparency="True" Background="Transparent"
         FontFamily="Microsoft YaHei">
+    <Grid>
 
-    <!-- 窗口阴影外壳 -->
-    <Border Margin="15" Background="#F21A1A1A" CornerRadius="20" BorderBrush="#44FFFFFF" BorderThickness="1">
-        <Border.Effect>
-            <DropShadowEffect BlurRadius="15" ShadowDepth="0" Opacity="0.5" Color="Black"/>
-        </Border.Effect>
+        <!-- 窗口阴影外壳 -->
+        <Border Margin="15" Background="#F21A1A1A" CornerRadius="20" BorderBrush="#44FFFFFF" BorderThickness="1">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="15" ShadowDepth="0" Opacity="0.5" Color="Black"/>
+            </Border.Effect>
 
-        <Grid>
-            <!-- 右上角关闭按钮 -->
-            <Button Content="✕" HorizontalAlignment="Right" VerticalAlignment="Top" 
+            <Grid>
+                <!-- 右上角关闭按钮 -->
+                <Button Content="✕" HorizontalAlignment="Right" VerticalAlignment="Top" 
                     Margin="0,10,15,0" Background="Transparent" BorderThickness="0" 
                     Foreground="#666" Cursor="Hand" Click="OnCloseClick"/>
 
-            <StackPanel Margin="25">
-                <!-- 1. Logo 区域：放大并加入霓虹发光 -->
-                <Grid Width="80" Height="80" Margin="0,10,0,15">
-                    <Ellipse Fill="#22FFFFFF"/>
-                    <Image Source="/Resources/app.ico" Width="50" Height="50" 
+                <StackPanel Margin="25">
+                    <!-- 1. Logo 区域：放大并加入霓虹发光 -->
+                    <Grid Width="80" Height="80" Margin="0,10,0,15">
+                        <Ellipse Fill="#22FFFFFF"/>
+                        <Image Source="/Resources/app.ico" Width="50" Height="50" 
                            RenderOptions.BitmapScalingMode="HighQuality">
-                        <Image.Effect>
-                            <DropShadowEffect BlurRadius="20" Color="Gold" Opacity="0.6" ShadowDepth="0"/>
-                        </Image.Effect>
-                    </Image>
-                </Grid>
+                            <Image.Effect>
+                                <DropShadowEffect BlurRadius="20" Color="Gold" Opacity="0.6" ShadowDepth="0"/>
+                            </Image.Effect>
+                        </Image>
+                    </Grid>
 
-                <!-- 2. 标题与版本 -->
-                <TextBlock Text="赛博摸鱼员" FontSize="26" FontWeight="ExtraBold" 
+                    <!-- 2. 标题与版本 -->
+                    <TextBlock Text="赛博摸鱼员" FontSize="26" FontWeight="ExtraBold" 
                            HorizontalAlignment="Center" Foreground="White">
-                    <TextBlock.Effect>
-                        <DropShadowEffect BlurRadius="5" Color="#00E5FF" Opacity="0.3" ShadowDepth="0"/>
-                    </TextBlock.Effect>
-                </TextBlock>
+                        <TextBlock.Effect>
+                            <DropShadowEffect BlurRadius="5" Color="#00E5FF" Opacity="0.3" ShadowDepth="0"/>
+                        </TextBlock.Effect>
+                    </TextBlock>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,25">
-                    <TextBlock x:Name="VersionText" Text="Version 1.0.1.29" FontSize="12" Foreground="#888" VerticalAlignment="Center"/>
-                    <Border x:Name="PreviewBadge" Visibility="Collapsed" Background="Orange" 
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,25">
+                        <TextBlock x:Name="VersionText" Text="Version 1.0.1.29" FontSize="12" Foreground="#888" VerticalAlignment="Center"/>
+                        <Border x:Name="PreviewBadge" Visibility="Collapsed" Background="Orange" 
                             CornerRadius="4" Padding="6,2" Margin="10,0,0,0">
-                        <TextBlock Text="PREVIEW" FontSize="10" FontWeight="Bold" Foreground="White"/>
-                    </Border>
-                </StackPanel>
+                            <TextBlock Text="PREVIEW" FontSize="10" FontWeight="Bold" Foreground="White"/>
+                        </Border>
+                    </StackPanel>
 
-                <!-- 3. 宣言：改用更具质感的引用块设计 -->
-                <Border Background="#11FFFFFF" Padding="20,15" CornerRadius="12" Margin="0,0,0,30" BorderBrush="#22FFFFFF" BorderThickness="1">
-                    <StackPanel>
-                        <TextBlock Text="“钱是老板的，命是自己的”" FontSize="14" 
+                    <!-- 3. 宣言：改用更具质感的引用块设计 -->
+                    <Border Background="#11FFFFFF" Padding="20,15" CornerRadius="12" Margin="0,0,0,30" BorderBrush="#22FFFFFF" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="“钱是老板的，命是自己的”" FontSize="14" 
                                    Foreground="Gold" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,0,0,8"/>
-                        <TextBlock Text="“每一秒专注的摸鱼，都是对生命尊严的无声挽留。”" 
+                            <TextBlock Text="“每一秒专注的摸鱼，都是对生命尊严的无声挽留。”" 
                                    FontSize="11" Foreground="#AAA" TextWrapping="Wrap" TextAlignment="Center" FontStyle="Italic"/>
-                    </StackPanel>
-                </Border>
+                        </StackPanel>
+                    </Border>
 
-                <!-- 4. 链接区域：改为横向图标感 -->
-                <UniformGrid Columns="3" Margin="10,0">
-                    <StackPanel>
-                        <TextBlock HorizontalAlignment="Center">
+                    <!-- 4. 链接区域：改为横向图标感 -->
+                    <UniformGrid Columns="3" Margin="10,0">
+                        <StackPanel>
+                            <TextBlock HorizontalAlignment="Center">
                             <Hyperlink NavigateUri="https://github.com/objectyan/CyberSlacker" RequestNavigate="OnNavigate" Foreground="#2196F3" TextDecorations="None">源码仓库</Hyperlink>
-                        </TextBlock>
-                    </StackPanel>
-                    <StackPanel>
-                        <TextBlock HorizontalAlignment="Center">
+                            </TextBlock>
+                        </StackPanel>
+                        <StackPanel>
+                            <TextBlock HorizontalAlignment="Center">
                             <Hyperlink NavigateUri="https://github.com/objectyan/CyberSlacker/issues" RequestNavigate="OnNavigate" Foreground="#2196F3" TextDecorations="None">反馈建议</Hyperlink>
-                        </TextBlock>
-                    </StackPanel>
-                    <StackPanel>
-                        <TextBlock HorizontalAlignment="Center">
+                            </TextBlock>
+                        </StackPanel>
+                        <StackPanel>
+                            <TextBlock HorizontalAlignment="Center">
                             <Hyperlink NavigateUri="https://github.com/objectyan/CyberSlacker/blob/master/LICENSE" RequestNavigate="OnNavigate" Foreground="#2196F3" TextDecorations="None">开源协议</Hyperlink>
-                        </TextBlock>
-                    </StackPanel>
-                </UniformGrid>
+                            </TextBlock>
+                        </StackPanel>
+                    </UniformGrid>
 
-                <!-- 5. 检查更新按钮：改为科技感的圆角长按钮 -->
-                <Button x:Name="updateBtn" Content="检 查 更 新" 
+                    <!-- 5. 检查更新按钮：改为科技感的圆角长按钮 -->
+                    <Button x:Name="updateBtn" Content="检 查 更 新" 
                         Click="OnCheckUpdate" Margin="0,30,0,0" Height="40"
-                        Background="#2196F3" Foreground="White" FontSize="14" FontWeight="Bold" Cursor="Hand">      
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <!-- 给 Border 起个名，方便 Trigger 改变它 -->
-                            <Border x:Name="btnBorder" Background="{TemplateBinding Background}" CornerRadius="20">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
+                        Background="#2196F3" Foreground="White" FontSize="14" FontWeight="Bold" Cursor="Hand">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <!-- 给 Border 起个名，方便 Trigger 改变它 -->
+                                <Border x:Name="btnBorder" Background="{TemplateBinding Background}" CornerRadius="20">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
 
-                            <ControlTemplate.Triggers>
-                                <!-- 当按钮被禁用时，改变背景色和透明度 -->
-                                <Trigger Property="IsEnabled" Value="False">
-                                    <Setter TargetName="btnBorder" Property="Background" Value="#444"/>
-                                    <Setter TargetName="btnBorder" Property="Opacity" Value="0.5"/>
-                                    <Setter Property="Foreground" Value="#888"/>
-                                </Trigger>
-                                <!-- 鼠标悬停效果 -->
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="btnBorder" Property="Background" Value="#1E88E5"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
+                                <ControlTemplate.Triggers>
+                                    <!-- 当按钮被禁用时，改变背景色和透明度 -->
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter TargetName="btnBorder" Property="Background" Value="#444"/>
+                                        <Setter TargetName="btnBorder" Property="Opacity" Value="0.5"/>
+                                        <Setter Property="Foreground" Value="#888"/>
+                                    </Trigger>
+                                    <!-- 鼠标悬停效果 -->
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="btnBorder" Property="Background" Value="#1E88E5"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
 
-                <!-- 6. 底部版权 -->
-                <TextBlock FontSize="10" Foreground="#444" HorizontalAlignment="Center" Margin="0,20,0,0">
-                    <TextBlock.Text>
-                        <Binding Source="{x:Static sys:DateTime.Now}" Path="Year" StringFormat="Copyright © {0} objectyan" />
-                    </TextBlock.Text>
-                </TextBlock>
+                    <!-- 6. 底部版权 -->
+                    <TextBlock FontSize="10" Foreground="#444" HorizontalAlignment="Center" Margin="0,20,0,0">
+                        <TextBlock.Text>
+                            <Binding Source="{x:Static sys:DateTime.Now}" Path="Year" StringFormat="Copyright © {0} objectyan" />
+                        </TextBlock.Text>
+                    </TextBlock>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 关于界面专属赛博胶囊 -->
+        <Border x:Name="MsgBar" 
+            VerticalAlignment="Bottom" 
+            HorizontalAlignment="Center"
+            Margin="0,0,0,80" 
+            Padding="15,7"
+            CornerRadius="18"
+            BorderBrush="#66FFFFFF" 
+            BorderThickness="1"
+            IsHitTestVisible="False"
+            Opacity="0"
+            RenderTransformOrigin="0.5,0.5">
+            <Border.RenderTransform>
+                <TranslateTransform x:Name="MsgTransform" Y="20"/>
+            </Border.RenderTransform>
+            <Border.Effect>
+                <DropShadowEffect x:Name="MsgGlow" BlurRadius="15" ShadowDepth="0" Opacity="0.6"/>
+            </Border.Effect>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock x:Name="MsgIcon" Text="✅" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                <TextBlock x:Name="MsgText" Text="提示信息" Foreground="White" FontSize="12" FontWeight="Bold" VerticalAlignment="Center"/>
             </StackPanel>
-        </Grid>
-    </Border>
+        </Border>
+    </Grid>
 </Window>

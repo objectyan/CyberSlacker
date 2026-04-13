@@ -3,12 +3,15 @@ using CyberSlacker.Services;
 using CyberSlacker.Util;
 using CyberSlacker.ViewModels;
 using Serilog;
+using System;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using static CyberSlacker.Util.Interop;
@@ -18,7 +21,6 @@ namespace CyberSlacker
     public partial class MainWindow : Window
     {
         IntPtr shellView = IntPtr.Zero;
-        private double _windowsScalingFactor;
         private readonly MainViewModel _vm;
 
         public MainWindow()
@@ -154,8 +156,7 @@ namespace CyberSlacker
             double dpiX = source?.CompositionTarget.TransformToDevice.M11 ?? 1.0;
             double dpiY = source?.CompositionTarget.TransformToDevice.M22 ?? 1.0;
 
-            Util.Interop.RECT parentRect;
-            Util.Interop.GetWindowRect(hwnd, out parentRect);
+            Util.Interop.GetWindowRect(hwnd, out var parentRect);
 
             double virtualLeft = SystemParameters.VirtualScreenLeft;
             double virtualTop = SystemParameters.VirtualScreenTop;
@@ -217,14 +218,20 @@ namespace CyberSlacker
                 From = 1.0,
                 To = 1.05,
                 Duration = TimeSpan.FromMilliseconds(200),
-                AutoReverse = true
+                AutoReverse = true,
+                EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut }
             };
 
             // 执行动画 对阴影透明度执行动画
             MainShadow.BeginAnimation(DropShadowEffect.OpacityProperty, glowAnim);
 
+            // 执行缩放动画 (同时应用到 X 和 Y 轴)
+            MainScaleTransform.BeginAnimation(ScaleTransform.ScaleXProperty, scaleAnim);
+            MainScaleTransform.BeginAnimation(ScaleTransform.ScaleYProperty, scaleAnim);
+
             // 可以给窗口透明度也加
             this.BeginAnimation(Window.OpacityProperty, glowAnim);
+
         }
 
         /// <summary>
@@ -239,7 +246,7 @@ namespace CyberSlacker
                 double dpiX = source?.CompositionTarget.TransformToDevice.M11 ?? 1.0;
                 double dpiY = source?.CompositionTarget.TransformToDevice.M22 ?? 1.0;
 
-                // 🌟 核心：将物理像素转回逻辑坐标再保存
+                // 将物理像素转回逻辑坐标再保存
                 Settings.Default.WindowLeft = rect.Left / dpiX;
                 Settings.Default.WindowTop = rect.Top / dpiY;
                 Settings.Default.Save();
@@ -274,22 +281,23 @@ namespace CyberSlacker
         /// <param name="e"></param>
         private void OnLockToggle(object sender, RoutedEventArgs e)
         {
-            var item = sender as MenuItem;
-            if (item == null) return;
-
-            // 1. 获取当前状态（如果是 IsCheckable 模式）
-            bool isLocked = item.IsChecked;
-
-            Settings.Default.IsLocked = isLocked;
-            Settings.Default.Save();
-
-            // 3. 执行穿透逻辑
-            ApplyLockState(isLocked);
-
-            // 4. 发个彩色通知提醒一下（可选，更有仪式感）
-            if (isLocked)
+            if (sender is MenuItem item)
             {
-                NativeToastService.Show("🔒 挂件已锁定", "现在点击将直接穿透，防止摸鱼时误触。");
+
+                // 1. 获取当前状态（如果是 IsCheckable 模式）
+                bool isLocked = item.IsChecked;
+
+                Settings.Default.IsLocked = isLocked;
+                Settings.Default.Save();
+
+                // 3. 执行穿透逻辑
+                ApplyLockState(isLocked);
+
+                // 4. 发个彩色通知提醒一下（可选，更有仪式感）
+                if (isLocked)
+                {
+                    NativeToastService.Show("🔒 挂件已锁定", "现在点击将直接穿透，防止摸鱼时误触。");
+                }
             }
         }
 

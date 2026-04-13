@@ -1,9 +1,13 @@
 ﻿using CyberSlacker.Services;
 using CyberSlacker.Util;
 using Serilog;
+using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Navigation;
 
 namespace CyberSlacker
@@ -65,11 +69,16 @@ namespace CyberSlacker
                            () => new UpdateInfoWindow(info)
                     );
                 }
+                else
+                {
+                    ShowStatus("当前已是最新基因，无需进化！", isSuccess: true);
+                }
             }
             catch (Exception ex)
             {
                 // 网络报错处理
                 Log.Error("赛博链路异常，无法连接 GitHub", ex);
+                ShowStatus("链路中断，无法连接 GitHub", isSuccess: false);
             }
             finally
             {
@@ -92,6 +101,32 @@ namespace CyberSlacker
         private void OnCloseClick(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+        private bool _isShowingMsg = false;
+        private async void ShowStatus(string message, bool isSuccess = true)
+        {
+            if (_isShowingMsg) return;
+            _isShowingMsg = true;
+
+            // 颜色切换
+            var color = isSuccess ? "#00E676" : "#FF5252";
+            MsgBar.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F2" + color.Replace("#", "")));
+            MsgGlow.Color = (Color)ColorConverter.ConvertFromString(color);
+            MsgIcon.Text = isSuccess ? "✅" : "❌";
+            MsgText.Text = message;
+
+            // 动画
+            MsgBar.BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(300)));
+            MsgTransform.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(20, 0, TimeSpan.FromMilliseconds(400))
+            {
+                EasingFunction = new BackEase { Amplitude = 0.5, EasingMode = EasingMode.EaseOut }
+            });
+
+            await Task.Delay(2000);
+
+            MsgBar.BeginAnimation(OpacityProperty, new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(300)));
+            _isShowingMsg = false;
         }
     }
 }

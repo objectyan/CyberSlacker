@@ -1,6 +1,7 @@
 ﻿using CyberSlacker.Services;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Serilog;
+using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media.Animation;
@@ -12,10 +13,6 @@ namespace CyberSlacker
     /// </summary>
     public partial class App : Application
     {
-        /// <summary>
-        /// 使用 static 确保全局唯一，防止重复弹出窗口
-        /// </summary>
-        private static bool _isUpdateWindowOpen = false;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -77,7 +74,7 @@ namespace CyberSlacker
         /// <summary>
         /// 初始化消息提示
         /// </summary>
-        private void InitNotify()
+        private static void InitNotify()
         {
 
             // 订阅激活事件
@@ -96,8 +93,7 @@ namespace CyberSlacker
                         switch (action)
                         {
                             case "main":
-                                var mainWin = Application.Current.MainWindow as MainWindow;
-                                if (mainWin != null)
+                                if (Application.Current.MainWindow is MainWindow mainWin)
                                 {
                                     // 如果窗口是隐藏的 (Collapsed)，重新显示
                                     if (mainWin.Visibility != Visibility.Visible)

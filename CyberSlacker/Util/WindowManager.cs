@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System;
+using System.Linq;
+using System.Windows;
 
 namespace CyberSlacker.Util
 {
@@ -10,7 +12,7 @@ namespace CyberSlacker.Util
         /// <typeparam name="T">窗口类型</typeparam>
         /// <param name="owner">父窗口</param>
         /// <param name="factory">创建新窗口的工厂方法（可选）</param>
-        public static void ShowUnique<T>(Window owner = null, Func<T> factory = null) where T : Window
+        public static void ShowUnique<T>(Window? owner = null, Func<T>? factory = null) where T : Window
         {
             // 1. 在当前所有打开的窗口中寻找是否已有该类型的窗口
             var existingWindow = Application.Current.Windows.OfType<T>().FirstOrDefault();

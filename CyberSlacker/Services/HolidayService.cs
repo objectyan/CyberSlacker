@@ -1,22 +1,20 @@
 ﻿using CyberSlacker.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace CyberSlacker.Services
 {
-    public class HolidayService
+    public class HolidayService(IHolidayProvider provider)
     {
         private bool _isUpdating = false; // 状态锁：防止重叠请求
 
-        private readonly IHolidayProvider _provider;
-        private List<HolidayItem> _cache = new();
+        private readonly IHolidayProvider _provider = provider;
+        private List<HolidayItem> _cache = [];
 
         public bool IsDataReady => _cache != null && _cache.Count > 0;
-
-
-        public HolidayService(IHolidayProvider provider)
-        {
-            _provider = provider;
-        }
 
         public async Task InitializeAsync(int year)
         {
@@ -41,7 +39,7 @@ namespace CyberSlacker.Services
                     if (!string.IsNullOrEmpty(cachedJson))
                     {
                         var data = JsonSerializer.Deserialize<List<HolidayItem>>(cachedJson);
-                        if (data != null && data.Any() && data[0].Date.Year == year)
+                        if (data != null && data.Count > 0 && data[0].Date.Year == year)
                         {
                             _cache = data;
                             // 如果缓存就是今天的，那就直接 return 释放锁即可
@@ -52,7 +50,7 @@ namespace CyberSlacker.Services
 
                 // 执行联网更新
                 var newData = await _provider.FetchYearDataAsync(year);
-                if (newData != null && newData.Any())
+                if (newData != null && newData.Count > 0)
                 {
                     _cache = newData;
                     Properties.Settings.Default.HolidayCacheJson = JsonSerializer.Serialize(_cache);

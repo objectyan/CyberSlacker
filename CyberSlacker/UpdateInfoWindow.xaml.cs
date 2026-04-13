@@ -2,6 +2,7 @@
 using CyberSlacker.Services;
 using Microsoft.Web.WebView2.Core;
 using Serilog;
+using System;
 using System.Reflection;
 using System.Windows;
 
@@ -12,7 +13,7 @@ namespace CyberSlacker
     /// </summary>
     public partial class UpdateInfoWindow : Window
     {
-        private string _lastVersion;
+        private readonly string _lastVersion = string.Empty;
 
         public UpdateInfoWindow(UpdateInfo info)
         {
@@ -70,7 +71,7 @@ namespace CyberSlacker
         }
 
 
-        private void CoreWebView2_NavigationStarting(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs e)
+        private void CoreWebView2_NavigationStarting(object? sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs e)
         {
             // 如果当前的链接不是我们最初设置的 Changelog (即用户点击了里面的链接)
             if (e.Uri != this.WebView.Source.ToString())
@@ -93,7 +94,7 @@ namespace CyberSlacker
             }
         }
 
-        private async void WebView_NavigationCompleted(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs e)
+        private async void WebView_NavigationCompleted(object? sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs e)
         {
             if (!e.IsSuccess) return;
             try

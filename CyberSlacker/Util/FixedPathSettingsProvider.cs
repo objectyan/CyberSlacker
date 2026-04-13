@@ -1,4 +1,5 @@
-﻿using System.Collections.Specialized;
+﻿using System;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Configuration;
 using System.IO;
@@ -25,7 +26,7 @@ namespace CyberSlacker.Util
         public override SettingsPropertyValueCollection GetPropertyValues(SettingsContext context, SettingsPropertyCollection collection)
         {
             var values = new SettingsPropertyValueCollection();
-            XDocument doc = null;
+            XDocument? doc = null;
 
             if (File.Exists(ConfigFilePath))
             {
@@ -35,7 +36,7 @@ namespace CyberSlacker.Util
             foreach (SettingsProperty setting in collection)
             {
                 var value = new SettingsPropertyValue(setting);
-                var node = doc?.Root.Element(setting.Name);
+                var node = doc?.Root?.Element(setting.Name);
 
                 if (node != null)
                 {
@@ -79,19 +80,19 @@ namespace CyberSlacker.Util
 
                 foreach (SettingsPropertyValue value in collection)
                 {
-                    var element = doc.Root.Element(value.Name);
+                    var element = doc?.Root?.Element(value.Name);
                     if (element == null)
                     {
                         element = new XElement(value.Name);
-                        doc.Root.Add(element);
+                        doc?.Root?.Add(element);
                     }
 
                     // 使用 TypeConverter 将值转为不随语言环境变化的字符串
                     var converter = TypeDescriptor.GetConverter(value.Property.PropertyType);
-                    element.Value = converter.ConvertToInvariantString(value.PropertyValue);
+                    element.Value = converter.ConvertToInvariantString(value.PropertyValue)!;
                 }
 
-                doc.Save(ConfigFilePath);
+                doc?.Save(ConfigFilePath);
             }
             catch (Exception ex)
             {
@@ -100,11 +101,11 @@ namespace CyberSlacker.Util
         }
 
         // 辅助方法：处理默认值转换
-        private object DefaultValue(SettingsProperty setting)
+        private static object? DefaultValue(SettingsProperty setting)
         {
-            if (setting.DefaultValue == null) return null;
+            string defaultValueStr = setting.DefaultValue?.ToString() ?? string.Empty;
             var converter = TypeDescriptor.GetConverter(setting.PropertyType);
-            return converter.ConvertFromInvariantString(setting.DefaultValue.ToString());
+            return converter.ConvertFromInvariantString(defaultValueStr)!;
         }
     }
 }

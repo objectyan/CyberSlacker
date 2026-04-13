@@ -1,4 +1,8 @@
-﻿namespace CyberSlacker.Models
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace CyberSlacker.Models
 {
     public enum DayType
     {

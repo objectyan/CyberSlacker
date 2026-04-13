@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CyberSlacker.Services;
 using CyberSlacker.Util;
+using System;
 using Timer = System.Timers.Timer;
 
 namespace CyberSlacker.ViewModels
@@ -141,10 +142,10 @@ namespace CyberSlacker.ViewModels
             HolidayTip = CountdownEngine.GetDynamicTip(now, todayInfo, _holidayService, _lastRestNotifyTime);
         }
 
-        private string GetMaxString(string mes, int length)
+        private static string GetMaxString(string mes, int length)
         {
             if (String.IsNullOrWhiteSpace(mes) || mes.Length <= length || length - 3 <= 0) return mes;
-            return mes.Substring(0, length - 3) + "...";
+            return mes.Length <= length ? mes : $"{mes[..(length - 3)]}...";
         }
 
         private void CheckOffWorkNotification(DateTime now)

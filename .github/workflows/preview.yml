@@ -167,10 +167,22 @@ jobs:
             git push origin master
         }
 
+    - name: Get previous tag
+      id: previous_tag
+      shell: pwsh
+      run: |
+        # 获取 preview 标签上一次指向的提交
+        $prevTag = git describe --tags --abbrev=0 preview^ 2>$null
+        if (-not $prevTag) { $prevTag = "v1.0.0" }
+        echo "prev_tag=$prevTag" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+        Write-Host "上一个对比标签: $prevTag"
+
     - name: Generate Changelog
       uses: mikepenz/release-changelog-builder-action@v4
       id: build_changelog
       with:
+        fromTag: ${{ steps.previous_tag.outputs.prev_tag }}
+        toTag: preview
         configuration: |
           exclude:
             labels:
@@ -193,6 +205,7 @@ jobs:
           render:
             compact: false
             include_commits: true
+            include_pre_build: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       

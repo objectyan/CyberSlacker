@@ -1,5 +1,6 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications;
 using Serilog;
+using System;
 
 namespace CyberSlacker.Services
 {

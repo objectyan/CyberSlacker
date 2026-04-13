@@ -1,4 +1,5 @@
 ﻿using CyberSlacker.Services;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
@@ -37,9 +38,9 @@ namespace CyberSlacker
                 long totalRead = 0;
                 int read;
 
-                while ((read = await downloadStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                while ((read = await downloadStream.ReadAsync(buffer.AsMemory())) > 0)
                 {
-                    await fileStream.WriteAsync(buffer, 0, read);
+                    await fileStream.WriteAsync(buffer.AsMemory(0, read));
                     totalRead += read;
 
                     // 实时更新 WPF 界面
