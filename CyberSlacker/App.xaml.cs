@@ -1,6 +1,4 @@
-﻿using CyberSlacker.Properties;
-using CyberSlacker.Services;
-using CyberSlacker.Util;
+﻿using CyberSlacker.Services;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Serilog;
 using System.Diagnostics;
@@ -45,10 +43,9 @@ namespace CyberSlacker
 
             InitNotify();
 
-            // 优化是否开机重启
-            StartupHelper.SetStartup(Settings.Default.IsAutoStart);
-
 #if !DEBUG
+            // 优化是否开机重启
+            CyberSlacker.Util.StartupHelper.SetStartup(CyberSlacker.Properties.Settings.Default.IsAutoStart);
             CyberSlacker.Services.NativeUpdateService.StartUpdateFlow();
 #endif
 
