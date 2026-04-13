@@ -1,5 +1,7 @@
 ﻿using CyberSlacker.Services;
+using CyberSlacker.Util;
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
@@ -12,6 +14,8 @@ namespace CyberSlacker
         private readonly string _downloadUrl;
         private readonly string _tempFilePath;
 
+        private bool _isDownloadFinished = false;
+
         public DownloadWindow(string url)
         {
             InitializeComponent();
@@ -20,6 +24,32 @@ namespace CyberSlacker
             _tempFilePath = Path.Combine(Path.GetTempPath(), "CyberSlacker_Update.msi");
 
             this.Loaded += (s, e) => StartDownload();
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            // 如果下载还没结束，就点不动 X，也按不了 Alt+F4
+            if (!_isDownloadFinished)
+            {
+                e.Cancel = true;
+                // 提示一下（可选，更人性化）
+                // ShowMsg("正在注入基因，请勿中断..."); 
+            }
+
+            base.OnClosing(e);
+        }
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+            IntPtr hWnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+            // 获取系统菜单句柄
+            IntPtr hMenu = Util.Interop.GetSystemMenu(hWnd, false);
+            if (hMenu != IntPtr.Zero)
+            {
+                // 禁用关闭按钮 (SC_CLOSE = 0xF060)
+                Interop.EnableMenuItem(hMenu, Interop.SC_CLOSE, Interop.MF_BYCOMMAND | Interop.MF_DISABLED | Interop.MF_GRAYED);
+            }
         }
 
         private async void StartDownload()
@@ -55,6 +85,8 @@ namespace CyberSlacker
 
                 fileStream.Close();
 
+                _isDownloadFinished = true;
+
                 // 下载完成：启动安装包并闪人
                 Process.Start(new ProcessStartInfo(_tempFilePath) { UseShellExecute = true });
                 System.Windows.Application.Current.Shutdown();
@@ -62,6 +94,7 @@ namespace CyberSlacker
             }
             catch (Exception ex)
             {
+                _isDownloadFinished = true;
                 NativeToastService.Show("更新失败", "下载失败，请重试: " + ex.Message);
                 this.Close();
             }

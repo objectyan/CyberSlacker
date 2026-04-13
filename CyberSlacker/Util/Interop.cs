@@ -225,6 +225,37 @@ namespace CyberSlacker.Util
         #endregion
 
 
+        #region 系统菜单操作 (System Menu)
+
+        /// <summary>
+        /// 访问窗口的系统菜单（即点击图标或右键标题栏弹出的菜单）
+        /// </summary>
+        /// <param name="hWnd">窗口句柄</param>
+        /// <param name="bRevert">如果为 false，返回当前菜单副本；如果为 true，恢复默认菜单</param>
+        /// <returns>菜单句柄</returns>
+        [LibraryImport(User32, EntryPoint = "GetSystemMenu")]
+        internal static partial nint GetSystemMenu(nint hWnd, [MarshalAs(UnmanagedType.Bool)] bool bRevert);
+
+        /// <summary>
+        /// 启用、禁用或变灰指定的菜单项
+        /// </summary>
+        /// <param name="hMenu">菜单句柄</param>
+        /// <param name="uIDEnableItem">要操作的菜单项 ID</param>
+        /// <param name="uEnable">控制标志（如 MF_GRAYED, MF_ENABLED）</param>
+        /// <returns>操作前的状态</returns>
+        [LibraryImport(User32, EntryPoint = "EnableMenuItem")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static partial bool EnableMenuItem(nint hMenu, uint uIDEnableItem, uint uEnable);
+
+        // --- 系统菜单常量 ---
+        internal const uint SC_CLOSE = 0xF060;           // “关闭”菜单项的 ID
+        internal const uint MF_BYCOMMAND = 0x00000000;   // 指明参数是命令 ID 而非位置索引
+        internal const uint MF_ENABLED = 0x00000000;     // 启用状态
+        internal const uint MF_GRAYED = 0x00000001;      // 变灰状态
+        internal const uint MF_DISABLED = 0x00000002;    // 禁用状态
+
+        #endregion
+
         /// <summary>
         /// 清理内存
         /// </summary>

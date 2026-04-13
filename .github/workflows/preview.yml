@@ -182,6 +182,12 @@ jobs:
         echo "prev_tag=$prevTag" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
         Write-Host "使用上一个正式版本对比: $prevTag"
 
+    - name: Fetch all tags
+      shell: pwsh
+      run: |
+        git fetch --tags --force origin
+        git fetch --all
+
     - name: Generate Changelog
       uses: mikepenz/release-changelog-builder-action@v4
       id: build_changelog
@@ -207,7 +213,8 @@ jobs:
             compact: false
             include_commits: true
             include_pre_build: false
-          commitMode: true
+        failOnError: false
+        commitMode: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
