@@ -196,15 +196,18 @@ jobs:
               - github-actions[bot]
           categories:
             - title: "🚀 赛博特性 (Features)"
-              labels: [feature, feat, enhancement]
+              labels: ["feature", "feat", "enhancement"]
             - title: "🐛 故障修复 (Bug Fixes)"
-              labels: [bug, fix, hotfix]
+              labels: ["bug", "fix", "hotfix"]
             - title: "📦 基础设施 (Maintenance)"
-              labels: [chore, ci]
+              labels: ["chore", "ci"]
+            - title: "📌 其他变更 (Other)"
+              labels: [] 
           render:
             compact: false
             include_commits: true
             include_pre_build: false
+          commitMode: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       

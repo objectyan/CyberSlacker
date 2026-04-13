@@ -20,11 +20,11 @@ namespace CyberSlacker.Services
         {
             try
             {
-                // 1. 初始化 CPU 计数器
+                // 初始化 CPU 计数器
                 _cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
                 _cpuCounter.NextValue(); // 初次采样预热
 
-                // 2. 初始化 GPU 计数器 (仅支持 Win10/11)
+                // 初始化 GPU 计数器 (仅支持 Win10/11)
                 // 逻辑：扫描所有名为 "engtype_3D" 的实例，这是任务管理器显示的使用率来源
                 var category = new PerformanceCounterCategory("GPU Engine");
                 var instanceNames = category.GetInstanceNames();
