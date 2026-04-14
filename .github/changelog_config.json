@@ -1,61 +1,63 @@
 {
-    "exclude": {
-        "labels": [
-            "skip-changelog"
-        ],
-        "authors": [
-            "github-actions[bot]",
-            "actions-user"
-        ],
-        "commits": [
-            "^.*\\[skip ci\\].*$",
-            "^Merge branch.*$"
-        ]
-    },
+    "disable_default": true,
+    "template": "#{{CHANGELOG}}",
+    "pr_template": "- #{{TITLE}} (`#{{MERGE_SHA}}`) - #{{MERGED_AT}} (by @#{{AUTHOR}}",
+    "commit_template": "- #{{TITLE}} (`#{{MERGE_SHA}}`) - #{{CREATED_AT}} (by @#{{AUTHOR}})",
     "categories": [
         {
-            "title": "🚀 赛博特性 (Features)",
+            "title": "## 🚀 赛博特性 (Features)",
             "labels": [
                 "feat",
-                "feat:",
                 "feature"
             ]
         },
         {
-            "title": "🐛 故障修复 (Bug Fixes)",
+            "title": "## 🐛 故障修复 (Bug Fixes)",
             "labels": [
                 "fix",
-                "fix:",
+                "hotfix",
                 "bug"
             ]
         },
         {
-            "title": "📦 基础设施 (Maintenance)",
+            "title": "## 📦 基础设施 (Maintenance)",
             "labels": [
                 "chore",
-                "chore:",
+                "deps",
+                "dep",
                 "ci",
                 "build"
             ]
         },
         {
-            "title": "📝 文档更新 (Docs)",
+            "title": "## 📝 文档更新 (Docs)",
             "labels": [
                 "docs",
                 "docs:",
                 "readme"
             ]
+        },
+        {
+            "title": "## 📌 其他变更 (Other)",
+            "labels": []
         }
     ],
-    "categories_as_labels": true,
-    "ignore_labels": [
-        "skip-changelog"
+    "label_extractor": [
+        {
+            "method": "match",
+            "pattern": "^([\\w\\-]+)",
+            "target": "$1",
+            "on_property": "title"
+        }
     ],
-    "unmapped_information": {
-        "title": "📌 其他变更 (Other)"
-    },
-    "disable_default": true,
-    "template": "${{CHANGELOG}}",
-    "pr_template": "${{TITLE}}",
-    "empty_template": "无变动明细"
+    "ignore_labels": [
+        "ignore",
+        "Merge branch",
+        "\\[skip ci\\]",
+        "update Preview manifests"
+    ],
+    "sort": {
+        "order": "DESC",
+        "on_property": "mergedAt"
+    }
 }
