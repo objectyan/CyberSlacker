@@ -22,7 +22,12 @@ namespace CyberSlacker.Util
             base.Initialize(ApplicationName, config);
         }
 
-        // --- 1. 读取逻辑修正 ---
+        /// <summary>
+        /// 读取逻辑修正
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="collection"></param>
+        /// <returns></returns>
         public override SettingsPropertyValueCollection GetPropertyValues(SettingsContext context, SettingsPropertyCollection collection)
         {
             var values = new SettingsPropertyValueCollection();
@@ -63,7 +68,11 @@ namespace CyberSlacker.Util
             return values;
         }
 
-        // --- 2. 写入逻辑修正 ---
+        /// <summary>
+        /// 写入逻辑修正
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="collection"></param>
         public override void SetPropertyValues(SettingsContext context, SettingsPropertyValueCollection collection)
         {
             try

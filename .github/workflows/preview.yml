@@ -200,7 +200,7 @@ jobs:
         failOnError: false
         mode: "COMMIT"
         configuration: |
-        
+
           exclude:
             labels:
               - skip-changelog
@@ -209,15 +209,16 @@ jobs:
               - actions-user
             commits:
               - message: "*\[skip ci\]*"
+              - message: "Merge branch*"
           categories:
             - title: "🚀 赛博特性 (Features)"
-              labels: ["feat", "feature", "enhancement"]
+              labels: ["feat", "feat:", "feature", "feature:", "enhancement"]
             - title: "🐛 故障修复 (Bug Fixes)"
-              labels: ["fix", "bug", "hotfix"]
+              labels: ["fix", "fix:", "bug", "bug:", "hotfix"]
             - title: "📦 基础设施 (Maintenance)"
-              labels: ["chore", "ci", "build", "deps"]
+              labels: ["chore", "chore:", "ci", "ci:", "build", "deps"]
             - title: "📝 文档更新 (Docs)"
-              labels: ["docs", "readme"]
+              labels: ["docs", "docs:", "readme", "readme:"]
             - title: "📌 其他变更 (Other)"
               labels: ["*"]
           render:
