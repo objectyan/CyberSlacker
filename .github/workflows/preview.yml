@@ -195,7 +195,7 @@ jobs:
         with:
           fromTag: ${{ steps.previous_tag.outputs.prev_tag }}
           toTag: preview
-          mode: "COMMIT"
+          mode: "HYBRID"
           commitMode: true
           configurationJson: |
              { 
