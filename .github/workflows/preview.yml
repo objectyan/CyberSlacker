@@ -196,7 +196,6 @@ jobs:
           fromTag: ${{ steps.previous_tag.outputs.prev_tag }}
           toTag: preview
           mode: "HYBRID"
-          commitMode: true
           configurationJson: |
             {
               "disable_default": true,
@@ -214,8 +213,7 @@ jobs:
                 },
                 {
                   "title": "## 📦 基础设施 (Maintenance)",
-                  "labels": ["chore", "chore:", "ci", "build", "deps"],
-                  "exclude_labels": ["ignore-this-commit"]
+                  "labels": ["chore", "chore:", "ci", "build", "deps"]
                 },
                 {
                   "title": "## 📝 文档更新 (Docs)",
@@ -223,8 +221,7 @@ jobs:
                 },
                 {
                   "title": "## 📌 其他变更 (Other)",
-                  "labels": [],
-                  "exclude_labels": ["ignore-this-commit"]
+                  "labels": []
                 }
               ],
               "transformers": [
@@ -232,7 +229,7 @@ jobs:
                     "method": "match",
                     "pattern": ".*(Merge branch|\\[skip ci\\]|update Preview manifests).*",
                     "target": "ignore-this-commit",
-                    "on_property": ["title"]
+                    "on_property": ["title", "labels", "body"]
                   }
                 ],
               "label_extractor": [
@@ -240,7 +237,7 @@ jobs:
                   "method": "match",
                   "pattern": "^([\\w\\-]+)",
                   "target": "$1",
-                  "on_property": ["title"]
+                  "on_property": ["title", "labels", "body"]
                 }
               ],
               "sort": {
