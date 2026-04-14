@@ -199,6 +199,15 @@ jobs:
           commitMode: true
           configurationJson: |
              { 
+                "ignore_labels": [
+                  "skip-changelog"
+                ],
+                "exclude": {
+                  "commits": [
+                    "Merge branch",
+                    "\\[skip ci\\]"
+                  ]
+                },
                 "pr_template": "- #{{TITLE}} (by @#{{AUTHOR}} in ##{{NUMBER}})",
                 "categories": [
                   {
