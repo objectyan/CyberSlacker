@@ -214,7 +214,8 @@ jobs:
                 },
                 {
                   "title": "## 📦 基础设施 (Maintenance)",
-                  "labels": ["chore", "chore:", "ci", "build", "deps"]
+                  "labels": ["chore", "chore:", "ci", "build", "deps"],
+                  "exclude_labels": ["ignore-this-commit"]
                 },
                 {
                   "title": "## 📝 文档更新 (Docs)",
@@ -222,13 +223,14 @@ jobs:
                 },
                 {
                   "title": "## 📌 其他变更 (Other)",
-                  "labels": []
+                  "labels": [],
+                  "exclude_labels": ["ignore-this-commit"]
                 }
               ],
               "label_extractor": [
                 {
                   "method": "match",
-                  "pattern": "^Merge branch",
+                  "pattern": ".*(Merge branch|\\[skip ci\\]|update Preview manifests).*",
                   "target": "ignore-this-commit",
                   "on_property": ["title"]
                 },
@@ -242,10 +244,7 @@ jobs:
               "sort": {
                 "order": "DESC",
                 "on_property": "mergedAt"
-              },
-              "ignore_labels": [
-                "ignore-this-commit"
-              ]
+              }
             }
 
       - name: Force Update Preview Tag
