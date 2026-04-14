@@ -139,7 +139,8 @@ namespace CyberSlacker.Services
         {
             if (bytesPerSec < 1024) return $"{bytesPerSec:F0}B/s";
             if (bytesPerSec < 1024 * 1024) return $"{(bytesPerSec / 1024.0):F1}K/s";
-            return $"{(bytesPerSec / 1024.0 / 1024.0):F1}M/s";
+            if (bytesPerSec < 1024 * 1024 * 1024) return $"{(bytesPerSec / 1024.0 / 1024.0):F1}K/s";
+            return $"{(bytesPerSec / 1024.0 / 1024.0 / 1024.0):F1}G/s";
         }
 
         #endregion

@@ -253,7 +253,7 @@ jobs:
                 "order": "DESC",
                 "on_property": "mergedAt"
               },
-              "ignore_labels": ["ignore-this-commit", "ignore"]
+              "ignore_labels": ["ignore-this-commit", "ignore", "Merge branch", "chore: update Preview manifests [skip ci]"]
             }
 
       - name: Out Debug Changelog
