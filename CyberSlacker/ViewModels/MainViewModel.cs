@@ -150,20 +150,20 @@ namespace CyberSlacker.ViewModels
 
         private void CheckOffWorkNotification(DateTime now)
         {
-            // 1. 每天凌晨重置通知状态
+            // 每天凌晨重置通知状态
             if (now.Hour == 0 && now.Minute == 0 && now.Second == 0)
             {
                 _hasNotifiedToday = false;
             }
 
-            // 2. 如果今天已经弹过窗了，直接退出
+            // 如果今天已经弹过窗了，直接退出
             if (_hasNotifiedToday) return;
 
-            // 3. 【最重要】如果今天是休息日（含法定节假日和普通周末），不弹窗
+            // 【最重要】如果今天是休息日（含法定节假日和普通周末），不弹窗
             // 这里调用我们之前写在 Engine 里的 IsRestDay
             if (CountdownEngine.IsRestDay(now, _holidayService)) return;
 
-            // 4. 判断是否到达下班点
+            // 判断是否到达下班点
             if (TimeSpan.TryParse(Properties.Settings.Default.EndTime, out var offTime))
             {
                 DateTime target = DateTime.Today.Add(offTime);
