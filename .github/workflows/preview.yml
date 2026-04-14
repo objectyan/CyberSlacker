@@ -224,7 +224,7 @@ jobs:
                 {
                   "title": "## 📌 其他变更 (Other)",
                   "labels": [],
-                  exclude_labels": ["ignore-this-commit"]
+                  "exclude_labels": ["ignore-this-commit"]
                 }
               ],
               "transformers": [
