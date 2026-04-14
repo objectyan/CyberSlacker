@@ -197,78 +197,56 @@ jobs:
           toTag: preview
           mode: "HYBRID"
           commitMode: true
-          # fetchViaCommits: true,
-          # fetchReviewers: true,
-          # fetchReleaseInformation: true,
-          # fetchReviews: true,
-          # offlineMode: true,
           configurationJson: |
-             { 
-                "disable_default": true,
-                "template": "#{{CHANGELOG}}",
-                "pr_template": "- #{{TITLE}} (`#{{MERGE_SHA}}`) - #{{MERGED_AT}} (by @#{{AUTHOR}}",
-                "commit_template": "- #{{TITLE}} (`#{{MERGE_SHA}}`) - #{{CREATED_AT}} (by @#{{AUTHOR}})",
-                "categories": [
-                  {
-                    "title": "## 🚀 赛博特性 (Features)",
-                    "labels": [
-                      "feat",
-                      "feature"
-                    ]
-                  },
-                  {
-                    "title": "## 🐛 故障修复 (Bug Fixes)",
-                    "labels": [
-                      "fix",
-                      "hotfix",
-                      "bug"
-                    ]
-                  },
-                  {
-                    "title": "## 📦 基础设施 (Maintenance)",
-                    "labels": [
-                      "chore",
-                      "deps",
-                      "dep",
-                      "ci",
-                      "build"
-                    ]
-                  },
-                  {
-                    "title": "## 📝 文档更新 (Docs)",
-                    "labels": [
-                      "docs",
-                      "docs:",
-                      "readme"
-                    ]
-                  },
-                  {
-                    "title": "## 📌 其他变更 (Other)",
-                    "labels": [],
-                  }
-                ],
-                "label_extractor": [
-                  {
-                    "method": "match",
-                    "pattern": ".*(Merge branch|skip ci|update Preview manifests).*",
-                    "target": "ignore-this-commit",
-                    "on_property": "title"
-                  },
-                  {
-                    "method": "match",
-                    "pattern": "^([\\w\\-]+)",
-                    "target": "$1",
-                    "on_property": "title"
-                  }
-                ],
-                "sort": {
-                  "order": "DESC",
-                  "on_property": "mergedAt"
+            {
+              "disable_default": true,
+              "template": "#{{CHANGELOG}}",
+              "pr_template": "- #{{TITLE}} (`#{{MERGE_SHA}}`) - @#{{AUTHOR}}",
+              "commit_template": "- #{{TITLE}} (`#{{MERGE_SHA}}`) - @#{{AUTHOR}}",
+              "categories": [
+                {
+                  "title": "## 🚀 赛博特性 (Features)",
+                  "labels": ["feat", "feat:", "feature", "Feature"]
                 },
-                "ignore_labels": [
-                  "ignore-this-commit"
-                ]
-              }
+                {
+                  "title": "## 🐛 故障修复 (Bug Fixes)",
+                  "labels": ["fix", "fix:", "bug", "Bug", "hotfix"]
+                },
+                {
+                  "title": "## 📦 基础设施 (Maintenance)",
+                  "labels": ["chore", "chore:", "ci", "build", "deps"]
+                },
+                {
+                  "title": "## 📝 文档更新 (Docs)",
+                  "labels": ["docs", "docs:", "readme"]
+                },
+                {
+                  "title": "## 📌 其他变更 (Other)",
+                  "labels": []
+                }
+              ],
+              "label_extractor": [
+                {
+                  "method": "match",
+                  "pattern": ".*(Merge branch|\\[skip ci\\]|update Preview manifests).*",
+                  "target": "ignore-this-commit",
+                  "on_property": ["title"]
+                },
+                {
+                  "method": "match",
+                  "pattern": "^([\\w\\-]+)",
+                  "target": "$1",
+                  "on_property": ["title"]
+                }
+              ],
+              "sort": {
+                "order": "DESC",
+                "on_property": "mergedAt"
+              },
+              "ignore_labels": [
+                "ignore-this-commit"
+              ]
+            }
 
       - name: Force Update Preview Tag
         run: |
