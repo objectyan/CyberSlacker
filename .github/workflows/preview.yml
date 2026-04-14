@@ -198,45 +198,51 @@ jobs:
           mode: "COMMIT"
           commitMode: true
           configurationJson: |
-            {
-              "categories": [
-               { "title": "## ⛰️ Features", "labels": ["new"] },
-               { "title": "## 🏗️ Implementations", "labels": ["implement"] },
-               { "title": "## 🐛 Bug Fixes", "labels": ["fix"] },
-               { "title": "## 🚜 Changes", "labels": ["change"] },
-               { "title": "## 🎯 Cover Requirements", "labels": ["cover"] },
-               { "title": "## ✨ Refactor", "labels": ["refactor"] },
-               { "title": "## 📚 Documentation", "labels": ["docs"] },
-               { "title": "## 🎨 Styling", "labels": ["style"] },
-               { "title": "## ◀️ Revert", "labels": ["revert"] },
-               { "title": "## ⚙️ Miscellaneous Tasks", "labels": ["misc"] },
-               { "title": "## 💬 Other", "labels": ["other"] },
-               { "title": "## ❓ Unknown", "labels": ["unknown"] },
-               { "title": "## 🚀 Release", "labels": ["release"] }
-             ],
-             "ignore_labels": [
-                "release",
-                "ignore"
-             ],
-             "transformers": [
-              {
-                "pattern": "^[^\\(:\\s]+(\\([^\\)]+\\))?!?:\\s+([\\S]+[\\s\\S]*)",
-                "target": "$2 $1"
+             { 
+                "pr_template": "- #{{TITLE}} (by @#{{AUTHOR}} in ##{{NUMBER}})",
+                "categories": [
+                  {
+                    "title": "## 🚀 Features",
+                    "labels": [
+                      "feat",
+                      "feature"
+                    ]
+                  },
+                  {
+                    "title": "## 🐛 Fixes",
+                    "labels": [
+                      "fix",
+                      "hotfix",
+                      "bug"
+                    ]
+                  },
+                  {
+                    "title": "## 🛠️ Chores",
+                    "labels": [
+                      "chore"
+                    ]
+                  },
+                  {
+                    "title": "## 🛠️ Dependencies",
+                    "labels": [
+                      "deps",
+                      "dep"
+                    ]
+                  },
+                  {
+                    "title": "## 🌀 Miscellaneous",
+                    "labels": []
+                  }
+                ],
+                "label_extractor": [
+                  {
+                    "method": "match",
+                    "pattern": "^([\\w\\-]+)",
+                    "target": "$1",
+                    "on_property": "branch"
+                  }
+                ]
               }
-             ],
-             "sort": {
-                "order": "DESC",
-                "on_property": "mergedAt"
-             },
-             "template": "#{{CHANGELOG}}\n\n<details>\n<summary>Uncategorized</summary>\n\n#{{UNCATEGORIZED}}\n</details>\n\n**Full Changelog**: [#{{FROM_TAG}}...#{{TO_TAG}}](https://github.com/#{{OWNER}}/#{{REPO}}/compare/#{{FROM_TAG}}...#{{TO_TAG}})",
-              "label_extractor": [
-               {
-                 "pattern": "^([^\\(:\\s]+)(\\([^\\)]+\\))?(!)?:\\s+([\\S]+[\\s\\S]*)",
-                 "on_property": "title",
-                 "target": "$1"
-               }
-             ]
-            }
 
       - name: Force Update Preview Tag
         run: |
