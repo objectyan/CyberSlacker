@@ -3,18 +3,17 @@ name: Preview Build (Preview)
 on:
   push:
     branches:
-      - master  # 当 main 分支有变动时触发
+      - master # 当 main 分支有变动时触发
     paths-ignore:
-      - '.github/workflows/**' # 修改任何 yml 工作流文件都不触发编译
-      - '**.md'                # 修改 README 等文档不触发
-      - 'LICENSE'              # 修改授权协议不触发
-      - 'manifests/**'         # 忽略清单目录变动（防止机器人自己推代码导致死循环）
+      - ".github/workflows/**" # 修改任何 yml 工作流文件都不触发编译
+      - "**.md" # 修改 README 等文档不触发
+      - "LICENSE" # 修改授权协议不触发
+      - "manifests/**" # 忽略清单目录变动（防止机器人自己推代码导致死循环）
 
 permissions:
   contents: write
-  pull-requests: read 
+  pull-requests: read
   issues: read
-
 
 concurrency:
   group: preview-${{ github.ref }}
@@ -27,250 +26,282 @@ jobs:
       matrix:
         arch: [x64, x86, arm64] # 预览版只提供主流架构，加快编译速度
     runs-on: windows-latest
-    
+
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '8.0.x'
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
 
-    - name: Install WiX
-      run: dotnet tool install --global wix --version 6.0.2
+      - name: Install WiX
+        run: dotnet tool install --global wix --version 6.0.2
 
-    - name: Install WiX Extensions
-      run: |
-        wix extension add WixToolset.Netfx.wixext/6.0.2
-        wix extension add WixToolset.Util.wixext/6.0.2
-    
-    - name: Enable Windows Installer Service
-      shell: pwsh
-      run: |
-        Start-Service -Name "msiserver" -ErrorAction SilentlyContinue
+      - name: Install WiX Extensions
+        run: |
+          wix extension add WixToolset.Netfx.wixext/6.0.2
+          wix extension add WixToolset.Util.wixext/6.0.2
 
-    - name: Fetch Latest Version from GitHub
-      shell: pwsh
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        # 1. 默认起始版本
-        $latestTag = "v1.0.0"
+      - name: Enable Windows Installer Service
+        shell: pwsh
+        run: |
+          Start-Service -Name "msiserver" -ErrorAction SilentlyContinue
 
-        # 2. 尝试获取版本，使用 2>$null 吞掉错误日志
-        $response = gh api repos/$env:GITHUB_REPOSITORY/releases/latest --jq '.tag_name' 2>$null
+      - name: Fetch Latest Version from GitHub
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # 1. 默认起始版本
+          $latestTag = "v1.0.0"
 
-        # 3. 这里的 $? 会检查上一个命令是否成功
-        if ($? -and $response) {
-            $latestTag = $response
-            Write-Host "检测到云端已发布版本: $latestTag"
-        } else {
-            Write-Host "云端未发现发布记录（或请求 404），采用默认起始值: $latestTag"
-        }
+          # 2. 尝试获取版本，使用 2>$null 吞掉错误日志
+          $response = gh api repos/$env:GITHUB_REPOSITORY/releases/latest --jq '.tag_name' 2>$null
 
-        # 4. 正常执行版本号清洗和拼接
-        $baseVer = $latestTag.TrimStart('v')
-        $fullVer = "$baseVer.${{ github.run_number }}"
+          # 3. 这里的 $? 会检查上一个命令是否成功
+          if ($? -and $response) {
+              $latestTag = $response
+              Write-Host "检测到云端已发布版本: $latestTag"
+          } else {
+              Write-Host "云端未发现发布记录（或请求 404），采用默认起始值: $latestTag"
+          }
 
-        # 5. 写入环境变量
-        "PREVIEW_VER=$fullVer" | Out-File -FilePath $env:GITHUB_ENV -Append
-        Write-Host "最终生成的预览版本号为: $fullVer"
-        
-        # 🌟 核心修复：强制设置退出码为 0，防止 404 导致整步变红
-        exit 0
-    
-    - name: Publish Application
-      run: |
-        dotnet publish CyberSlacker/CyberSlacker.csproj `
-            -c Release `
-            -r win-${{ matrix.arch }} `
-            --self-contained false `
-            -p:PublishSingleFile=false `
-            -p:Version=${{ env.PREVIEW_VER }} `
-            -p:FileVersion="${{ env.PREVIEW_VER }}" `
-            -p:AssemblyVersion="${{ env.PREVIEW_VER }}" `
-            -p:IncludeSourceRevisionInInformationalVersion=false `
-            -o ./publish-${{ matrix.arch }} 
-            
-    - name: Build MSI
-      shell: pwsh
-      run: |
-        wix build Package.wxs `
-          -ext WixToolset.Netfx.wixext/6.0.2 `
-          -ext WixToolset.Util.wixext/6.0.2 `
-          -culture zh-CN `
-          -d AppVersion="${{ env.PREVIEW_VER }}" `
-          -d AppArch="${{ matrix.arch }}" `
-          -arch ${{ matrix.arch }} `
-          -o "Output/CyberSlacker_Preview_${{ matrix.arch }}.msi"
+          # 4. 正常执行版本号清洗和拼接
+          $baseVer = $latestTag.TrimStart('v')
+          $fullVer = "$baseVer.${{ github.run_number }}"
 
-    - name: Generate Preview XML
-      shell: pwsh
-      run: |
-        $ver = "${{ env.PREVIEW_VER }}"
-        $arch = "${{ matrix.arch }}"
-        
-        if (-not (Test-Path "manifests")) { New-Item -ItemType Directory -Path "manifests" }
-        
-        $xmlContent = @"
-        <?xml version="1.0" encoding="UTF-8"?>
-        <item>
-            <version>$ver</version>
-            <url>https://github.com/${{ github.repository }}/releases/download/preview/CyberSlacker_Preview_$arch.msi</url>
-            <changelog>https://github.com/${{ github.repository }}/releases/tag/preview</changelog>
-            <mandatory>true</mandatory>
-        </item>
-        "@
-        $xmlContent | Set-Content -Path "manifests/Update_preview_$arch.xml" -Encoding utf8
+          # 5. 写入环境变量
+          "PREVIEW_VER=$fullVer" | Out-File -FilePath $env:GITHUB_ENV -Append
+          Write-Host "最终生成的预览版本号为: $fullVer"
 
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: preview-assets-${{ matrix.arch }}
-        path: |
-          Output/*.msi
-          manifests/Update_preview_${{ matrix.arch }}.xml
+          # 🌟 核心修复：强制设置退出码为 0，防止 404 导致整步变红
+          exit 0
+
+      - name: Publish Application
+        run: |
+          dotnet publish CyberSlacker/CyberSlacker.csproj `
+              -c Release `
+              -r win-${{ matrix.arch }} `
+              --self-contained false `
+              -p:PublishSingleFile=false `
+              -p:Version=${{ env.PREVIEW_VER }} `
+              -p:FileVersion="${{ env.PREVIEW_VER }}" `
+              -p:AssemblyVersion="${{ env.PREVIEW_VER }}" `
+              -p:IncludeSourceRevisionInInformationalVersion=false `
+              -o ./publish-${{ matrix.arch }}
+
+      - name: Build MSI
+        shell: pwsh
+        run: |
+          wix build Package.wxs `
+            -ext WixToolset.Netfx.wixext/6.0.2 `
+            -ext WixToolset.Util.wixext/6.0.2 `
+            -culture zh-CN `
+            -d AppVersion="${{ env.PREVIEW_VER }}" `
+            -d AppArch="${{ matrix.arch }}" `
+            -arch ${{ matrix.arch }} `
+            -o "Output/CyberSlacker_Preview_${{ matrix.arch }}.msi"
+
+      - name: Generate Preview XML
+        shell: pwsh
+        run: |
+          $ver = "${{ env.PREVIEW_VER }}"
+          $arch = "${{ matrix.arch }}"
+
+          if (-not (Test-Path "manifests")) { New-Item -ItemType Directory -Path "manifests" }
+
+          $xmlContent = @"
+          <?xml version="1.0" encoding="UTF-8"?>
+          <item>
+              <version>$ver</version>
+              <url>https://github.com/${{ github.repository }}/releases/download/preview/CyberSlacker_Preview_$arch.msi</url>
+              <changelog>https://github.com/${{ github.repository }}/releases/tag/preview</changelog>
+              <mandatory>true</mandatory>
+          </item>
+          "@
+          $xmlContent | Set-Content -Path "manifests/Update_preview_$arch.xml" -Encoding utf8
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: preview-assets-${{ matrix.arch }}
+          path: |
+            Output/*.msi
+            manifests/Update_preview_${{ matrix.arch }}.xml
 
   # --- 新增：汇总并推送任务 ---
   sync-preview:
     needs: build-preview
     runs-on: windows-latest
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
-      with:
-        ref: master
-        fetch-depth: 0 
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
 
-    - name: Download Artifacts
-      uses: actions/download-artifact@v4
-      with:
-        pattern: preview-assets-*
-        path: ./temp_preview
-        merge-multiple: true
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: preview-assets-*
+          path: ./temp_preview
+          merge-multiple: true
 
-    - name: Push Preview Manifests to Repo
-      shell: pwsh
-      run: |
-        if (-not (Test-Path "manifests")) { mkdir manifests }
-        Move-Item -Force "./temp_preview/manifests/Update_preview_*.xml" "./manifests/"
-        
-        git config --global user.name "github-actions"
-        git config --global user.email "action@github.com"
+      - name: Push Preview Manifests to Repo
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "manifests")) { mkdir manifests }
+          Move-Item -Force "./temp_preview/manifests/Update_preview_*.xml" "./manifests/"
 
-        git pull origin master --rebase
-        
-        git add manifests/Update_preview_*.xml
-        
-        $status = git status --porcelain
-        if ($status) {
-            # 使用 [skip ci] 防止触发无限循环编译
-            git commit -m "chore: update Preview manifests [skip ci]"
-            git push origin master
-        }
+          git config --global user.name "github-actions"
+          git config --global user.email "action@github.com"
 
-    - name: Get previous tag
-      id: previous_tag
-      shell: pwsh
-      run: |
-        git fetch --tags origin
-        # 拿到最近一个真实版本号（排除 preview 标签）
-        $prevTag = git tag --list "v*" --sort=-creatordate | Where-Object { $_ -ne "preview" } | Select -First 1
-        if (-not $prevTag) { $prevTag = "v1.0.0" }
-        echo "prev_tag=$prevTag" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-        Write-Host "使用上一个正式版本对比: $prevTag"
+          git pull origin master --rebase
 
-    - name: Fetch all tags
-      shell: pwsh
-      run: |
-        git fetch --tags --force origin
-        git fetch --all
+          git add manifests/Update_preview_*.xml
 
-    - name: Generate Changelog
-      uses: mikepenz/release-changelog-builder-action@v6
-      id: build_changelog
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        fromTag: ${{ steps.previous_tag.outputs.prev_tag }}
-        toTag: preview
-        mode: "COMMIT"
-        configuration: ".github/changelog-config.json"
-      
-    - name: Force Update Preview Tag
-      run: |
-        git config --global user.name "github-actions"
-        git config --global user.email "action@github.com"
-        # 强制将 preview 标签移动到当前的提交(HEAD)
-        git tag -f preview
-        # 强制推送到远程
-        git push -f origin preview
+          $status = git status --porcelain
+          if ($status) {
+              # 使用 [skip ci] 防止触发无限循环编译
+              git commit -m "chore: update Preview manifests [skip ci]"
+              git push origin master
+          }
 
-    - name: Fetch Latest Version from GitHub
-      shell: pwsh
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        # 1. 默认起始版本
-        $latestTag = "v1.0.0"
+      - name: Get previous tag
+        id: previous_tag
+        shell: pwsh
+        run: |
+          git fetch --tags origin
+          # 拿到最近一个真实版本号（排除 preview 标签）
+          $prevTag = git tag --list "v*" --sort=-creatordate | Where-Object { $_ -ne "preview" } | Select -First 1
+          if (-not $prevTag) { $prevTag = "v1.0.0" }
+          echo "prev_tag=$prevTag" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          Write-Host "使用上一个正式版本对比: $prevTag"
 
-        # 2. 尝试获取版本，使用 2>$null 吞掉错误日志
-        $response = gh api repos/$env:GITHUB_REPOSITORY/releases/latest --jq '.tag_name' 2>$null
+      - name: Fetch all tags
+        shell: pwsh
+        run: |
+          git fetch --tags --force origin
+          git fetch --all
 
-        # 3. 这里的 $? 会检查上一个命令是否成功
-        if ($? -and $response) {
-            $latestTag = $response
-            Write-Host "检测到云端已发布版本: $latestTag"
-        } else {
-            Write-Host "云端未发现发布记录（或请求 404），采用默认起始值: $latestTag"
-        }
+      - name: Generate Changelog
+        uses: mikepenz/release-changelog-builder-action@v6
+        id: build_changelog
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          fromTag: ${{ steps.previous_tag.outputs.prev_tag }}
+          toTag: preview
+          mode: "COMMIT"
+          configurationJson: |
+            {
+              "template": "#{{CHANGELOG}}",
+              "categories": [
+                {
+                    "title": "## 🚀 赛博特性 (Features)",
+                    "labels": ["feat", "feature"]
+                },
+                {
+                    "title": "## 🐛 故障修复 (Bug Fixes)",
+                    "labels": ["fix", "bug"]
+                },
+                {
+                    "title": "## 📦 基础设施 (Maintenance)",
+                    "labels": ["chore", "ci", "build"]
+                },
+                {
+                    "title": "📝 文档更新 (Docs)",
+                    "labels": ["docs", "readme"]
+                },
+                {
+                    "title": "📌 其他变更 (Other)",
+                    "labels": []
+                }
+              ],
+              "label_extractor": [
+                {
+                  "pattern": "^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test){1}(\\([\\w\\-\\.]+\\))?(!)?: ([\\w ])+([\\s\\S]*)",
+                  "on_property": "title",
+                  "target": "$1"
+                }
+              ]
+            }
 
-        # 4. 正常执行版本号清洗和拼接
-        $baseVer = $latestTag.TrimStart('v')
-        $fullVer = "$baseVer.${{ github.run_number }}"
+      - name: Force Update Preview Tag
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "action@github.com"
+          # 强制将 preview 标签移动到当前的提交(HEAD)
+          git tag -f preview
+          # 强制推送到远程
+          git push -f origin preview
 
-        # 5. 写入环境变量
-        "PREVIEW_VER=$fullVer" | Out-File -FilePath $env:GITHUB_ENV -Append
-        Write-Host "最终生成的预览版本号为: $fullVer"
-        
-        # 🌟 核心修复：强制设置退出码为 0，防止 404 导致整步变红
-        exit 0
-    - name: Update Preview Release
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: preview  # 保持使用固定的标签名
-        name: "🛠️ 预览版 (Preview Build) - v${{ env.PREVIEW_VER }}"
-        body: |
-          🚀 **CyberSlacker 赛博预览版自动更新**
-          ---
-          ### ⚠️ 实验性版本
-          此版本由 GitHub Actions 自动编译。包含最新的开发特性，可能存在不稳定因素。
-          - **编译时间**: `${{ github.event.head_commit.timestamp }}`
-          - **预览版本号**: `${{ env.PREVIEW_VER }}`
-          - **构建流水号**: `${{ github.run_number }}`
-          ---
-          ### 📝 变动明细 
-          ${{ steps.build_changelog.outputs.changelog }}
-          ---
-          *警告：预览版可能包含未完成的功能，仅供测试。*          
-        # 指向下载的临时目录下的所有 MSI 文件
-        files: |
-          ./temp_preview/Output/*.msi
-        
-        prerelease: true      # 标记为预发布（带有黄色角标）
-        make_latest: false    # 预览版不应该抢占“最新正式版”的标志
-        
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
-    - name: Push Preview to Top
-      shell: bash
-      run: |
-        curl -L \
-          -X PATCH \
-          -H "Accept: application/vnd.github+json" \
-          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          https://api.github.com/repos/${{ github.repository }}/releases/tags/preview \
-          -d "{\"published_at\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}"
+      - name: Fetch Latest Version from GitHub
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # 1. 默认起始版本
+          $latestTag = "v1.0.0"
+
+          # 2. 尝试获取版本，使用 2>$null 吞掉错误日志
+          $response = gh api repos/$env:GITHUB_REPOSITORY/releases/latest --jq '.tag_name' 2>$null
+
+          # 3. 这里的 $? 会检查上一个命令是否成功
+          if ($? -and $response) {
+              $latestTag = $response
+              Write-Host "检测到云端已发布版本: $latestTag"
+          } else {
+              Write-Host "云端未发现发布记录（或请求 404），采用默认起始值: $latestTag"
+          }
+
+          # 4. 正常执行版本号清洗和拼接
+          $baseVer = $latestTag.TrimStart('v')
+          $fullVer = "$baseVer.${{ github.run_number }}"
+
+          # 5. 写入环境变量
+          "PREVIEW_VER=$fullVer" | Out-File -FilePath $env:GITHUB_ENV -Append
+          Write-Host "最终生成的预览版本号为: $fullVer"
+
+          # 🌟 核心修复：强制设置退出码为 0，防止 404 导致整步变红
+          exit 0
+      - name: Update Preview Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: preview # 保持使用固定的标签名
+          name: "🛠️ 预览版 (Preview Build) - v${{ env.PREVIEW_VER }}"
+          body: |
+            🚀 **CyberSlacker 赛博预览版自动更新**
+            ---
+            ### ⚠️ 实验性版本
+            此版本由 GitHub Actions 自动编译。包含最新的开发特性，可能存在不稳定因素。
+            - **编译时间**: `${{ github.event.head_commit.timestamp }}`
+            - **预览版本号**: `${{ env.PREVIEW_VER }}`
+            - **构建流水号**: `${{ github.run_number }}`
+            ---
+            ### 📝 变动明细 
+            ${{ steps.build_changelog.outputs.changelog }}
+            ---
+            *警告：预览版可能包含未完成的功能，仅供测试。*
+          # 指向下载的临时目录下的所有 MSI 文件
+          files: |
+            ./temp_preview/Output/*.msi
+
+          prerelease: true # 标记为预发布（带有黄色角标）
+          make_latest: false # 预览版不应该抢占“最新正式版”的标志
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push Preview to Top
+        shell: bash
+        run: |
+          curl -L \
+            -X PATCH \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/${{ github.repository }}/releases/tags/preview \
+            -d "{\"published_at\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}"

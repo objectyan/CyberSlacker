@@ -21,7 +21,7 @@ namespace CyberSlacker
         {
             InitializeComponent();
 
-            // 1. 获取版本号
+            // 获取版本号
             var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
 
             // 显示 3 位或 4 位版本
