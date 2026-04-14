@@ -227,6 +227,16 @@ jobs:
                   "exclude_labels": ["ignore-this-commit"]
                 }
               ],
+              "custom_placeholders": [
+                  {
+                    "name": "TITLE",
+                    "source": "TITLE",
+                    "transformer": {
+                      "pattern": ".*(Merge branch|\\[skip ci\\]|update Preview manifests).*",
+                      "target": "-1111 $1"
+                    }
+                  }
+                ],
               "label_extractor": [
                 {
                   "method": "match",
