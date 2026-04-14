@@ -259,7 +259,7 @@ jobs:
                 "sort": {
                   "order": "DESC",
                   "on_property": "mergedAt"
-                },
+                }
               }
 
       - name: Force Update Preview Tag
