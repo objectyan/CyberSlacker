@@ -222,7 +222,12 @@ jobs:
                 },
                 {
                   "title": "## 📌 其他变更 (Other)",
-                  "labels": []
+                  "labels": [],
+                  "rule":{
+                    "pattern": "ignore-this-commit",
+                    "on_property": ["title", "labels", "body"]
+                  },
+                  exclude_labels": ["ignore-this-commit"]
                 }
               ],
               "transformers": [
@@ -257,18 +262,18 @@ jobs:
       - name: Out Debug Changelog
         shell: pwsh
         run: |
-            Write-Host "============== RAW CHANGELOG =============="
-            Write-Host "${{ steps.build_changelog.outputs.changelog }}"
-            Write-Host "============================================"
-            Write-Host "============== RAW IGNORED_PRS =============="
-            Write-Host "${{ steps.build_changelog.outputs.ignored_prs }}"
-            Write-Host "============================================"
-            Write-Host "============== RAW CATEGORIZED_PRS =============="
-            Write-Host "${{ steps.build_changelog.outputs.categorized_prs }}"
-            Write-Host "============================================"
-            Write-Host "============== RAW UNCATEGORIZED_PRS =============="
-            Write-Host "${{ steps.build_changelog.outputs.uncategorized_prs }}"
-            Write-Host "============================================"
+          Write-Host "============== RAW CHANGELOG =============="
+          Write-Host "${{ steps.build_changelog.outputs.changelog }}"
+          Write-Host "============================================"
+          Write-Host "============== RAW IGNORED_PRS =============="
+          Write-Host "${{ steps.build_changelog.outputs.ignored_prs }}"
+          Write-Host "============================================"
+          Write-Host "============== RAW CATEGORIZED_PRS =============="
+          Write-Host "${{ steps.build_changelog.outputs.categorized_prs }}"
+          Write-Host "============================================"
+          Write-Host "============== RAW UNCATEGORIZED_PRS =============="
+          Write-Host "${{ steps.build_changelog.outputs.uncategorized_prs }}"
+          Write-Host "============================================"
 
       - name: Force Update Preview Tag
         run: |
