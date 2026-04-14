@@ -220,11 +220,6 @@ jobs:
                 {
                   "title": "## 📝 文档更新 (Docs)",
                   "labels": ["docs", "docs:", "readme"]
-                },
-                {
-                  "title": "## 📌 其他变更 (Other)",
-                  "labels": [],
-                  "exclude_labels": ["ignore-this-commit"]
                 }
               ],
               "transformers": [

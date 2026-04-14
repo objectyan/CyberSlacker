@@ -137,10 +137,16 @@ namespace CyberSlacker.Services
 
         private static string FormatSpeed(double bytesPerSec)
         {
-            if (bytesPerSec < 1024) return $"{bytesPerSec:F0}B/s";
-            if (bytesPerSec < 1024 * 1024) return $"{(bytesPerSec / 1024.0):F1}K/s";
-            if (bytesPerSec < 1024 * 1024 * 1024) return $"{(bytesPerSec / 1024.0 / 1024.0):F1}K/s";
-            return $"{(bytesPerSec / 1024.0 / 1024.0 / 1024.0):F1}G/s";
+            string[] suffixes = { "B/s", "KB/s", "MB/s", "GB/s", "TB/s", "PB/s", "EB/s" };
+            int index = 0;
+
+            while (bytesPerSec >= 1024 && index < suffixes.Length - 1)
+            {
+                bytesPerSec /= 1024;
+                index++;
+            }
+
+            return $"{bytesPerSec:F1} {suffixes[index]}";
         }
 
         #endregion
