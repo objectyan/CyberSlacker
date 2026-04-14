@@ -194,6 +194,8 @@ jobs:
       with:
         fromTag: ${{ steps.previous_tag.outputs.prev_tag }}
         toTag: preview
+        commitMode: true
+        failOnError: false
         configuration: |
           exclude:
             labels:
@@ -201,6 +203,8 @@ jobs:
             authors:
               - github-actions[bot]
               - actions-user
+            commits:
+              - message: "*\[skip ci\]*"
           categories:
             - title: "🚀 赛博特性 (Features)"
               labels: ["feat", "feature", "enhancement"]
@@ -216,8 +220,9 @@ jobs:
             compact: false
             include_commits: true
             include_pre_build: false
-        failOnError: false
-        commitMode: true
+            show_contributors: false
+            show_pr_numbers: false
+          disable_default: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       

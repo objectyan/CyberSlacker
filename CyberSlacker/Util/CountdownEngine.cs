@@ -252,10 +252,10 @@ namespace CyberSlacker.Util
                 offTime = new TimeSpan(18, 0, 0);
             }
 
-            // 1. 先算本月的调整后发薪日
+            // 先算本月的调整后发薪日
             DateTime currentPayday = GetAdjustedPayday(now, service);
 
-            // 2. 如果今天已经过了本月发薪日（假设17点后算第二天），算下个月的
+            // 如果今天已经过了本月发薪日（假设17点后算第二天），算下个月的
             if (now > currentPayday.Add(offTime))
             {
                 currentPayday = GetAdjustedPayday(now.AddMonths(1), service);
@@ -267,7 +267,7 @@ namespace CyberSlacker.Util
             return $"{diff} 天";
         }
 
-        // 🌟 将元组内容合并为一行字符串
+        // 将元组内容合并为一行字符串
         private static string Merge((string Title, string Content) quote) => $"{quote.Title} {quote.Content}";
 
         private static string Merge(string prefix, string context) => $"{prefix} {context}";
