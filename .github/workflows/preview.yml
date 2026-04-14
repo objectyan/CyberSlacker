@@ -197,11 +197,11 @@ jobs:
           toTag: preview
           mode: "HYBRID"
           commitMode: true
-          fetchViaCommits: true,
-          fetchReviewers: true,
-          fetchReleaseInformation: true,
-          fetchReviews: true,
-          offlineMode: true,
+          # fetchViaCommits: true,
+          # fetchReviewers: true,
+          # fetchReleaseInformation: true,
+          # fetchReviews: true,
+          # offlineMode: true,
           configurationJson: |
              { 
                 "disable_default": true,
