@@ -247,7 +247,7 @@ jobs:
                 "order": "DESC",
                 "on_property": "mergedAt"
               },
-              "ignore_labels": ["ignore-this-commit"],
+              "ignore_labels": ["ignore-this-commit"]
             }
 
       - name: Force Update Preview Tag
