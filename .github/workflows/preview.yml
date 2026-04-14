@@ -239,7 +239,13 @@ jobs:
                   },
                   {
                     "title": "## 📌 其他变更 (Other)",
-                    "labels": []
+                    "labels": [],
+                    "exclude_labels": [
+                      "ignore",
+                      "Merge branch",
+                      "\\[skip ci\\]",
+                      "update Preview manifests"
+                    ]
                   }
                 ],
                 "label_extractor": [
