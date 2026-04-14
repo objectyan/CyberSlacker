@@ -236,6 +236,12 @@ jobs:
               "label_extractor": [
                 {
                   "method": "match",
+                  "pattern": ".*(Merge branch|\\[skip ci\\]|update Preview manifests).*",
+                  "target": "ignore-this-commit",
+                  "on_property": ["title"]
+                },
+                {
+                  "method": "match",
                   "pattern": "^([\\w\\-]+)",
                   "target": "$1",
                   "on_property": ["title", "labels", "body"]
@@ -247,6 +253,22 @@ jobs:
               },
               "ignore_labels": ["ignore-this-commit", "ignore"]
             }
+
+      - name: Out Debug Changelog
+        shell: pwsh
+        run: |
+            Write-Host "============== RAW CHANGELOG =============="
+            Write-Host "${{ steps.build_changelog.outputs.changelog }}"
+            Write-Host "============================================"
+            Write-Host "============== RAW IGNORED_PRS =============="
+            Write-Host "${{ steps.build_changelog.outputs.ignored_prs }}"
+            Write-Host "============================================"
+            Write-Host "============== RAW CATEGORIZED_PRS =============="
+            Write-Host "${{ steps.build_changelog.outputs.categorized_prs }}"
+            Write-Host "============================================"
+            Write-Host "============== RAW UNCATEGORIZED_PRS =============="
+            Write-Host "${{ steps.build_changelog.outputs.uncategorized_prs }}"
+            Write-Host "============================================"
 
       - name: Force Update Preview Tag
         run: |
