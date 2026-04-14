@@ -391,7 +391,7 @@ namespace CyberSlacker.Util
         // 判定某天是否真的是休息日（考虑调休优先级）
         public static bool IsRestDay(DateTime date, HolidayService service)
         {
-            // 1. 尝试从 API 缓存中获取这一天的特殊定义
+            // 尝试从 API 缓存中获取这一天的特殊定义
             // 注意：Timor API 的 year 列表只包含“被改动过”的日子（节日或调休上班）
             var info = service.GetDateInfo(date);
 
@@ -402,7 +402,7 @@ namespace CyberSlacker.Util
                 if (info.Type == DayType.Tiaoxiu) return false; // 明确补班
             }
 
-            // 2. 如果 API 列表里没这一天，说明它是“普通日子”，按星期几判断
+            // 如果 API 列表里没这一天，说明它是“普通日子”，按星期几判断
             int mode = Settings.Default.WorkMode; // 0:双休, 1:大小周, 2:单休
             DayOfWeek dow = date.DayOfWeek;
 

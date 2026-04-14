@@ -189,14 +189,18 @@ jobs:
         git fetch --all
 
     - name: Generate Changelog
-      uses: mikepenz/release-changelog-builder-action@v4
+      uses: mikepenz/release-changelog-builder-action@v6
       id: build_changelog
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         fromTag: ${{ steps.previous_tag.outputs.prev_tag }}
         toTag: preview
         commitMode: true
         failOnError: false
+        mode: "COMMIT"
         configuration: |
+        
           exclude:
             labels:
               - skip-changelog
@@ -223,8 +227,8 @@ jobs:
             show_contributors: false
             show_pr_numbers: false
           disable_default: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          sort:
+            order: DESC
       
     - name: Force Update Preview Tag
       run: |
