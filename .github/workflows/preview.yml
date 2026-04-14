@@ -200,36 +200,39 @@ jobs:
         failOnError: false
         mode: "COMMIT"
         configuration: |
-
-          exclude:
-            labels:
-              - skip-changelog
-            authors:
-              - github-actions[bot]
-              - actions-user
-            commits:
-              - message: "*\[skip ci\]*"
-              - message: "Merge branch*"
-          categories:
-            - title: "🚀 赛博特性 (Features)"
-              labels: ["feat", "feat:", "feature", "feature:", "enhancement"]
-            - title: "🐛 故障修复 (Bug Fixes)"
-              labels: ["fix", "fix:", "bug", "bug:", "hotfix"]
-            - title: "📦 基础设施 (Maintenance)"
-              labels: ["chore", "chore:", "ci", "ci:", "build", "deps"]
-            - title: "📝 文档更新 (Docs)"
-              labels: ["docs", "docs:", "readme", "readme:"]
-            - title: "📌 其他变更 (Other)"
-              labels: ["*"]
-          render:
-            compact: false
-            include_commits: true
-            include_pre_build: false
-            show_contributors: false
-            show_pr_numbers: false
-          disable_default: true
-          sort:
-            order: DESC
+            {
+              "exclude": {
+                "labels": ["skip-changelog"],
+                "authors": ["github-actions[bot]", "actions-user"],
+                "commits": [
+                  "^.*\\[skip ci\\].*$",
+                  "^Merge branch.*$"
+                ]
+              },
+              "categories": [
+                {
+                  "title": "🚀 赛博特性 (Features)",
+                  "labels": ["feat", "feat:", "feature"]
+                },
+                {
+                  "title": "🐛 故障修复 (Bug Fixes)",
+                  "labels": ["fix", "fix:", "bug"]
+                },
+                {
+                  "title": "📦 基础设施 (Maintenance)",
+                  "labels": ["chore", "chore:", "ci", "build"]
+                },
+                {
+                  "title": "📝 文档更新 (Docs)",
+                  "labels": ["docs", "docs:", "readme"]
+                }
+              ],
+              "categories_as_labels": true,
+              "ignore_labels": ["skip-changelog"],
+              "unmapped_information": {
+                "title": "📌 其他变更 (Other)"
+              }
+            }
       
     - name: Force Update Preview Tag
       run: |

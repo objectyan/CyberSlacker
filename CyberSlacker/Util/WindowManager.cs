@@ -14,12 +14,12 @@ namespace CyberSlacker.Util
         /// <param name="factory">创建新窗口的工厂方法（可选）</param>
         public static void ShowUnique<T>(Window? owner = null, Func<T>? factory = null) where T : Window
         {
-            // 1. 在当前所有打开的窗口中寻找是否已有该类型的窗口
+            // 在当前所有打开的窗口中寻找是否已有该类型的窗口
             var existingWindow = Application.Current.Windows.OfType<T>().FirstOrDefault();
 
             if (existingWindow != null)
             {
-                // 2. 如果窗口已存在：唤醒它
+                // 如果窗口已存在：唤醒它
                 if (existingWindow.Visibility != Visibility.Visible)
                 {
                     existingWindow.Visibility = Visibility.Visible;
@@ -32,7 +32,7 @@ namespace CyberSlacker.Util
                 return;
             }
 
-            // 3. 如果窗口不存在：创建它
+            // 如果窗口不存在：创建它
             T newWindow = factory != null ? factory() : Activator.CreateInstance<T>();
 
             if (owner != null && owner.IsVisible)
