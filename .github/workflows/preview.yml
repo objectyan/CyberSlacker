@@ -228,7 +228,7 @@ jobs:
               "label_extractor": [
                 {
                   "method": "match",
-                  "pattern": ".*(Merge branch|\\[skip ci\\]|update Preview manifests).*",
+                  "pattern": "^Merge branch",
                   "target": "ignore-this-commit",
                   "on_property": ["title"]
                 },
