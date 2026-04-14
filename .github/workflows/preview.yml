@@ -192,80 +192,13 @@ jobs:
         id: build_changelog
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RUNNER_DEBUG: 1
         with:
           fromTag: ${{ steps.previous_tag.outputs.prev_tag }}
           toTag: preview
           mode: "HYBRID"
           commitMode: false
-          configurationJson: |
-            {
-              "disable_default": true,
-              "template": "#{{CHANGELOG}}",
-              "pr_template": "- #{{TITLE}} (`#{{MERGE_SHA}}`) - @#{{AUTHOR}}",
-              "commit_template": "- #{{TITLE}} (`#{{MERGE_SHA}}`) - @#{{AUTHOR}}",
-              "categories": [
-                {
-                  "title": "## 🚀 赛博特性 (Features)",
-                  "labels": ["feat", "feat:", "feature", "Feature"]
-                },
-                {
-                  "title": "## 🐛 故障修复 (Bug Fixes)",
-                  "labels": ["fix", "fix:", "bug", "Bug", "hotfix"]
-                },
-                {
-                  "title": "## 📦 基础设施 (Maintenance)",
-                  "labels": ["chore", "chore:", "ci", "build", "deps"]
-                },
-                {
-                  "title": "## 📝 文档更新 (Docs)",
-                  "labels": ["docs", "docs:", "readme"]
-                }
-              ],
-              "transformers": [
-                  {
-                    "method": "match",
-                    "pattern": ".*(Merge branch|\\[skip ci\\]|update Preview manifests).*",
-                    "target": "ignore-this-commit",
-                    "on_property": ["title", "labels", "body"]
-                  }
-                ],
-              "label_extractor": [
-                {
-                  "method": "match",
-                  "pattern": ".*(Merge branch|\\[skip ci\\]|update Preview manifests).*",
-                  "target": "ignore-this-commit",
-                  "on_property": ["title", "labels", "body"]
-                },
-                {
-                  "method": "match",
-                  "pattern": "^([\\w\\-]+)",
-                  "target": "$1",
-                  "on_property": ["title", "labels", "body"]
-                }
-              ],
-              "sort": {
-                "order": "DESC",
-                "on_property": "mergedAt"
-              },
-              "ignore_labels": ["ignore-this-commit", "ignore", "Merge branch", "chore: update Preview manifests [skip ci]"]
-            }
-
-      - name: Out Debug Changelog
-        shell: pwsh
-        run: |
-          Write-Host "============== RAW CHANGELOG =============="
-          Write-Host "${{ steps.build_changelog.outputs.changelog }}"
-          Write-Host "============================================"
-          Write-Host "============== RAW IGNORED_PRS =============="
-          Write-Host "${{ steps.build_changelog.outputs.ignored_prs }}"
-          Write-Host "============================================"
-          Write-Host "============== RAW CATEGORIZED_PRS =============="
-          Write-Host "${{ steps.build_changelog.outputs.categorized_prs }}"
-          Write-Host "============================================"
-          Write-Host "============== RAW UNCATEGORIZED_PRS =============="
-          Write-Host "${{ steps.build_changelog.outputs.uncategorized_prs }}"
-          Write-Host "============================================"
+          configuration: ".github/changelog_config.json"
+            
 
       - name: Force Update Preview Tag
         run: |

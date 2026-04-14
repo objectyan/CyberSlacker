@@ -1,63 +1,85 @@
 {
     "disable_default": true,
     "template": "#{{CHANGELOG}}",
-    "pr_template": "- #{{TITLE}} (`#{{MERGE_SHA}}`) - #{{MERGED_AT}} (by @#{{AUTHOR}}",
-    "commit_template": "- #{{TITLE}} (`#{{MERGE_SHA}}`) - #{{CREATED_AT}} (by @#{{AUTHOR}})",
+    "pr_template": "- #{{TITLE}} (`#{{MERGE_SHA}}`) - @#{{AUTHOR}}",
+    "commit_template": "- #{{TITLE}} (`#{{MERGE_SHA}}`) - @#{{AUTHOR}}",
     "categories": [
         {
             "title": "## 🚀 赛博特性 (Features)",
             "labels": [
                 "feat",
-                "feature"
+                "feature",
+                "Feature"
             ]
         },
         {
             "title": "## 🐛 故障修复 (Bug Fixes)",
             "labels": [
                 "fix",
-                "hotfix",
-                "bug"
+                "bug",
+                "Bug",
+                "hotfix"
             ]
         },
         {
             "title": "## 📦 基础设施 (Maintenance)",
             "labels": [
                 "chore",
-                "deps",
-                "dep",
                 "ci",
-                "build"
+                "build",
+                "deps"
             ]
         },
         {
             "title": "## 📝 文档更新 (Docs)",
             "labels": [
                 "docs",
-                "docs:",
                 "readme"
             ]
-        },
+        }
+    ],
+    "transformers": [
         {
-            "title": "## 📌 其他变更 (Other)",
-            "labels": []
+            "method": "match",
+            "pattern": ".*(Merge branch|\\[skip ci\\]|update Preview manifests).*",
+            "target": "ignore-this-commit",
+            "on_property": [
+                "title",
+                "labels",
+                "body"
+            ]
         }
     ],
     "label_extractor": [
         {
             "method": "match",
+            "pattern": ".*(Merge branch|\\[skip ci\\]|update Preview manifests).*",
+            "target": "ignore-this-commit",
+            "on_property": [
+                "title",
+                "labels",
+                "body"
+            ]
+        },
+        {
+            "method": "match",
             "pattern": "^([\\w\\-]+)",
             "target": "$1",
-            "on_property": "title"
+            "on_property": [
+                "title",
+                "labels",
+                "body"
+            ]
         }
-    ],
-    "ignore_labels": [
-        "ignore",
-        "Merge branch",
-        "\\[skip ci\\]",
-        "update Preview manifests"
     ],
     "sort": {
         "order": "DESC",
         "on_property": "mergedAt"
-    }
+    },
+    "ignore_labels": [
+        "ignore-this-commit",
+        "ignore",
+        "Merge branch",
+        "chore: update Preview manifests [skip ci]"
+    ]
 }
