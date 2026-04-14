@@ -197,16 +197,17 @@ jobs:
           toTag: preview
           mode: "HYBRID"
           commitMode: true
+          fetchViaCommits: true,
+          fetchReviewers: true,
+          fetchReleaseInformation: true,
+          fetchReviews: true,
+          offlineMode: true,
           configurationJson: |
              { 
                 "disable_default": true,
                 "template": "#{{CHANGELOG}}",
                 "pr_template": "- #{{TITLE}} (`#{{MERGE_SHA}}`) - #{{MERGED_AT}} (by @#{{AUTHOR}}",
                 "commit_template": "- #{{TITLE}} (`#{{MERGE_SHA}}`) - #{{CREATED_AT}} (by @#{{AUTHOR}})",
-                "fetchViaCommits": true,
-                "fetchReviewers": true,
-                "fetchReleaseInformation": true,
-                "fetchReviews": true,
                 "categories": [
                   {
                     "title": "## 🚀 赛博特性 (Features)",
@@ -244,32 +245,21 @@ jobs:
                   {
                     "title": "## 📌 其他变更 (Other)",
                     "labels": [],
-                    "exclude_labels": [
-                      "ignore",
-                      "Merge branch",
-                      "\\[skip ci\\]",
-                      "update Preview manifests"
-                    ]
                   }
                 ],
                 "label_extractor": [
+                  {
+                    "method": "match",
+                    "pattern": ".*(Merge branch|skip ci|update Preview manifests).*",
+                    "target": "ignore-this-commit",
+                    "on_property": "title"
+                  },
                   {
                     "method": "match",
                     "pattern": "^([\\w\\-]+)",
                     "target": "$1",
                     "on_property": "title"
                   }
-                ],
-                "duplicate_filter": {
-                  "pattern": "\\[Merge....\\]",
-                  "on_property": "title",
-                  "method": "match"
-                },
-                "ignore_labels": [
-                    "ignore",
-                     "Merge branch",
-                    "\\[skip ci\\]",
-                    "update Preview manifests"
                 ],
                 "sort": {
                   "order": "DESC",
