@@ -200,15 +200,9 @@ jobs:
           configurationJson: |
              { 
                 "disable_default": true,
-                "exclude": {
-                  "commits": [
-                    "Merge branch",
-                    "\\[skip ci\\]",
-                    "update Preview manifests"
-                  ]
-                },
                 "template": "#{{CHANGELOG}}",
-                "pr_template": "- #{{TITLE}} (`#{{HASH}}`) - #{{DATE}} #{{TIME}} (by @#{{AUTHOR}}",
+                "pr_template": "- #{{TITLE}} (`#{{MERGE_SHA}}`) - #{{MERGED_AT}} (by @#{{AUTHOR}}",
+                "commit_template": "- #{{TITLE}} (`#{{MERGE_SHA}}`) - #{{CREATED_AT}} (by @#{{AUTHOR}})",
                 "categories": [
                   {
                     "title": "## 🚀 赛博特性 (Features)",
@@ -256,9 +250,16 @@ jobs:
                     "on_property": "title"
                   }
                 ],
-                "common": {
-                  "time_format": "YYYY-MM-DD HH:mm"
-                }
+                "ignore_labels": [
+                    "ignore",
+                     "Merge branch",
+                    "\\[skip ci\\]",
+                    "update Preview manifests"
+                ],
+                "sort": {
+                  "order": "DESC",
+                  "on_property": "mergedAt"
+                },
               }
 
       - name: Force Update Preview Tag
