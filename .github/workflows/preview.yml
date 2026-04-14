@@ -199,39 +199,43 @@ jobs:
           commitMode: true
           configurationJson: |
             {
-              "template": "#{{CHANGELOG}}",
               "categories": [
-                {
-                    "title": "## 🚀 赛博特性 (Features)",
-                    "labels": ["feat", "feature"]
-                },
-                {
-                    "title": "## 🐛 故障修复 (Bug Fixes)",
-                    "labels": ["fix", "bug"]
-                },
-                {
-                    "title": "## 📦 基础设施 (Maintenance)",
-                    "labels": ["chore", "ci", "build"]
-                },
-                {
-                    "title": "📝 文档更新 (Docs)",
-                    "labels": ["docs", "readme"]
-                },
-                {
-                    "title": "📌 其他变更 (Other)",
-                    "labels": []
-                }
-              ],
-              "label_extractor": [
-                {
-                  "pattern": "^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test){1}(\\([\\w\\-\\.]+\\))?(!)?: ([\\w ])+([\\s\\S]*)",
-                  "on_property": "title",
-                  "target": "$1"
-                }
-              ],
-              "common": {
-                "include_commits": true
+               { "title": "## ⛰️ Features", "labels": ["new"] },
+               { "title": "## 🏗️ Implementations", "labels": ["implement"] },
+               { "title": "## 🐛 Bug Fixes", "labels": ["fix"] },
+               { "title": "## 🚜 Changes", "labels": ["change"] },
+               { "title": "## 🎯 Cover Requirements", "labels": ["cover"] },
+               { "title": "## ✨ Refactor", "labels": ["refactor"] },
+               { "title": "## 📚 Documentation", "labels": ["docs"] },
+               { "title": "## 🎨 Styling", "labels": ["style"] },
+               { "title": "## ◀️ Revert", "labels": ["revert"] },
+               { "title": "## ⚙️ Miscellaneous Tasks", "labels": ["misc"] },
+               { "title": "## 💬 Other", "labels": ["other"] },
+               { "title": "## ❓ Unknown", "labels": ["unknown"] },
+               { "title": "## 🚀 Release", "labels": ["release"] }
+             ],
+             "ignore_labels": [
+                "release",
+                "ignore"
+             ],
+             "transformers": [
+              {
+                "pattern": "^[^\\(:\\s]+(\\([^\\)]+\\))?!?:\\s+([\\S]+[\\s\\S]*)",
+                "target": "$2 $1"
               }
+             ],
+             "sort": {
+                "order": "DESC",
+                "on_property": "mergedAt"
+             },
+             "template": "#{{CHANGELOG}}\n\n<details>\n<summary>Uncategorized</summary>\n\n#{{UNCATEGORIZED}}\n</details>\n\n**Full Changelog**: [#{{FROM_TAG}}...#{{TO_TAG}}](https://github.com/#{{OWNER}}/#{{REPO}}/compare/#{{FROM_TAG}}...#{{TO_TAG}})",
+              "label_extractor": [
+               {
+                 "pattern": "^([^\\(:\\s]+)(\\([^\\)]+\\))?(!)?:\\s+([\\S]+[\\s\\S]*)",
+                 "on_property": "title",
+                 "target": "$1"
+               }
+             ]
             }
 
       - name: Force Update Preview Tag
