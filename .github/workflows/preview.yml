@@ -199,9 +199,7 @@ jobs:
           commitMode: true
           configurationJson: |
              { 
-                "ignore_labels": [
-                  "skip-changelog"
-                ],
+                "disable_default": true,
                 "exclude": {
                   "commits": [
                     "Merge branch",
