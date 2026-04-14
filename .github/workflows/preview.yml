@@ -203,6 +203,10 @@ jobs:
                 "template": "#{{CHANGELOG}}",
                 "pr_template": "- #{{TITLE}} (`#{{MERGE_SHA}}`) - #{{MERGED_AT}} (by @#{{AUTHOR}}",
                 "commit_template": "- #{{TITLE}} (`#{{MERGE_SHA}}`) - #{{CREATED_AT}} (by @#{{AUTHOR}})",
+                "fetchViaCommits": true,
+                "fetchReviewers": true,
+                "fetchReleaseInformation": true,
+                "fetchReviews": true,
                 "categories": [
                   {
                     "title": "## 🚀 赛博特性 (Features)",
@@ -256,6 +260,11 @@ jobs:
                     "on_property": "title"
                   }
                 ],
+                "duplicate_filter": {
+                  "pattern": "\\[Merge....\\]",
+                  "on_property": "title",
+                  "method": "match"
+                },
                 "ignore_labels": [
                     "ignore",
                      "Merge branch",
