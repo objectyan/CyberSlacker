@@ -224,10 +224,6 @@ jobs:
                 {
                   "title": "## 📌 其他变更 (Other)",
                   "labels": [],
-                  "rule":{
-                    "pattern": "ignore-this-commit",
-                    "on_property": ["title", "labels", "body"]
-                  },
                   exclude_labels": ["ignore-this-commit"]
                 }
               ],
