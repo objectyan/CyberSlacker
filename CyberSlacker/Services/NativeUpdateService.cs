@@ -21,7 +21,7 @@ namespace CyberSlacker.Services
     {
         public static async Task<UpdateInfo?> CheckForUpdateAsync()
         {
-            // 1. 获取架构和配置路径
+            // 获取架构和配置路径
             string arch = RuntimeInformation.ProcessArchitecture.ToString().ToLower();
             string prefix = Properties.Settings.Default.IsPreviewEnabled ? "Update_preview_" : "Update_";
             string url = $"https://raw.githubusercontent.com/objectyan/CyberSlacker/master/manifests/{prefix}{arch}.xml";
@@ -31,7 +31,7 @@ namespace CyberSlacker.Services
             // 增加随机参数防止 GitHub CDN 缓存
             string xmlContent = await client.GetStringAsync($"{url}?t={DateTime.Now.Ticks}");
 
-            // 2. 解析 XML
+            // 解析 XML
             var doc = XDocument.Parse(xmlContent);
             var item = doc.Element("item");
             if (item == null) return null;
@@ -39,10 +39,10 @@ namespace CyberSlacker.Services
             var remoteVerStr = item.Element("version")?.Value;
             var remoteVer = new Version(remoteVerStr ?? "0.0.0.0");
 
-            // 3. 获取本地版本
+            // 获取本地版本
             var localVer = Assembly.GetExecutingAssembly().GetName().Version;
 
-            // 4. 比对版本
+            // 比对版本
             if (remoteVer > localVer)
             {
                 return new UpdateInfo

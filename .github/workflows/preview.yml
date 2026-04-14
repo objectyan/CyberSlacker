@@ -200,15 +200,18 @@ jobs:
               - skip-changelog
             authors:
               - github-actions[bot]
+              - actions-user
           categories:
             - title: "🚀 赛博特性 (Features)"
-              labels: ["feature", "feat", "enhancement"]
+              labels: ["feat", "feature", "enhancement"]
             - title: "🐛 故障修复 (Bug Fixes)"
-              labels: ["bug", "fix", "hotfix"]
+              labels: ["fix", "bug", "hotfix"]
             - title: "📦 基础设施 (Maintenance)"
-              labels: ["chore", "ci"]
+              labels: ["chore", "ci", "build", "deps"]
+            - title: "📝 文档更新 (Docs)"
+              labels: ["docs", "readme"]
             - title: "📌 其他变更 (Other)"
-              labels: [] 
+              labels: ["*"]
           render:
             compact: false
             include_commits: true
