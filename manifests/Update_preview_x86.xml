@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <item>
-    <version>1.0.1.62</version>
+    <version>1.0.1.63</version>
     <url>https://github.com/objectyan/CyberSlacker/releases/download/preview/CyberSlacker_Preview_x86.msi</url>
     <changelog>https://github.com/objectyan/CyberSlacker/releases/tag/preview</changelog>
     <mandatory>true</mandatory>
