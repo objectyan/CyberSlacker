@@ -192,6 +192,7 @@ jobs:
         id: build_changelog
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUNNER_DEBUG: 1
         with:
           fromTag: ${{ steps.previous_tag.outputs.prev_tag }}
           toTag: preview
