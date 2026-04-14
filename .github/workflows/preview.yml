@@ -227,23 +227,15 @@ jobs:
                   "exclude_labels": ["ignore-this-commit"]
                 }
               ],
-              "custom_placeholders": [
+              "transformers": [
                   {
-                    "name": "TITLE",
-                    "source": "TITLE",
-                    "transformer": {
-                      "pattern": ".*(Merge branch|\\[skip ci\\]|update Preview manifests).*",
-                      "target": "-1111 $1"
-                    }
+                    "method": "match",
+                    "pattern": ".*(Merge branch|\\[skip ci\\]|update Preview manifests).*",
+                    "target": "ignore-this-commit",
+                    "on_property": ["title"]
                   }
                 ],
               "label_extractor": [
-                {
-                  "method": "match",
-                  "pattern": ".*(Merge branch|\\[skip ci\\]|update Preview manifests).*",
-                  "target": "ignore-this-commit",
-                  "on_property": ["title"]
-                },
                 {
                   "method": "match",
                   "pattern": "^([\\w\\-]+)",
