@@ -141,6 +141,15 @@ namespace CyberSlacker.Util
                 : new nint(SetWindowLong32(hWnd, nIndex, (int)dwNewLong));
         }
 
+        // 向所有顶层窗口广播消息
+        [LibraryImport("user32.dll", EntryPoint = "PostMessageW")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static partial bool PostMessage(nint hWnd, uint Msg, nint wParam, nint lParam);
+
+        // 常量定义
+        internal const nint HWND_BROADCAST = 0xffff;
+        internal const string UniqueMessageName = "CyberSlacker_Restore_Message";
+
         #endregion
 
         #region 布局与硬件 (Layout & Hardware)

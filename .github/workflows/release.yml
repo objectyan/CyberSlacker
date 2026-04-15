@@ -111,6 +111,35 @@ jobs:
           ref: master
           fetch-depth: 0
 
+      - name: Get previous tag
+        id: previous_tag
+        shell: pwsh
+        run: |
+          git fetch --tags origin
+          # 拿到最近一个真实版本号（排除 preview 标签）
+          $prevTag = git tag --list "v*" --sort=-creatordate | Where-Object { $_ -ne "preview" } | Select -First 1
+          if (-not $prevTag) { $prevTag = "v1.0.0" }
+          echo "prev_tag=$prevTag" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          Write-Host "使用上一个正式版本对比: $prevTag"
+
+      - name: Fetch all tags
+        shell: pwsh
+        run: |
+          git fetch --tags --force origin
+          git fetch --all
+
+      - name: Generate Changelog
+        uses: mikepenz/release-changelog-builder-action@v6
+        id: build_changelog
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          fromTag: ${{ steps.previous_tag.outputs.prev_tag }}
+          toTag: ${{ github.ref_name }}
+          mode: "HYBRID"
+          commitMode: false
+          configuration: ".github/changelog_config.json"
+
       - name: Download all artifacts (MSIs and XMLs)
         uses: actions/download-artifact@v4
         with:
@@ -143,6 +172,10 @@ jobs:
             本次版本更新已就绪，请各工位成员及时领取。
 
             ---
+            ### 📝 变动明细 
+            ${{ steps.build_changelog.outputs.changelog }}
+            ---
+            *警告：预览版可能包含未完成的功能，仅供测试。*
           generate_release_notes: true
           files: ./temp_all/Output/*.msi
         env:

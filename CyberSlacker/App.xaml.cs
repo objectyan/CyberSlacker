@@ -13,6 +13,10 @@ namespace CyberSlacker
     /// </summary>
     public partial class App : Application
     {
+#if !DEBUG
+        private static System.Threading.Mutex _mutex;
+        private static uint _restoreMsg;
+#endif
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -41,6 +45,22 @@ namespace CyberSlacker
             InitNotify();
 
 #if !DEBUG
+
+            _restoreMsg = CyberSlacker.Util.Interop.RegisterWindowMessage(CyberSlacker.Util.Interop.UniqueMessageName);
+            _mutex = new System.Threading.Mutex(true, "CyberSlacker_Unique_Mutex_ID", out bool createdNew);
+
+            if (!createdNew)
+            {
+                // 说明已经有一个实例在跑了
+                // 向系统所有窗口广播“暗号”，让旧实例看到后自己跳出来
+                CyberSlacker.Util.Interop.PostMessage(CyberSlacker.Util.Interop.HWND_BROADCAST, _restoreMsg, 0, 0);
+
+                // 退出当前新启动的进程
+                Application.Current.Shutdown();
+                System.Environment.Exit(0);
+                return;
+            }
+
             // 优化是否开机重启
             CyberSlacker.Util.StartupHelper.SetStartup(CyberSlacker.Properties.Settings.Default.IsAutoStart);
             CyberSlacker.Services.NativeUpdateService.StartUpdateFlow();

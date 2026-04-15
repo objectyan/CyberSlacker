@@ -80,9 +80,43 @@ namespace CyberSlacker
             }
         }
 
+#if !DEBUG
+        private nint WndProc(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)
+        {
+            // 检查收到的消息是不是我们注册的“唤醒暗号”
+            uint restoreMsg = CyberSlacker.Util.Interop.RegisterWindowMessage(CyberSlacker.Util.Interop.UniqueMessageName);
+
+            if (msg == restoreMsg)
+            {
+                // 唤醒并显示挂件
+                if (this.Visibility != Visibility.Visible)
+                {
+                    this.Visibility = Visibility.Visible;
+                }
+
+                this.Show();
+                this.Activate();
+                this.Topmost = true; // 强行置顶一下，防止被挡住
+
+                // 播放我们之前写的闪烁动画，告诉用户“我在这儿呢”
+                PlayFlashAnimation();
+
+                handled = true;
+            }
+            return nint.Zero;
+        }
+#endif
+
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
+
+#if !DEBUG
+            // 获取窗口句柄并添加钩子（Hook）
+            nint hWnd = new WindowInteropHelper(this).Handle;
+            HwndSource source = HwndSource.FromHwnd(hWnd);
+            source.AddHook(WndProc);
+#endif
 
             try
             {
