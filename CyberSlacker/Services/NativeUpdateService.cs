@@ -1,7 +1,6 @@
 ﻿using CyberSlacker.Util;
 using Serilog;
 using System;
-using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -19,6 +18,7 @@ namespace CyberSlacker.Services
 
     public static class NativeUpdateService
     {
+
         public static async Task<UpdateInfo?> CheckForUpdateAsync()
         {
             // 获取架构和配置路径
@@ -26,7 +26,13 @@ namespace CyberSlacker.Services
             string prefix = Properties.Settings.Default.IsPreviewEnabled ? "Update_preview_" : "Update_";
             string url = $"https://raw.githubusercontent.com/objectyan/CyberSlacker/master/manifests/{prefix}{arch}.xml";
 
-            using var client = new HttpClient();
+            using var client = new System.Net.Http.HttpClient();
+
+            if (!client.DefaultRequestHeaders.Contains("User-Agent"))
+            {
+                client.DefaultRequestHeaders.Add("User-Agent", "CyberSlacker-App");
+            }
+
             client.Timeout = TimeSpan.FromSeconds(10);
             // 增加随机参数防止 GitHub CDN 缓存
             string xmlContent = await client.GetStringAsync($"{url}?t={DateTime.Now.Ticks}");
