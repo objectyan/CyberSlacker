@@ -124,7 +124,7 @@ namespace CyberSlacker.ViewModels
                              $"📅 周末: {WeekendCountdown}\n" +
                              $"💰 发薪: {PayDayCountdown}\n" +
                              $"🎁 下个节日: {NextHolidayName} ({NextHolidayCountdown})\n" +
-                             $"🚀 网速:{HwNet}";
+                             $"🚀 网速: {HwNet}";
 
             if (now.Second == 0)
             {
