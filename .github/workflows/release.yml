@@ -115,12 +115,24 @@ jobs:
         id: previous_tag
         shell: pwsh
         run: |
-          git fetch --tags origin
-          # 拿到最近一个真实版本号（排除 preview 标签）
-          $prevTag = git tag --list "v*" --sort=-creatordate | Where-Object { $_ -ne "preview" } | Select -First 1
-          if (-not $prevTag) { $prevTag = "v1.0.0" }
-          echo "prev_tag=$prevTag" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-          Write-Host "使用上一个正式版本对比: $prevTag"
+          # 1. 强制获取所有标签
+          git fetch --tags --force origin
+
+          # 2. 获取当前正在构建的名称
+          $currentRef = "${{ github.ref_name }}"
+          
+          # 3. 寻找上一个正式版 (v*)，逻辑是：列出所有 v* 标签，按时间排序，
+          # 排除掉当前正在构建的这个，排除掉 preview 标签，取第一个。
+          $prevTag = git tag --list "v*" --sort=-creatordate | 
+                    Where-Object { $_ -ne $currentRef -and $_ -ne "preview" -and $_ -ne "nightly" } | 
+                    Select-Object -First 1
+
+          # 如果从来没有正式版，默认从 v1.0.0 开始
+          if (!$prevTag) { $prevTag = "v1.0.0" }
+          
+          echo "prev_tag=$prevTag" >> $env:GITHUB_OUTPUT
+          Write-Host "对比起点 (fromTag): $prevTag"
+          Write-Host "对比终点 (toTag): $currentRef"
 
       - name: Fetch all tags
         shell: pwsh
