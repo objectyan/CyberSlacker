@@ -170,6 +170,15 @@ jobs:
               git push origin master
           }
 
+      - name: Force Update Preview Tag
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "action@github.com"
+          # 强制将 preview 标签移动到当前的提交(HEAD)
+          git tag -f preview
+          # 强制推送到远程
+          git push -f origin preview
+
       - name: Get previous tag
         id: previous_tag
         shell: pwsh
@@ -198,16 +207,6 @@ jobs:
           mode: "HYBRID"
           commitMode: false
           configuration: ".github/changelog_config.json"
-            
-
-      - name: Force Update Preview Tag
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "action@github.com"
-          # 强制将 preview 标签移动到当前的提交(HEAD)
-          git tag -f preview
-          # 强制推送到远程
-          git push -f origin preview
 
       - name: Fetch Latest Version from GitHub
         shell: pwsh
