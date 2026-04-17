@@ -187,8 +187,6 @@ jobs:
             ### 📝 变动明细 
             ${{ steps.build_changelog.outputs.changelog }}
             ---
-            *警告：预览版可能包含未完成的功能，仅供测试。*
-          generate_release_notes: true
           files: ./temp_all/Output/*.msi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
