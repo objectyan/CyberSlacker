@@ -171,8 +171,8 @@
                                 </Grid>
                                 <Slider Minimum="0.2" Maximum="1.0" TickFrequency="0.05" IsSnapToTickEnabled="True" Value="{Binding Opacity}"/>
 
-                                <CheckBox Content="开机自动启动" Margin="0,15,0,5" IsChecked="{Binding IsAutoStart}"/>
-                                <CheckBox Content="预览版计划" IsChecked="{Binding IsPreviewEnabled}"/>
+                                <CheckBox Content="开机自动启动" Margin="0,15,0,5" IsChecked="{Binding IsAutoStart}" Foreground="White"/>
+                                <CheckBox Content="预览版计划" IsChecked="{Binding IsPreviewEnabled}" Foreground="White"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>
