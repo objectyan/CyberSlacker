@@ -94,7 +94,7 @@ namespace CyberSlacker.Services
         {
             try
             {
-                string url = $"https://raw.githubusercontent.com/objectyan/CyberSlacker/master/manifests/{prefix}{arch}.xml";
+                string url = $"https://github.com/objectyan/CyberSlacker/raw/refs/heads/master/manifests/{prefix}{arch}.xml";
 
                 using var client = new System.Net.Http.HttpClient();
                 // 设置 User-Agent 和 超时
