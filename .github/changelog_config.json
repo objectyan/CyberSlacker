@@ -1,8 +1,8 @@
 {
     "disable_default": true,
     "template": "#{{CHANGELOG}}",
-    "pr_template": "- [`#{{TITLE}}`](${{ github.server_url }}/${{ github.repository }}/commit/#{{MERGE_SHA}}) - @#{{AUTHOR}}",
-    "commit_template": "- [`#{{TITLE}}`](${{ github.server_url }}/${{ github.repository }}/commit/#{{MERGE_SHA}}) - @#{{AUTHOR}}",
+    "pr_template": "- [`#{{TITLE}}`](https://github.com/objectyan/CyberSlacker/commit/#{{MERGE_SHA}}) - @#{{AUTHOR}}",
+    "commit_template": "- [`#{{TITLE}}`](https://github.com/objectyan/CyberSlacker/commit/#{{MERGE_SHA}}) - @#{{AUTHOR}}",
     "categories": [
         {
             "title": "## 🚀 赛博特性 (Features)",
