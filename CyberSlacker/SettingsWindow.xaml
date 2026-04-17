@@ -70,9 +70,8 @@
                 <!-- 1. 标题栏 (支持拖动) -->
                 <Grid Grid.Row="0" Margin="25,20,25,10" MouseLeftButtonDown="OnHeaderDrag">
                     <TextBlock Text="赛博助手设置" FontSize="20" FontWeight="Bold" Foreground="White"/>
-                    <Button Content="✕" HorizontalAlignment="Right" VerticalAlignment="Center" 
-                        Background="Transparent" BorderThickness="0" Foreground="#666" 
-                        FontSize="18" Cursor="Hand" Click="OnCloseClick"/>
+                    <Button Style="{StaticResource CyberCircleButtonStyle}" HorizontalAlignment="Right" VerticalAlignment="Center" 
+                        Background="Transparent" BorderThickness="0"  Margin="0,-5,-5,0"  Click="OnCloseClick"/>
                 </Grid>
 
                 <!-- 2. 设置内容区 -->
