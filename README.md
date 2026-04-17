@@ -1,47 +1,22 @@
 # ⚡ CyberSlacker (赛博摸鱼员)
 
-### 📝 代码质量
-
-[![CodeFactor](https://www.codefactor.io/repository/github/objectyan/CyberSlacker/badge?style=flat-square)](https://www.codefactor.io/repository/github/objectyan/CyberSlacker)
-
-### 🚀 构建状态
-
-[![Build and Release CyberSlacker](https://img.shields.io/github/actions/workflow/status/objectyan/CyberSlacker/release.yml?branch=v1.0.3&label=Build&logo=github&style=flat-square)](https://github.com/objectyan/CyberSlacker/actions/workflows/release.yml)
-[![Preview Build (Preview)](https://img.shields.io/github/actions/workflow/status/objectyan/CyberSlacker/preview.yml?label=Preview&logo=github&style=flat-square)](https://github.com/objectyan/CyberSlacker/actions/workflows/preview.yml)
-
-### 📌 版本信息
-
-[![Latest Release](https://img.shields.io/github/v/release/objectyan/CyberSlacker?color=orange&logo=github&style=flat-square&label=Release)](https://github.com/objectyan/CyberSlacker/releases)
-[![Latest Tag](https://img.shields.io/github/v/tag/objectyan/CyberSlacker?color=red&logo=github&style=flat-square&label=Tag)](https://github.com/objectyan/CyberSlacker/tags)
-[![WinGet Version](https://img.shields.io/badge/WinGet-v1.0.2-green?logo=windows&style=flat-square)](https://github.com/microsoft/winget-pkgs/tree/master/manifests/o/objectyan/CyberSlacker)
-
-### 🛠️ 技术栈
-
-[![.NET](https://img.shields.io/badge/.NET-8.0-blue?logo=dotnet&style=flat-square)](https://dotnet.microsoft.com/zh-cn/download/dotnet/8.0)
-[![Language](https://img.shields.io/github/languages/top/objectyan/CyberSlacker?color=blue&logo=csharp&style=flat-square)](https://github.com/objectyan/CyberSlacker)
-[![Platform](https://img.shields.io/badge/platform-Windows-0078D6?logo=windows&style=flat-square&label=Platform)](https://github.com/objectyan/CyberSlacker)
-
-### 📊 项目数据
-
-[![Downloads](https://img.shields.io/github/downloads/objectyan/CyberSlacker/total?color=green&logo=github&style=flat-square&label=Downloads)](https://github.com/objectyan/CyberSlacker/releases)
-[![Preview Downloads](https://img.shields.io/github/downloads/objectyan/CyberSlacker/preview/total?label=Preview%20Downloads&color=green&style=flat-square)](https://github.com/objectyan/CyberSlacker/releases/tag/preview)
-[![Stars](https://img.shields.io/github/stars/objectyan/CyberSlacker?color=yellow&logo=github&style=flat-square&label=Stars)](https://github.com/objectyan/CyberSlacker/stargazers)
-[![Repo Size](https://img.shields.io/github/repo-size/objectyan/CyberSlacker?color=purple&logo=github&style=flat-square&label=Repo%20Size)](https://github.com/objectyan/CyberSlacker)
-
-### 📈 活跃度
-
-[![GitHub Commit Activity](https://img.shields.io/github/commit-activity/m/objectyan/CyberSlacker?color=green&logo=git&style=flat-square&label=Commit%20Activity)](https://github.com/objectyan/CyberSlacker)
-[![Last Commit](https://img.shields.io/github/last-commit/objectyan/CyberSlacker?color=brown&logo=git&style=flat-square&label=Last%20Commit)](https://github.com/objectyan/CyberSlacker/commits/master)
-
-### 📄 协议
-
-[![License](https://img.shields.io/github/license/objectyan/CyberSlacker?color=orange&logo=opensourceinitiative&style=flat-square&label=License)](https://github.com/objectyan/CyberSlacker/blob/master/LICENSE)
-
 > 掌控搬砖时间的终极逻辑。
 
 > **“钱是老板的，命是自己的。”** —— 这是一个真正懂打工人的桌面贴心挂件。
 
 打工人助手是一款基于 **WPF (.NET 8)** 开发的桌面小组件。它不仅仅是一个简单的倒计时器，更集成了复杂的中国节假日调休算法、发薪日智能策略以及各种幽默的打工人语录，旨在为您枯燥的办公生活增添一份仪式感。
+
+---
+
+| 分类 | 徽章 |
+| :--- | :--- |
+| **📝 代码质量** | [![CodeFactor](https://www.codefactor.io/repository/github/objectyan/CyberSlacker/badge?style=flat-square)](https://www.codefactor.io/repository/github/objectyan/CyberSlacker) |
+| **🚀 构建状态** | [![Build status](https://img.shields.io/github/actions/workflow/status/objectyan/CyberSlacker/release.yml?logo=github&style=flat-square&label=Build)](https://github.com/objectyan/CyberSlacker/actions/workflows/release.yml) [![Preview status](https://img.shields.io/github/actions/workflow/status/objectyan/CyberSlacker/preview.yml?label=Preview&logo=github&style=flat-square)](https://github.com/objectyan/CyberSlacker/actions/workflows/preview.yml) |
+| **📌 版本信息** | [![Latest Release](https://img.shields.io/github/v/release/objectyan/CyberSlacker?color=orange&logo=github&style=flat-square&label=Release)](https://github.com/objectyan/CyberSlacker/releases) [![Latest Tag](https://img.shields.io/github/v/tag/objectyan/CyberSlacker?color=red&logo=github&style=flat-square&label=Tag)](https://github.com/objectyan/CyberSlacker/tags) [![WinGet Version](https://img.shields.io/badge/WinGet-v1.0.2-green?logo=windows&style=flat-square)](https://github.com/microsoft/winget-pkgs/tree/master/manifests/o/objectyan/CyberSlacker) |
+| **🛠️ 技术栈** | [![.NET](https://img.shields.io/badge/.NET-8.0-blue?logo=dotnet&style=flat-square)](https://dotnet.microsoft.com/zh-cn/download/dotnet/8.0) [![Language](https://img.shields.io/github/languages/top/objectyan/CyberSlacker?color=blue&logo=csharp&style=flat-square)](https://github.com/objectyan/CyberSlacker) [![Platform](https://img.shields.io/badge/platform-Windows-0078D6?logo=windows&style=flat-square&label=Platform)](https://github.com/objectyan/CyberSlacker) |
+| **📊 项目数据** | [![Downloads](https://img.shields.io/github/downloads/objectyan/CyberSlacker/total?color=green&logo=github&style=flat-square&label=Downloads)](https://github.com/objectyan/CyberSlacker/releases) [![Preview Downloads](https://img.shields.io/github/downloads/objectyan/CyberSlacker/preview/total?label=Preview%20Downloads&color=green&style=flat-square)](https://github.com/objectyan/CyberSlacker/releases/tag/preview) [![Stars](https://img.shields.io/github/stars/objectyan/CyberSlacker?color=yellow&logo=github&style=flat-square&label=Stars)](https://github.com/objectyan/CyberSlacker/stargazers) [![Repo Size](https://img.shields.io/github/repo-size/objectyan/CyberSlacker?color=purple&logo=github&style=flat-square&label=Repo%20Size)](https://github.com/objectyan/CyberSlacker) |
+| **📈 活跃度** | [![GitHub Commit Activity](https://img.shields.io/github/commit-activity/m/objectyan/CyberSlacker?color=green&logo=git&style=flat-square&label=Commit%20Activity)](https://github.com/objectyan/CyberSlacker) [![Last Commit](https://img.shields.io/github/last-commit/objectyan/CyberSlacker?color=brown&logo=git&style=flat-square&label=Last%20Commit)](https://github.com/objectyan/CyberSlacker/commits/master) |
+| **📄 协议** | [![License](https://img.shields.io/github/license/objectyan/CyberSlacker?color=orange&logo=opensourceinitiative&style=flat-square&label=License)](https://github.com/objectyan/CyberSlacker/blob/master/LICENSE) |
 
 ---
 
