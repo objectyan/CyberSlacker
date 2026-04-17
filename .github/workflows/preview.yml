@@ -9,6 +9,7 @@ on:
       - "**.md" # 修改 README 等文档不触发
       - "LICENSE" # 修改授权协议不触发
       - "manifests/**" # 忽略清单目录变动（防止机器人自己推代码导致死循环）
+      - "docs/**" # 修改文档目录不触发
 
 permissions:
   contents: write
@@ -24,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [x64, x86, arm64] # 预览版只提供主流架构，加快编译速度
+        arch: [ x64, x86, arm64 ] # 预览版只提供主流架构，加快编译速度
     runs-on: windows-latest
 
     steps:
