@@ -56,9 +56,8 @@ namespace CyberSlacker
         {
             try
             {
-                using var client = new HttpClient();
                 // 获取文件大小
-                var response = await client.GetAsync(_downloadUrl, HttpCompletionOption.ResponseHeadersRead);
+                var response = await HttpUtil.Client.GetAsync(_downloadUrl, HttpCompletionOption.ResponseHeadersRead);
                 var totalBytes = response.Content.Headers.ContentLength ?? -1L;
 
                 using var downloadStream = await response.Content.ReadAsStreamAsync();

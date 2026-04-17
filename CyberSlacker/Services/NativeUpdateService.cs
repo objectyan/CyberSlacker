@@ -87,6 +87,7 @@ namespace CyberSlacker.Services
             return null;
         }
 
+
         /// <summary>
         /// 私有辅助方法：负责具体的下载和解析
         /// </summary>
@@ -96,15 +97,16 @@ namespace CyberSlacker.Services
             {
                 string url = $"https://github.com/objectyan/CyberSlacker/raw/refs/heads/master/manifests/{prefix}{arch}.xml";
 
-                using var client = new System.Net.Http.HttpClient();
-                // 设置 User-Agent 和 超时
-                client.DefaultRequestHeaders.Add("User-Agent", "CyberSlacker-App");
-                client.Timeout = TimeSpan.FromSeconds(10);
-
                 // 加随机数参数绕过 GitHub/CDN 缓存
                 string finalUrl = $"{url}?t={DateTime.Now.Ticks}";
 
-                string xmlContent = await client.GetStringAsync(finalUrl);
+                string? xmlContent = await HttpUtil.GetStringWithRetryAsync(url, 2);
+
+                if (xmlContent == null)
+                {
+                    Log.Warning($"未能获取更新信息 (URL: {finalUrl})");
+                    return null;
+                }
 
                 // 解析 XML
                 var doc = XDocument.Parse(xmlContent);
