@@ -130,14 +130,16 @@ namespace CyberSlacker.Util
         /// <summary>
         /// 发薪日专属动力语录
         /// </summary>
-        private static readonly (string Title, string Content)[] _paydayQuotes = [
-            ("💰 余额已回血", "今天的工作动力 100% 由人民币提供！老板看我的眼神都温柔了。"),
-            ("🍖 晚饭加个腿", "工资到账，腰杆变硬。今晚必须犒劳一下这位辛苦搬砖的猛士！"),
-            ("💸 暂时的富豪", "这笔钱虽然只是在我卡里路过，但那一秒钟，我确实是富有的。"),
-            ("🎰 数字跳动", "看着卡里增加的余额，感觉我又能忍受老板五分钟了。"),
-            ("🕯️ 奢华一夜", "今晚点外卖不看满减，这是发薪日给予我最后的底气。"),
-            ("💎 散发光芒", "此时的我，走路带风，看隔壁桌的秃顶同事都觉得慈眉善目。"),
-        ];
+        private static readonly string[] _paydayQuotes = [
+            "💰 钞能力，启动！",
+            "🍗 工资到账，加个鸡腿！",
+            "💎 钱虽路过，富过一秒。",
+            "📈 余额回血，再忍五分。",
+            "🕯️ 点餐不看满减，硬气！",
+            "✨ 走路带风，万物可爱。",
+            "🧱 搬砖动力，瞬间拉满。",
+            "🚀 账户复苏，满血复活！"
+         ];
 
         /// <summary>
         /// 下班倒计时
@@ -263,7 +265,7 @@ namespace CyberSlacker.Util
 
             int diff = (currentPayday.Date - now.Date).Days;
 
-            if (diff == 0) return Merge(_paydayQuotes[_rng.Next(_paydayQuotes.Length)]);
+            if (diff == 0) return _paydayQuotes[_rng.Next(_paydayQuotes.Length)];
             return $"{diff} 天";
         }
 
@@ -334,8 +336,9 @@ namespace CyberSlacker.Util
                     prefix += "🚀 还有 " + Math.Ceiling(remaining) + " 分钟！随时弹射！";
 
                 if (IsRestDay(DateTime.Today.AddDays(1), service))
+                {
                     return Merge(prefix, _lastDayQuotes[_rng.Next(_lastDayQuotes.Length)]);
-
+                }
                 return Merge(prefix, GetRandomOffWorkCheer());
             }
 
