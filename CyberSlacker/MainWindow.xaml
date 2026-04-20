@@ -29,7 +29,7 @@
                     <!-- 2. 锁定位置（点击穿透） -->
                     <MenuItem IsCheckable="True" 
                           IsChecked="{Binding IsLocked, Source={x:Static prop:Settings.Default}, Mode=TwoWay}" 
-                          Click="OnLockToggle"> 
+                          Click="OnLockToggle">
                         <MenuItem.Style>
                             <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
                                 <!-- 默认文字 -->
@@ -119,14 +119,25 @@ Fill="White" Stretch="Uniform"/>
 
                     <!-- 【左侧：倒计时区】 -->
                     <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                        <TextBlock Text="距离下班还有" Foreground="#888" FontSize="11" Margin="0,0,0,5"/>
+                        <TextBlock Text="下班倒计时" Foreground="#888" FontSize="11" Margin="0,0,0,5"/>
                         <TextBlock Text="{Binding OffWorkCountdown}" Foreground="#FF5252" FontSize="38" FontWeight="Bold"/>
                         <StackPanel Margin="0,10,0,0">
-                            <TextBlock Text="距离周末还有" Foreground="#888" FontSize="11"/>
+                            <TextBlock Text="周末倒计时" Foreground="#888" FontSize="11"/>
                             <TextBlock Text="{Binding WeekendCountdown}" Foreground="White" FontSize="15"/>
                         </StackPanel>
                         <StackPanel Margin="0,10,0,0">
-                            <TextBlock Text="距离发薪还有" Foreground="#888" FontSize="11"/>
+                            <TextBlock Foreground="#888" FontSize="11">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="发薪倒计时"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsPayDay}" Value="True">
+                                                <Setter Property="Text" Value="今日状态"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                             <TextBlock Text="{Binding PayDayCountdown}" Foreground="Gold" FontSize="15" FontWeight="Bold"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">

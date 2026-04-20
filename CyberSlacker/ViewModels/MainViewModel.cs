@@ -25,6 +25,7 @@ namespace CyberSlacker.ViewModels
         [ObservableProperty] private string _offWorkCountdown = "计算中...";
         [ObservableProperty] private string _weekendCountdown = "同步中...";
         [ObservableProperty] private string _payDayCountdown = "计算中...";
+        [ObservableProperty] private bool _isPayDay = false;
         [ObservableProperty] private string _holidayTip = "正在加载...";
         [ObservableProperty] private string _nextHolidayName = "加载中...";
         [ObservableProperty] private string _nextHolidayCountdown = "加载中...";
@@ -74,7 +75,9 @@ namespace CyberSlacker.ViewModels
                 // 动态提示语
                 HolidayTip = CountdownEngine.GetDynamicTip(now, todayInfo, _holidayService, _lastRestNotifyTime);
                 // 发薪日
-                PayDayCountdown = CountdownEngine.GetPaydayString(now, _holidayService);
+                var (isPayday, paydayString) = CountdownEngine.GetPaydayString(now, _holidayService);
+                IsPayDay = isPayday;
+                PayDayCountdown = paydayString;
                 // 下一个节日
                 var (holidayName, holidayCountdown) = CountdownEngine.GetNextHolidayInfo(now, _holidayService);
                 NextHolidayName = holidayName;
@@ -93,7 +96,9 @@ namespace CyberSlacker.ViewModels
                 else if (roll < 80)
                 {
                     // 发薪日
-                    PayDayCountdown = CountdownEngine.GetPaydayString(now, _holidayService);
+                    var (isPayday, paydayString) = CountdownEngine.GetPaydayString(now, _holidayService);
+                    IsPayDay = isPayday;
+                    PayDayCountdown = paydayString;
                 }
                 else
                 {
@@ -119,12 +124,14 @@ namespace CyberSlacker.ViewModels
             HwGpu = $"{gpu:F0}%";
             HwNet = $"↓{netIn} ↑{netOut}";
 
-            TaskbarTooltip = $"{GetMaxString(HolidayTip, 30)}\n" +
-                             $"⏳ 下班: {OffWorkCountdown}\n" +
+            var endTooltip = $"⏳ 下班: {OffWorkCountdown}\n" +
                              $"📅 周末: {WeekendCountdown}\n" +
-                             $"💰 发薪: {PayDayCountdown}\n" +
+                             $"💰 {(IsPayDay ? "状态" : "发薪")}: {PayDayCountdown}\n" +
                              $"🎁 下个节日: {NextHolidayName} ({NextHolidayCountdown})\n" +
                              $"🚀 网速: {HwNet}";
+
+            TaskbarTooltip = $"{GetMaxString(HolidayTip, 124 - endTooltip.Length)}\n" +
+                             $"{endTooltip}";
 
             if (now.Second == 0)
             {

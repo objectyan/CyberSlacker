@@ -131,14 +131,26 @@ namespace CyberSlacker.Util
         /// 发薪日专属动力语录
         /// </summary>
         private static readonly string[] _paydayQuotes = [
-            "💰 钞能力，启动！",
-            "🍗 工资到账，加个鸡腿！",
-            "💎 钱虽路过，富过一秒。",
-            "📈 余额回血，再忍五分。",
-            "🕯️ 点餐不看满减，硬气！",
-            "✨ 走路带风，万物可爱。",
-            "🧱 搬砖动力，瞬间拉满。",
-            "🚀 账户复苏，满血复活！"
+            "💰 钞能力启动",
+            "📈 余额已复苏",
+            "🚀 动力已满格",
+            "🔋 满血复活中",
+            "💎 资产值重置",
+            "🛠️ 搬砖奖赏令",
+            "🛠️ 搬砖更有劲",
+            "🍗 加个大鸡腿",
+            "✨ 走路带风中",
+            "✨ 走路自带风",
+            "🤝 看老板顺眼",
+            "💳 钱只是路过",
+            "🥰 万物皆可爱",
+            "🥰 看谁都顺眼",
+            "🔥 瞬间变富有",
+            "🎮 奖励关卡中",
+            "🆙 等级已提升",
+            "⛽ 燃油已加满",
+            "📡 信号满格了",
+            "🍕 今晚点外卖",
          ];
 
         /// <summary>
@@ -245,9 +257,9 @@ namespace CyberSlacker.Util
         /// <param name="now"></param>
         /// <param name="service"></param>
         /// <returns></returns>
-        public static string GetPaydayString(DateTime now, HolidayService service)
+        public static (bool, string) GetPaydayString(DateTime now, HolidayService service)
         {
-            if (!service.IsDataReady) return "同步中...";
+            if (!service.IsDataReady) return (false, "同步中...");
 
             if (!TimeSpan.TryParse(Settings.Default.EndTime, out var offTime))
             {
@@ -265,8 +277,8 @@ namespace CyberSlacker.Util
 
             int diff = (currentPayday.Date - now.Date).Days;
 
-            if (diff == 0) return _paydayQuotes[_rng.Next(_paydayQuotes.Length)];
-            return $"{diff} 天";
+            if (diff == 0) return (true, _paydayQuotes[_rng.Next(_paydayQuotes.Length)]);
+            return (false, $"{diff} 天");
         }
 
         // 将元组内容合并为一行字符串
