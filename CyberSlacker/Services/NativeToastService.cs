@@ -34,6 +34,7 @@ namespace CyberSlacker.Services
                 .AddText(title)
                 .AddText(content)
                 .AddArgument("action", "main")
+                .SetToastScenario(ToastScenario.Alarm)
                 .Show();
             }
             catch (Exception ex)
