@@ -42,7 +42,7 @@
 		<Content Include="Resources\app.ico">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
-		<EmbeddedResource Include="Resources\CyberInject.js" />
+		<Resource Include="Resources\CyberInject.js" />
 	</ItemGroup>
 
 	<ItemGroup>

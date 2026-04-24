@@ -102,10 +102,10 @@ namespace CyberSlacker
             if (!e.IsSuccess) return;
             try
             {
-                string jsCode = GetEmbeddedScript("CyberInject.js");
-
-                if (!string.IsNullOrEmpty(jsCode))
+                var resourceInfo = Application.GetResourceStream(new Uri("pack://application:,,,/Resources/CyberInject.js"));
+                using (var reader = new StreamReader(resourceInfo.Stream))
                 {
+                    string jsCode = reader.ReadToEnd();
                     WebView.Visibility = Visibility.Visible;
                     await WebView.CoreWebView2.ExecuteScriptAsync(jsCode);
                     await Task.Delay(100);
@@ -117,23 +117,6 @@ namespace CyberSlacker
             catch (Exception ex)
             {
                 Log.Error("WebView2 执行脚本失败: ", ex);
-            }
-        }
-
-        private string GetEmbeddedScript(string fileName)
-        {
-            // 注意：这里的路径格式是 "命名空间.文件夹名.文件名"
-            // 请确认你的项目命名空间是否叫 CyberSlacker
-            string resourceName = $"CyberSlacker.Resources.{fileName}";
-
-            var assembly = Assembly.GetExecutingAssembly();
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-            {
-                if (stream == null) return null;
-                using (StreamReader reader = new StreamReader(stream))
-                {
-                    return reader.ReadToEnd();
-                }
             }
         }
 
