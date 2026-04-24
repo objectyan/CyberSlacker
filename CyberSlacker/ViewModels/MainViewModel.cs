@@ -130,7 +130,7 @@ namespace CyberSlacker.ViewModels
                              $"🎁 下个节日: {NextHolidayName} ({NextHolidayCountdown})\n" +
                              $"🚀 网速: {HwNet}";
 
-            TaskbarTooltip = $"{GetMaxString(HolidayTip, 124 - endTooltip.Length)}\n" +
+            TaskbarTooltip = $"{GetMaxString(HolidayTip, 124 - endTooltip.Length - HwNet.Length + 20)}\n" +
                              $"{endTooltip}";
 
             if (now.Second == 0)
