@@ -57,6 +57,8 @@ namespace CyberSlacker
                 var env = await CoreWebView2Environment.CreateAsync(null, userDataFolder);
                 await WebView.EnsureCoreWebView2Async(env);
 
+                // 禁用左下角 URL 显示
+                WebView.CoreWebView2.Settings.IsStatusBarEnabled = false;
 
                 WebView.CoreWebView2.NavigationStarting += CoreWebView2_NavigationStarting;
 
@@ -105,6 +107,14 @@ namespace CyberSlacker
                 var resourceInfo = Application.GetResourceStream(new Uri("pack://application:,,,/Resources/CyberInject.js"));
                 using (var reader = new StreamReader(resourceInfo.Stream))
                 {
+                    string styleHide = @"(function () {
+                                            const head = document.head || document.getElementsByTagName('head')[0];
+                                            const fastHideStyle = document.createElement('style');
+                                            fastHideStyle.innerHTML = 'body > *:not(#cyber-stage) { display: none !important; }';
+                                            head.appendChild(fastHideStyle);
+                                        })();";
+                    await WebView.CoreWebView2.ExecuteScriptAsync(styleHide);
+                    await Task.Delay(100);
                     string jsCode = reader.ReadToEnd();
                     WebView.Visibility = Visibility.Visible;
                     await WebView.CoreWebView2.ExecuteScriptAsync(jsCode);
