@@ -3,8 +3,11 @@ using CyberSlacker.Services;
 using Microsoft.Web.WebView2.Core;
 using Serilog;
 using System;
+using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media.Animation;
 
 namespace CyberSlacker
 {
@@ -99,29 +102,17 @@ namespace CyberSlacker
             if (!e.IsSuccess) return;
             try
             {
-                string jsCode = @"
-        (function() {
-            var content = document.querySelector('.markdown-body');
-            if (content) {
-                document.body.innerHTML = content.outerHTML;
-                
-                document.body.style.backgroundColor = '#1A1A1A'; 
-                document.body.style.color = '#EEEEEE';          
-                document.body.style.padding = '20px';
-                document.body.style.overflowX = 'hidden';
+                string jsCode = GetEmbeddedScript("CyberInject.js");
 
-                var style = document.createElement('style');
-                style.innerHTML = '* { border-color: #333 !important; } .markdown-body { background: transparent !important; }';
-                document.head.appendChild(style);
-            }
-            
-            document.body.style.msOverflowStyle = 'none'; 
-        })();
-    ";
-
-                await WebView.CoreWebView2.ExecuteScriptAsync(jsCode);
-                LoadingStack.Visibility = Visibility.Collapsed;
-                WebView.Visibility = Visibility.Visible;
+                if (!string.IsNullOrEmpty(jsCode))
+                {
+                    WebView.Visibility = Visibility.Visible;
+                    await WebView.CoreWebView2.ExecuteScriptAsync(jsCode);
+                    await Task.Delay(100);
+                    DoubleAnimation fadeOut = new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(400));
+                    fadeOut.Completed += (s, ev) => LoadingStack.Visibility = Visibility.Collapsed;
+                    LoadingStack.BeginAnimation(UIElement.OpacityProperty, fadeOut);
+                }
             }
             catch (Exception ex)
             {
@@ -129,6 +120,22 @@ namespace CyberSlacker
             }
         }
 
+        private string GetEmbeddedScript(string fileName)
+        {
+            // 注意：这里的路径格式是 "命名空间.文件夹名.文件名"
+            // 请确认你的项目命名空间是否叫 CyberSlacker
+            string resourceName = $"CyberSlacker.Resources.{fileName}";
+
+            var assembly = Assembly.GetExecutingAssembly();
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            {
+                if (stream == null) return null;
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
+        }
 
         private void OnUpdate(object sender, RoutedEventArgs e)
         {
