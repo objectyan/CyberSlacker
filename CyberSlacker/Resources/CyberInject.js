@@ -20,8 +20,8 @@
 
     const style = document.createElement('style');
     style.innerHTML = `
-        html, body { background: #0A0A0A !important; margin: 0; padding: 0; overflow: hidden !important; }
-        #cyber-stage { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0A0A0A; z-index: 999999; }
+        html, body { background: #1A1A1A !important; margin: 0; padding: 0; overflow: hidden !important; }
+        #cyber-stage { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #1A1A1A; z-index: 999999; }
 
         #cyber-stage::after {
             content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -103,7 +103,11 @@
         #cyber-stage.active #cyber-content { opacity: 1; filter: blur(0px); transform: scale(1); }
 
         ::-webkit-scrollbar { width: 3px; }
-        ::-webkit-scrollbar-thumb { background: #333; }
+        ::-webkit-scrollbar-thumb { background: #00E5FF; }
+
+        p em {
+           color: yellow;
+        }
     `;
 
     document.head.appendChild(style);

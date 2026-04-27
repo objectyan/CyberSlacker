@@ -60,6 +60,8 @@ namespace CyberSlacker
                 // 禁用左下角 URL 显示
                 WebView.CoreWebView2.Settings.IsStatusBarEnabled = false;
 
+                WebView.DefaultBackgroundColor = System.Drawing.Color.FromArgb(0, 26, 26, 26);
+
                 WebView.CoreWebView2.NavigationStarting += CoreWebView2_NavigationStarting;
 
                 WebView.NavigationCompleted += WebView_NavigationCompleted;
@@ -110,7 +112,10 @@ namespace CyberSlacker
                     string styleHide = @"(function () {
                                             const head = document.head || document.getElementsByTagName('head')[0];
                                             const fastHideStyle = document.createElement('style');
-                                            fastHideStyle.innerHTML = 'body > *:not(#cyber-stage) { display: none !important; }';
+                                            fastHideStyle.innerHTML = `
+                                                body > *:not(#cyber-stage) { display: none !important; } 
+                                                html, body { background: #1A1A1A !important; margin: 0; padding: 0; overflow: hidden !important; }
+                                            `;
                                             head.appendChild(fastHideStyle);
                                         })();";
                     await WebView.CoreWebView2.ExecuteScriptAsync(styleHide);
