@@ -41,7 +41,7 @@
     <Setting Name="PaydayStrategy" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="Opacity" Type="System.String" Scope="User">
+    <Setting Name="Opacity" Type="System.Decimal" Scope="User">
       <Value Profile="(Default)">0.8</Value>
     </Setting>
     <Setting Name="IsLocked" Type="System.Boolean" Scope="User">
