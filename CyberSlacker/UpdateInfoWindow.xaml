@@ -3,13 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         x:Name="ThisWin" Title="赛博进化" Height="500" Width="500"
-        WindowStyle="None" AllowsTransparency="True" Background="#F21A1A1A"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         WindowStartupLocation="CenterScreen" Topmost="True">
 
     <Border Background="#F21A1A1A" CornerRadius="20" BorderBrush="#44FFFFFF" BorderThickness="1">
-        <Grid Margin="20">
+        <Grid Margin="20" Background="#F21A1A1A">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="34"/>
+                <RowDefinition Height="26.64"/>
                 <!-- 标题 -->
                 <RowDefinition Height="*"/>
                 <!-- 网页预览 -->
@@ -18,18 +19,18 @@
             </Grid.RowDefinitions>
 
             <!-- 1. 标题区域 -->
-            <StackPanel Grid.Row="0" Margin="0,0,0,15">
+            <StackPanel Grid.Row="0" Margin="0,0,0,15" Grid.RowSpan="2">
                 <TextBlock x:Name="TitleText" Text="🚀 发现新基因" FontSize="20" FontWeight="Bold" Foreground="Gold"/>
                 <TextBlock Margin="0,5,0,0" Foreground="#888">
                     <Run Text="版本演进: "/>
                     <Run x:Name="CurrentVerTxt" Text="0.0.0"/> 
                     <Run Text="  ➡  "/>
-                    <Run x:Name="NewVerTxt" Text="0.0.0" Foreground="#FF5252" FontWeight="Bold"/>       
+                    <Run x:Name="NewVerTxt" Text="0.0.0" Foreground="#FF5252" FontWeight="Bold"/>
                 </TextBlock>
             </StackPanel>
 
             <!-- 2. 网页预览区域 (展示 GitHub Release 内容) -->
-            <Border Grid.Row="1" Background="#F21A1A1A" CornerRadius="8" ClipToBounds="True">
+            <Border Grid.Row="2" Background="#F21A1A1A" CornerRadius="8" ClipToBounds="True">
                 <Grid>
                     <!-- 赛博风加载提示 -->
                     <StackPanel x:Name="LoadingStack" VerticalAlignment="Center" HorizontalAlignment="Center">
@@ -69,13 +70,13 @@
                     <!-- WebView 依然保持隐藏，直到加载完成 -->
                     <wv2:WebView2 x:Name="WebView" 
                           Visibility="Hidden"
-                          DefaultBackgroundColor="#F21A1A1A"/>    
+                          DefaultBackgroundColor="#F21A1A1A"/>
                 </Grid>
             </Border>
 
 
             <!-- 3. 底部按钮 -->
-            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
                 <Button Content="以后再说" Click="OnSkip" Width="80" Margin="0,0,10,0" 
                         Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Foreground="#888"/>
                 <Button Content="立即进化" Click="OnUpdate" Width="110" Height="34" 
