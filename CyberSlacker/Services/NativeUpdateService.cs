@@ -80,7 +80,7 @@ namespace CyberSlacker.Services
             catch (Exception ex)
             {
                 // 记录错误日志
-                Log.Error($"检查更新时发生异常:", ex);
+                Log.Error(ex, $"检查更新时发生异常:");
                 throw;
             }
 
@@ -127,7 +127,7 @@ namespace CyberSlacker.Services
             }
             catch (Exception ex)
             {
-                Log.Error($"获取远程更新信息失败 (URL: {prefix}{arch}.xml):", ex);
+                Log.Error(ex, $"获取远程更新信息失败 (URL: {prefix}{arch}.xml):");
                 throw;
             }
             return null;
@@ -154,7 +154,7 @@ namespace CyberSlacker.Services
             }
             catch (Exception ex)
             {
-                Log.Error("自动检查更新静默失败:", ex);
+                Log.Error(ex, "自动检查更新静默失败:");
             }
         }
     }

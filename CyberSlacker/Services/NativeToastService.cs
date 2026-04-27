@@ -17,7 +17,7 @@ namespace CyberSlacker.Services
             }
             catch (Exception ex)
             {
-                Log.Error("通知发送失败: ", ex);
+                Log.Error(ex, "通知发送失败: ");
             }
         }
 
@@ -39,7 +39,7 @@ namespace CyberSlacker.Services
             }
             catch (Exception ex)
             {
-                Log.Error("触发挂件通知发送失败: ", ex);
+                Log.Error(ex, "触发挂件通知发送失败: ");
             }
         }
     }

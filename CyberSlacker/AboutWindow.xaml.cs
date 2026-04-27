@@ -77,7 +77,7 @@ namespace CyberSlacker
             catch (Exception ex)
             {
                 // 网络报错处理
-                Log.Error("赛博链路异常，无法连接 GitHub", ex);
+                Log.Error(ex, "赛博链路异常，无法连接 GitHub");
                 ShowStatus("链路中断，无法连接 GitHub", isSuccess: false);
             }
             finally

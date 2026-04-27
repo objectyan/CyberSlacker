@@ -52,7 +52,7 @@ namespace CyberSlacker.Util
                     if (i == maxRetries - 1)
                     {
                         // 只有最后一次失败才记录日志
-                        Log.Error($"请求失败: {url}", ex);
+                        Log.Error(ex, $"请求失败: {url}");
                         throw;
                     }
                     await Task.Delay(TimeSpan.FromSeconds(delay));

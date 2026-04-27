@@ -132,9 +132,9 @@ namespace CyberSlacker
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Error("无桌面环境，跳过托盘初始化");
+                Log.Error(ex, "无桌面环境，跳过托盘初始化");
             }
 
             IntPtr hwnd = new WindowInteropHelper(this).Handle;

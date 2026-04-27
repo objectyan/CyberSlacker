@@ -73,7 +73,7 @@ namespace CyberSlacker
             }
             catch (Exception ex)
             {
-                Log.Error("WebView2 初始化失败: ", ex);
+                Log.Error(ex, "WebView2 初始化失败: ");
             }
         }
 
@@ -96,7 +96,7 @@ namespace CyberSlacker
                 }
                 catch (Exception ex)
                 {
-                    Log.Error("无法打开浏览器: ", ex);
+                    Log.Error(ex, "无法打开浏览器: ");
                 }
             }
         }
@@ -131,7 +131,7 @@ namespace CyberSlacker
             }
             catch (Exception ex)
             {
-                Log.Error("WebView2 执行脚本失败: ", ex);
+                Log.Error(ex, "WebView2 执行脚本失败: ");
             }
         }
 
