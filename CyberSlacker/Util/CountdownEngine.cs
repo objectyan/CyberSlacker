@@ -174,7 +174,7 @@ namespace CyberSlacker.Util
             // 计算总剩余秒数
             TimeSpan totalRemaining = target - now;
 
-            return $"{(int)totalRemaining.TotalHours:D2}:{totalRemaining.Minutes:D2}:{totalRemaining.Seconds:D2}";
+            return totalRemaining.ToSmartFormat();
 
         }
 
@@ -218,7 +218,7 @@ namespace CyberSlacker.Util
             if (weekendStart.HasValue)
             {
                 TimeSpan diff = weekendStart.Value - now;
-                return $"{(int)diff.TotalDays}天 {diff.Hours:D2}:{diff.Minutes:D2}:{diff.Seconds:D2}";
+                return diff.ToSmartFormat();
             }
 
             // 3. 【终极兜底】如果 service 没数据且没算出来，显示搬砖中
@@ -397,6 +397,37 @@ namespace CyberSlacker.Util
             if (nextH != null)
             {
                 int days = (nextH.Date.Date - now.Date).Days;
+                if (days <= 1)
+                {
+                    if (!TimeSpan.TryParse(Settings.Default.EndTime, out var offTime))
+                    {
+                        offTime = new(17, 30, 0);
+                    }
+                    DateTime today = DateTime.Today;
+
+                    DateTime? weekendStart = null;
+                    for (int i = 0; i < 15; i++)
+                    {
+                        DateTime curr = today.AddDays(i);
+                        DateTime next = today.AddDays(i + 1);
+
+                        if (!IsRestDay(curr, service) && IsRestDay(next, service))
+                        {
+                            weekendStart = curr.Add(offTime);
+                            if (weekendStart > now)
+                            {
+                                break;
+                            }
+                        }
+                    }
+
+                    if (weekendStart.HasValue && weekendStart.Value.Date.AddDays(1) == nextH.Date.Date)
+                    {
+                        TimeSpan diff = weekendStart.Value - now;
+                        return (nextH.Name ?? "节假日", $"余{diff.ToSmartFormat()}");
+                    }
+                }
+
                 return (nextH.Name ?? "节假日", $"还有 {days} 天");
             }
 

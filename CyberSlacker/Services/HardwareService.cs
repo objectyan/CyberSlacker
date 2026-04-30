@@ -140,13 +140,14 @@ namespace CyberSlacker.Services
             string[] suffixes = { "B/s", "KB/s", "MB/s", "GB/s", "TB/s", "PB/s", "EB/s" };
             int index = 0;
 
-            while (bytesPerSec >= 1024 && index < suffixes.Length - 1)
+            while (bytesPerSec >= 1000 && index < suffixes.Length - 1)
             {
                 bytesPerSec /= 1024;
                 index++;
             }
 
-            return $"{bytesPerSec:F1} {suffixes[index]}";
+            return $"{bytesPerSec:0.#} {suffixes[index]}";
+
         }
 
         #endregion

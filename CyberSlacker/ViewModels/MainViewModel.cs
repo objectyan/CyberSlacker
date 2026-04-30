@@ -78,10 +78,6 @@ namespace CyberSlacker.ViewModels
                 var (isPayday, paydayString) = CountdownEngine.GetPaydayString(now, _holidayService);
                 IsPayDay = isPayday;
                 PayDayCountdown = paydayString;
-                // 下一个节日
-                var (holidayName, holidayCountdown) = CountdownEngine.GetNextHolidayInfo(now, _holidayService);
-                NextHolidayName = holidayName;
-                NextHolidayCountdown = holidayCountdown;
                 // 设置下次刷新时间：当前时间 + 30~300秒 之间的随机值
                 _nextTipUpdateTime = now.AddSeconds(_rng.Next(30, 301));
             }
@@ -93,23 +89,21 @@ namespace CyberSlacker.ViewModels
                     // 动态提示语
                     HolidayTip = CountdownEngine.GetDynamicTip(now, todayInfo, _holidayService, _lastRestNotifyTime);
                 }
-                else if (roll < 80)
+                else
                 {
                     // 发薪日
                     var (isPayday, paydayString) = CountdownEngine.GetPaydayString(now, _holidayService);
                     IsPayDay = isPayday;
                     PayDayCountdown = paydayString;
                 }
-                else
-                {
-                    // 下一个节日
-                    var (holidayName, holidayCountdown) = CountdownEngine.GetNextHolidayInfo(now, _holidayService);
-                    NextHolidayName = holidayName;
-                    NextHolidayCountdown = holidayCountdown;
-                }
                 // 设置下次刷新时间：当前时间 + 30~300秒 之间的随机值
                 _nextTipUpdateTime = now.AddSeconds(_rng.Next(30, 301));
             }
+
+            // 下一个节日
+            var (holidayName, holidayCountdown) = CountdownEngine.GetNextHolidayInfo(now, _holidayService);
+            NextHolidayName = holidayName;
+            NextHolidayCountdown = holidayCountdown;
 
             CheckOffWorkNotification(now);
 
@@ -127,11 +121,12 @@ namespace CyberSlacker.ViewModels
             var endTooltip = $"⏳ 下班: {OffWorkCountdown}\n" +
                              $"📅 周末: {WeekendCountdown}\n" +
                              $"💰 {(IsPayDay ? "状态" : "发薪")}: {PayDayCountdown}\n" +
-                             $"🎁 下个节日: {NextHolidayName} ({NextHolidayCountdown})\n" +
-                             $"🚀 网速: {HwNet}";
+                             $"🎁 下个节日: {NextHolidayName} ({NextHolidayCountdown})\n";
 
-            TaskbarTooltip = $"{GetMaxString(HolidayTip, 124 - endTooltip.Length - HwNet.Length + 20)}\n" +
-                             $"{endTooltip}";
+            var netTip = $"🚀 网速: {HwNet}";
+
+            TaskbarTooltip = $"{GetMaxString(HolidayTip, 124 - endTooltip.Length - 20)}\n" +
+                             $"{endTooltip}{netTip}";
 
             if (now.Second == 0)
             {
